@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSP Ready - AP Computer Science Principles Mastery</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1>CSP Ready</h1>
+                <span>AP Computer Science Principles Mastery Platform</span>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="hero-section">
+                <h2>Master AP Computer Science Principles</h2>
+                <p>Sequential, mastery-based learning with instant feedback and detailed progress tracking.</p>
+            </div>
+
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button id="teacher-tab" class="tab active">I'm a Teacher</button>
+                    <button id="student-tab" class="tab">I'm a Student</button>
+                </div>
+
+                <!-- Teacher Login/Signup -->
+                <div id="teacher-forms" class="form-container active">
+                    <div class="form-switch">
+                        <button id="teacher-login-btn" class="switch-btn active">Login</button>
+                        <button id="teacher-signup-btn" class="switch-btn">Sign Up</button>
+                    </div>
+
+                    <form id="teacher-login-form" class="auth-form active">
+                        <h3>Teacher Login</h3>
+                        <div class="form-group">
+                            <label for="teacher-email">Email</label>
+                            <input type="email" id="teacher-email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacher-password">Password</label>
+                            <input type="password" id="teacher-password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Login</button>
+                    </form>
+
+                    <form id="teacher-signup-form" class="auth-form">
+                        <h3>Create Teacher Account</h3>
+                        <div class="form-group">
+                            <label for="teacher-signup-name">Full Name</label>
+                            <input type="text" id="teacher-signup-name" name="displayName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacher-signup-email">Email</label>
+                            <input type="email" id="teacher-signup-email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacher-signup-password">Password</label>
+                            <input type="password" id="teacher-signup-password" name="password" required minlength="6">
+                        </div>
+                        <button type="submit" class="btn-primary">Create Account</button>
+                    </form>
+                </div>
+
+                <!-- Student Login/Signup -->
+                <div id="student-forms" class="form-container">
+                    <div class="form-switch">
+                        <button id="student-login-btn" class="switch-btn active">Login</button>
+                        <button id="student-signup-btn" class="switch-btn">Sign Up</button>
+                    </div>
+
+                    <form id="student-login-form" class="auth-form active">
+                        <h3>Student Login</h3>
+                        <div class="form-group">
+                            <label for="student-login-class-code">Class Code</label>
+                            <input type="text" id="student-login-class-code" name="classCode" required maxlength="6" style="text-transform: uppercase;">
+                        </div>
+                        <div class="form-group">
+                            <label for="student-login-username">Username</label>
+                            <input type="text" id="student-login-username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="student-login-password">Password</label>
+                            <input type="password" id="student-login-password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Login</button>
+                    </form>
+
+                    <form id="student-signup-form" class="auth-form">
+                        <h3>Join Class</h3>
+                        <div class="form-group">
+                            <label for="student-class-code">Class Code</label>
+                            <input type="text" id="student-class-code" name="classCode" required maxlength="6" style="text-transform: uppercase;" placeholder="e.g., ABC123">
+                            <small>Get this code from your teacher</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="student-display-name">Full Name</label>
+                            <input type="text" id="student-display-name" name="displayName" required placeholder="e.g., John S.">
+                        </div>
+                        <div class="form-group">
+                            <label for="student-username">Username</label>
+                            <input type="text" id="student-username" name="username" required placeholder="Unique within your class">
+                        </div>
+                        <div class="form-group">
+                            <label for="student-signup-password">Password</label>
+                            <input type="password" id="student-signup-password" name="password" required minlength="6">
+                        </div>
+                        <button type="submit" class="btn-primary">Join Class</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="features-section">
+                <h3>Features</h3>
+                <div class="features-grid">
+                    <div class="feature">
+                        <h4>🎯 Mastery-Based Learning</h4>
+                        <p>Topics unlock sequentially as students master each concept</p>
+                    </div>
+                    <div class="feature">
+                        <h4>📊 Progress Tracking</h4>
+                        <p>Detailed analytics for teachers and visual progress for students</p>
+                    </div>
+                    <div class="feature">
+                        <h4>📝 AP-Aligned Content</h4>
+                        <p>Comprehensive question bank covering all AP CSP topics</p>
+                    </div>
+                    <div class="feature">
+                        <h4>💡 Instant Feedback</h4>
+                        <p>Immediate explanations help students learn from mistakes</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 CSP Ready. Built for AP Computer Science Principles educators.</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Firebase Configuration -->
+    <script type="module">
+        // Firebase configuration will be added here
+        window.firebaseConfig = {
+            // Add your Firebase config here when setting up the frontend
+        };
+    </script>
+    
+    <script src="js/auth.js"></script>
+</body>
+</html>
