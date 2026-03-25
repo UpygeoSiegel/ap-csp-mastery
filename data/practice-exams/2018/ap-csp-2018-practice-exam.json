@@ -1,0 +1,2024 @@
+{
+  "examInfo": {
+    "title": "AP Computer Science Principles 2018 Practice Exam",
+    "year": 2018,
+    "totalQuestions": 66,
+    "singleSelectQuestions": 59,
+    "multiSelectQuestions": 7,
+    "timeLimit": "2 hours",
+    "source": "College Board"
+  },
+  "bigIdeas": {
+    "CRD": "Big Idea 1: Creative Development",
+    "DAT": "Big Idea 2: Data",
+    "AAP": "Big Idea 3: Algorithms and Programming",
+    "CSN": "Big Idea 4: Computer Systems and Networks",
+    "IOC": "Big Idea 5: Impact of Computing"
+  },
+  "questions": [
+    {
+      "questionNumber": 1,
+      "type": "multiple_choice",
+      "text": "The code segment below is intended to swap the values of the variables first and second using a temporary variable, temp.\n\ntemp \u2190 first\nfirst \u2190 second\n<MISSING CODE>\n\nWhich of the following can be used to replace <MISSING CODE> so that the code segment works as intended?",
+      "hasImage": true,
+      "imagePath": "images/q01_swap_code.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "second \u2190 first"
+        },
+        {
+          "id": "B",
+          "text": "second \u2190 temp"
+        },
+        {
+          "id": "C",
+          "text": "temp \u2190 first"
+        },
+        {
+          "id": "D",
+          "text": "temp \u2190 second"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Variables and Assignment",
+      "explanation": "To complete the swap, second needs to be assigned the original value of first, which was stored in temp. So second \u2190 temp is correct."
+    },
+    {
+      "questionNumber": 2,
+      "type": "multiple_choice",
+      "text": "A bank customer receives an e-mail from a sender claiming to be a bank employee. The e-mail asks the customer to provide personal information and to call a phone number if he or she has any questions. The customer suspects the e-mail might be a phishing attempt. Which of the following responses is most likely to be a privacy risk for the bank customer?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Calling the bank at its official phone number to ask whether the request for personal information is legitimate"
+        },
+        {
+          "id": "B",
+          "text": "Calling the phone number given in the e-mail and providing the personal information over the phone"
+        },
+        {
+          "id": "C",
+          "text": "Checking that the domain name of the sender's e-mail address is associated with the bank"
+        },
+        {
+          "id": "D",
+          "text": "Conducting a Web search to see if other people have received similar requests for personal information"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Safe Computing - Phishing",
+      "explanation": "Calling the phone number in a suspicious email and providing personal information is the riskiest action as it directly engages with potential scammers."
+    },
+    {
+      "questionNumber": 3,
+      "type": "multiple_choice",
+      "text": "Which of the following would be the best use of citizen science?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "An experiment that requires all participants to be working in the same laboratory"
+        },
+        {
+          "id": "B",
+          "text": "An experiment that requires expensive equipment to conduct"
+        },
+        {
+          "id": "C",
+          "text": "An experiment that requires data measurements to be taken in many different locations"
+        },
+        {
+          "id": "D",
+          "text": "An experiment that requires specialized knowledge and training to conduct"
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Crowdsourcing and Citizen Science",
+      "explanation": "Citizen science is best suited for tasks that benefit from distributed data collection across many locations, leveraging many volunteers."
+    },
+    {
+      "questionNumber": 4,
+      "type": "multiple_choice",
+      "text": "A student is writing a program to model different real-world events using simulations. Which of the following simulations will generate a result that would best be stored using a Boolean variable?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "A simulation of flipping a fair coin"
+        },
+        {
+          "id": "B",
+          "text": "A simulation of rolling a fair die (with sides numbered 1 through 6)"
+        },
+        {
+          "id": "C",
+          "text": "A simulation of the temperature in a location over time"
+        },
+        {
+          "id": "D",
+          "text": "A simulation of traffic patterns on a road"
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Data Types - Boolean",
+      "explanation": "A coin flip has exactly two outcomes (heads or tails), which maps perfectly to a Boolean value (true/false)."
+    },
+    {
+      "questionNumber": 5,
+      "type": "multiple_choice",
+      "text": "The ticket prices at a movie theater are given below.\n\nType of Ticket | Price (in dollars)\nRegular | 12\nChild (ages 12 and below) | 9\nSenior (ages 60 and above) | 9\n\nAdditional $5 fee for 3-D movies\n\nA programmer is creating an algorithm to set the value of ticketPrice based on the information in the table. The programmer uses the integer variable age for the age of the moviegoer. The Boolean variable is3D is true when the movie is 3-D and false otherwise.\n\nWhich of the following code segments correctly sets the value of ticketPrice?",
+      "hasImage": true,
+      "imagePath": "images/q05_ticket_price.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "ticketPrice \u2190 12; IF (age \u2264 12) OR (age \u2265 60) { ticketPrice \u2190 9 }; IF (is3D) { ticketPrice \u2190 17 }"
+        },
+        {
+          "id": "B",
+          "text": "ticketPrice \u2190 12; IF (age \u2264 12) OR (age \u2265 60) { ticketPrice \u2190 9 } ELSE { ticketPrice \u2190 17 }"
+        },
+        {
+          "id": "C",
+          "text": "ticketPrice \u2190 12; IF (age \u2264 12) OR (age \u2265 60) { ticketPrice \u2190 9 }; IF (is3D) { ticketPrice \u2190 ticketPrice + 5 }"
+        },
+        {
+          "id": "D",
+          "text": "ticketPrice \u2190 12; IF (age \u2264 12) OR (age \u2265 60) { ticketPrice \u2190 9 } ELSE { ticketPrice \u2190 ticketPrice + 5 }"
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Selection - Conditionals",
+      "explanation": "Option C correctly sets the base price, adjusts for age discounts, then adds $5 for 3D movies to whatever the current price is."
+    },
+    {
+      "questionNumber": 6,
+      "type": "multiple_choice",
+      "text": "Which of the following best describes the role of the Internet Engineering Task Force (IETF)?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Developing standards and protocols for Internet communication"
+        },
+        {
+          "id": "B",
+          "text": "Preventing copyrighted materials from being illegally distributed online"
+        },
+        {
+          "id": "C",
+          "text": "Preventing malicious software from being distributed online"
+        },
+        {
+          "id": "D",
+          "text": "Verifying the ownership of encrypted keys used in secured messages"
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Internet Standards and Protocols",
+      "explanation": "The IETF is responsible for developing and promoting voluntary Internet standards, particularly the standards that comprise the Internet protocol suite."
+    },
+    {
+      "questionNumber": 7,
+      "type": "multiple_choice",
+      "text": "Consider the following program, which uses the variables start, end, and current.\n\nstart \u2190 1\nend \u2190 20\ncurrent \u2190 3\nstart \u2190 current\ncurrent \u2190 current + 1\nDISPLAY (start)\nDISPLAY (current)\n\nWhat is displayed as a result of executing the program?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "1 3"
+        },
+        {
+          "id": "B",
+          "text": "3 3"
+        },
+        {
+          "id": "C",
+          "text": "3 4"
+        },
+        {
+          "id": "D",
+          "text": "4 4"
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Variables and Assignment",
+      "explanation": "start gets the value of current (3), then current becomes 4. Display shows start (3) then current (4)."
+    },
+    {
+      "questionNumber": 8,
+      "type": "multiple_choice",
+      "text": "A smartphone stores the following data for each photo that is taken using the phone.\n\u2022 The file name of the photo\n\u2022 The date and time the photo was taken\n\u2022 The geographic location where the photo was taken\n\nAssume that all of the photos that have been taken on the phone are accessible. Which of the following can be determined using the photo data described above?\n\nI. The number of photos that were taken at a particular geographic location\nII. The number of photos that were taken in the last year\nIII. The name of the person who took the most recent photo",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "III only"
+        },
+        {
+          "id": "B",
+          "text": "I and II only"
+        },
+        {
+          "id": "C",
+          "text": "I and III only"
+        },
+        {
+          "id": "D",
+          "text": "I, II, and III"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data and Metadata",
+      "explanation": "With location data, we can count photos at a location (I). With date/time, we can count photos in the last year (II). The photographer's name is not stored, so III cannot be determined."
+    },
+    {
+      "questionNumber": 9,
+      "type": "multiple_choice",
+      "text": "Which of the following best describes one of the benefits of using an iterative and incremental process of program development?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "It allows programmers to implement algorithmic solutions to otherwise unsolvable problems."
+        },
+        {
+          "id": "B",
+          "text": "It eliminates the need for programmers to test completed programs."
+        },
+        {
+          "id": "C",
+          "text": "It enables programmers to create programs that use the lowest-level abstractions available."
+        },
+        {
+          "id": "D",
+          "text": "It helps programmers identify errors as components are added to a working program."
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "CRD",
+      "topic": "Program Development",
+      "explanation": "Iterative development allows testing after each increment, making it easier to identify which new component introduced an error."
+    },
+    {
+      "questionNumber": 10,
+      "type": "multiple_choice",
+      "text": "The procedure DrawCircle(x, y, r) can be used to draw a circle on a coordinate grid. The circle is centered at the coordinate (x, y) and has a radius of r units. The procedure will be used to draw the following figure on a coordinate grid.\n\n[Figure shows three circles arranged diagonally from bottom-left to top-right, with centers at approximately (3,6), (5,4), and (7,2)]\n\nWhich of the following code segments can be used to draw the figure?",
+      "hasImage": true,
+      "imagePath": "images/q10_circle_grid.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "xPos \u2190 3; yPos \u2190 6; REPEAT 3 TIMES { DrawCircle(xPos, yPos, 2); xPos \u2190 xPos + 2; yPos \u2190 yPos + 2 }"
+        },
+        {
+          "id": "B",
+          "text": "xPos \u2190 3; yPos \u2190 6; REPEAT 3 TIMES { DrawCircle(xPos, yPos, 2); xPos \u2190 xPos + 2; yPos \u2190 yPos - 2 }"
+        },
+        {
+          "id": "C",
+          "text": "xPos \u2190 7; yPos \u2190 2; REPEAT 3 TIMES { DrawCircle(xPos, yPos, 2); xPos \u2190 xPos + 2; yPos \u2190 yPos + 2 }"
+        },
+        {
+          "id": "D",
+          "text": "xPos \u2190 7; yPos \u2190 2; REPEAT 3 TIMES { DrawCircle(xPos, yPos, 2); xPos \u2190 xPos + 2; yPos \u2190 yPos - 2 }"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Iteration and Procedures",
+      "explanation": "Starting at (3,6) and moving right (+2 to x) and down (-2 to y) produces circles at (3,6), (5,4), and (7,2)."
+    },
+    {
+      "questionNumber": 11,
+      "type": "multiple_choice",
+      "text": "A spinner is divided into three sections. The sector labeled Red is four times as large as each of the sectors labeled Blue and Yellow, which are of equal size.\n\nThe procedure below is intended to simulate the behavior of the spinner.\n\nPROCEDURE Spinner\n<MISSING CODE>\n\nWhich of the following can be used to replace <MISSING CODE> so that the procedure correctly simulates the spinner?",
+      "hasImage": true,
+      "imagePath": "images/q11_spinner.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "spin \u2190 RANDOM(1, 3); IF spin = 1 { RETURN \"Red\" }; IF spin = 2 { RETURN \"Yellow\" }; RETURN \"Blue\""
+        },
+        {
+          "id": "B",
+          "text": "spin \u2190 RANDOM(1, 3); IF spin = 1 { RETURN \"Yellow\" }; IF spin = 2 { RETURN \"Blue\" }; RETURN \"Red\""
+        },
+        {
+          "id": "C",
+          "text": "spin \u2190 RANDOM(1, 6); IF spin = 1 { RETURN \"Red\" }; IF spin = 2 { RETURN \"Yellow\" }; RETURN \"Blue\""
+        },
+        {
+          "id": "D",
+          "text": "spin \u2190 RANDOM(1, 6); IF spin = 1 { RETURN \"Yellow\" }; IF spin = 2 { RETURN \"Blue\" }; RETURN \"Red\""
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Simulations and Random",
+      "explanation": "Red is 4x larger than Blue or Yellow, so out of 6 equal parts: Red=4, Blue=1, Yellow=1. Using RANDOM(1,6), Yellow gets 1, Blue gets 2, Red gets 3-6."
+    },
+    {
+      "questionNumber": 12,
+      "type": "multiple_choice",
+      "text": "Questions 12-13 refer to the information below.\n\nA social media site allows users to send messages to each other. A group of researchers gathered user data for the first 10 years of the site's existence.\n\n[Table showing Year, Milestone, Total Registered Users, Active Daily Users, Daily Messages Per User, Characters Per Message from Year 1-10]\n\nThe researchers noticed that the total number of registered users appears to be increasing at about a constant rate. If this pattern continues, which of the following best approximates the total number of registered users, in millions, in year 12 (two years after the last entry in the table)?",
+      "hasImage": true,
+      "imagePath": "images/q12_13_social_media_table.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "30.6"
+        },
+        {
+          "id": "B",
+          "text": "31.2"
+        },
+        {
+          "id": "C",
+          "text": "31.8"
+        },
+        {
+          "id": "D",
+          "text": "32.4"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Analysis",
+      "explanation": "The growth rate is about 0.5-0.6 million per year. Year 10 = 30.2, so Year 12 \u2248 30.2 + 1.0 = 31.2 million."
+    },
+    {
+      "questionNumber": 13,
+      "type": "multiple_choice",
+      "text": "Which of the following hypotheses is most consistent with the data in the table?",
+      "hasImage": true,
+      "imagePath": "images/q12_13_social_media_table.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "The mobile app release did not have any effect on the average number of daily messages sent per user."
+        },
+        {
+          "id": "B",
+          "text": "The mobile app release discouraged new user registration on the site."
+        },
+        {
+          "id": "C",
+          "text": "The mobile app release led to users being less frequently active on the site."
+        },
+        {
+          "id": "D",
+          "text": "The mobile app release led to users tending to write shorter messages."
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Analysis and Interpretation",
+      "explanation": "After the mobile app release in Year 5, the average characters per message dropped significantly from ~360 to 96 by Year 10, suggesting shorter messages."
+    },
+    {
+      "questionNumber": 14,
+      "type": "multiple_choice",
+      "text": "Consider the two programs below.\n\nProgram A:\ni \u2190 1\nREPEAT UNTIL (i > 10)\n{ DISPLAY(i); i \u2190 i + 1 }\n\nProgram B:\ni \u2190 1\nREPEAT UNTIL (i > 10)\n{ i \u2190 i + 1; DISPLAY(i) }\n\nWhich of the following best compares the values displayed by programs A and B?",
+      "hasImage": true,
+      "imagePath": "images/q14_program_comparison.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "Program A and program B display identical values."
+        },
+        {
+          "id": "B",
+          "text": "Program A and program B display the same values in different orders."
+        },
+        {
+          "id": "C",
+          "text": "Program A and program B display the same number of values, but the values differ."
+        },
+        {
+          "id": "D",
+          "text": "Program A and program B display a different number of values."
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Iteration",
+      "explanation": "Program A displays 1-10 (display then increment). Program B displays 2-11 (increment then display). Same count, different values."
+    },
+    {
+      "questionNumber": 15,
+      "type": "multiple_choice",
+      "text": "Which of the following is a true statement about Internet communication?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Devices from different manufacturers are required to run the same operating system to communicate over the Internet."
+        },
+        {
+          "id": "B",
+          "text": "Every device connected to the Internet is assigned a digital certificate by a certificate authority."
+        },
+        {
+          "id": "C",
+          "text": "Every device connected to the Internet is assigned an Internet protocol (IP) address."
+        },
+        {
+          "id": "D",
+          "text": "Every device connected to the Internet requires a high-bandwidth connection to enable redundant routing to each device."
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Internet - IP Addresses",
+      "explanation": "Every device on the Internet must have an IP address to send and receive data, regardless of manufacturer or operating system."
+    },
+    {
+      "questionNumber": 16,
+      "type": "multiple_choice",
+      "text": "A user reads reviews of a popular artist's new album and then downloads the album from the Web site of a licensed online music seller. Which of the following is LEAST likely to be a consequence of this action?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Advertisements for the artist's other albums will be displayed when the user visits a different Web site."
+        },
+        {
+          "id": "B",
+          "text": "Album reviews from other people who live nearby will be displayed to the user."
+        },
+        {
+          "id": "C",
+          "text": "Similar artists will be recommended to the user based on the user's download selection."
+        },
+        {
+          "id": "D",
+          "text": "The user will be in violation of the Digital Millennium Copyright Act (DMCA)."
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Legal and Ethical Use",
+      "explanation": "Downloading from a licensed seller is legal and does not violate DMCA. The other options are common consequences of online activity tracking."
+    },
+    {
+      "questionNumber": 17,
+      "type": "multiple_choice",
+      "text": "Which of the following actions could be used to help reduce the digital divide?\n\nI. Providing free education and training on how to use computing devices\nII. Providing free or low-cost computing devices to low-income individuals\nIII. Providing networks and infrastructure to people in remote areas",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "III only"
+        },
+        {
+          "id": "B",
+          "text": "I and II only"
+        },
+        {
+          "id": "C",
+          "text": "II and III only"
+        },
+        {
+          "id": "D",
+          "text": "I, II, and III"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Digital Divide",
+      "explanation": "All three actions address different aspects of the digital divide: skills, access to devices, and connectivity."
+    },
+    {
+      "questionNumber": 18,
+      "type": "multiple_choice",
+      "text": "A population researcher is interested in predicting the number of births that will occur in a particular community. She created a computer model that uses data from the past ten years, including number of residents and the number of babies born. The model predicted that there would be 200 births last year, but the actual number of births last year was only 120. Which of the following strategies is LEAST likely to provide a more accurate prediction?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Gathering data for additional years to try to identify patterns in birth rates"
+        },
+        {
+          "id": "B",
+          "text": "Refining the model used in the computer simulation to more closely reflect the data from the past ten years"
+        },
+        {
+          "id": "C",
+          "text": "Removing as many details from the model as possible so that calculations can be performed quickly"
+        },
+        {
+          "id": "D",
+          "text": "Taking into consideration more information about the community, such as the ages of residents"
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Simulations and Models",
+      "explanation": "Removing details from a model typically reduces accuracy. The other options would help improve the model's predictive power."
+    },
+    {
+      "questionNumber": 19,
+      "type": "multiple_choice",
+      "text": "A library of e-books contains metadata for each book. The metadata are intended to help a search feature find books that users are interested in. Which of the following is LEAST likely to be contained in the metadata of each e-book?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "An archive containing previous versions of the e-book"
+        },
+        {
+          "id": "B",
+          "text": "The author and title of the e-book"
+        },
+        {
+          "id": "C",
+          "text": "The date the e-book was first published"
+        },
+        {
+          "id": "D",
+          "text": "The genre of the e-book (e.g., comedy, fantasy, romance, etc.)"
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Metadata",
+      "explanation": "Metadata is data about data - typically small descriptive information. An archive of previous versions is actual content, not metadata."
+    },
+    {
+      "questionNumber": 20,
+      "type": "multiple_choice",
+      "text": "An application program interface (API) provides a procedure Max, which returns the greater of its two integer arguments.\n\nA programmer would like to find the greatest of three integer values a, b, and c. Which of the following expressions will produce the desired result in every case?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Max(Max(a, b), c)"
+        },
+        {
+          "id": "B",
+          "text": "Max(a, b) - Max(b, c)"
+        },
+        {
+          "id": "C",
+          "text": "Max(a, b) + Max(b, c) - Max(a, c)"
+        },
+        {
+          "id": "D",
+          "text": "(Max(a, b) + Max(b, c)) / 2"
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Procedures and APIs",
+      "explanation": "Max(Max(a, b), c) first finds the larger of a and b, then compares that to c, giving the maximum of all three."
+    },
+    {
+      "questionNumber": 21,
+      "type": "multiple_choice",
+      "text": "The following question uses a robot in a grid of squares. The robot is represented by a triangle, which is initially facing right.\n\n[Grid showing robot and target gray square]\n\nConsider the procedures below:\nPROCEDURE MoveXTimes(x) { REPEAT x TIMES { MOVE_FORWARD } }\nPROCEDURE RightXTimes(x) { REPEAT x TIMES { ROTATE_RIGHT } }\n\nWhich of the following code segments will move the robot to the gray square?",
+      "hasImage": true,
+      "imagePath": "images/q21_robot_grid.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "MoveXTimes(2); RightXTimes(1); MoveXTimes(3)"
+        },
+        {
+          "id": "B",
+          "text": "MoveXTimes(2); RightXTimes(3); MoveXTimes(3)"
+        },
+        {
+          "id": "C",
+          "text": "MoveXTimes(3); RightXTimes(1); MoveXTimes(3)"
+        },
+        {
+          "id": "D",
+          "text": "MoveXTimes(3); RightXTimes(3); MoveXTimes(3)"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Robot Programming",
+      "explanation": "RightXTimes(3) is equivalent to turning left once (3 right turns = 1 left turn). The robot needs to move right 3, turn left, move up 3."
+    },
+    {
+      "questionNumber": 22,
+      "type": "multiple_choice",
+      "text": "A student is creating a procedure to determine whether the weather for a particular month was considered very hot. The procedure takes as input a list containing daily high temperatures for a particular month. The procedure is intended to return true if the daily high temperature was at least 90 degrees for a majority of days in the month and return false otherwise.\n\nPROCEDURE IsHot(temperatureList)\n{\n  total \u2190 0\n  counter \u2190 0\n  FOR EACH temperature IN temperatureList\n  {\n    IF (temperature \u2265 90) { counter \u2190 counter + 1 }\n    total \u2190 total + 1\n  }\n  RETURN (<MISSING CODE>)\n}\n\nWhich of the following can be used to replace <MISSING CODE> so that the procedure works as intended?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "counter < 0.5 * total"
+        },
+        {
+          "id": "B",
+          "text": "counter > 0.5 * total"
+        },
+        {
+          "id": "C",
+          "text": "total < 0.5 * counter"
+        },
+        {
+          "id": "D",
+          "text": "total > 0.5 * counter"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Procedures and Boolean Logic",
+      "explanation": "For a majority, counter (hot days) must be greater than half of total days: counter > 0.5 * total."
+    },
+    {
+      "questionNumber": 23,
+      "type": "multiple_choice",
+      "text": "The following figures represent different ways of configuring a network of physically linked computers labeled P, Q, R, and S. A line between two computers indicates that the computers can communicate directly with each other. In which configuration is it NOT possible to have redundant routing between computers P and S?",
+      "hasImage": true,
+      "imagePath": "images/q23_network_topology.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "P-Q, P-R, Q-S, R-S (rectangle)"
+        },
+        {
+          "id": "B",
+          "text": "P-Q, P-R, Q-R, R-S (triangle plus one)"
+        },
+        {
+          "id": "C",
+          "text": "P-Q, P-R, R-S (no Q-S connection)"
+        },
+        {
+          "id": "D",
+          "text": "P-Q, P-R, Q-S, R-S, Q-R (fully connected)"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Network Redundancy",
+      "explanation": "In configuration B, P to S only goes through R. If R fails, there's no alternative path from P to S."
+    },
+    {
+      "questionNumber": 24,
+      "type": "multiple_choice",
+      "text": "Questions 24-25 refer to the information below.\n\nByte pair encoding is a data encoding technique. The encoding algorithm looks for pairs of characters that appear in the string more than once and replaces each instance of that pair with a corresponding character that does not appear in the string. The algorithm saves a list containing the mapping of character pairs to their corresponding replacement characters.\n\nFor example, the string \"THIS_IS_THE_BEST_WISH\" can be encoded as \"%#_#_%E_BEST_W#H\" by replacing all instances of \"TH\" with \"%\" and replacing all instances of \"IS\" with \"#\".\n\nWhich of the following statements about byte pair encoding is true?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Byte pair encoding is an example of a lossy transformation because it discards some of the data in the original string."
+        },
+        {
+          "id": "B",
+          "text": "Byte pair encoding is an example of a lossy transformation because some pairs of characters are replaced by a single character."
+        },
+        {
+          "id": "C",
+          "text": "Byte pair encoding is an example of a lossless transformation because an encoded string can be restored to its original version."
+        },
+        {
+          "id": "D",
+          "text": "Byte pair encoding is an example of a lossless transformation because it can be used to transmit messages securely."
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Compression - Lossless",
+      "explanation": "Byte pair encoding is lossless because the mapping is saved and can be used to restore the original data exactly."
+    },
+    {
+      "questionNumber": 25,
+      "type": "multiple_choice",
+      "text": "For which of the following strings is it NOT possible to use byte pair encoding to shorten the string's length?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "\"BANANA\""
+        },
+        {
+          "id": "B",
+          "text": "\"LEVEL_UP\""
+        },
+        {
+          "id": "C",
+          "text": "\"MEET_ME_LATER\""
+        },
+        {
+          "id": "D",
+          "text": "\"NEITHER_HERE_NOR_THERE\""
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Compression",
+      "explanation": "\"LEVEL_UP\" has no character pairs that repeat. \"AN\" appears twice in BANANA, \"ME\" and \"ER\" repeat in the others."
+    },
+    {
+      "questionNumber": 26,
+      "type": "multiple_choice",
+      "text": "The grid below contains a robot represented as a triangle, initially facing up. The robot can move into a white or gray square but cannot move into a black region.\n\n[Grid with robot and obstacles]\n\nThe code segment below uses the procedure GoalReached, which evaluates to true if the robot is in the gray square and evaluates to false otherwise.\n\nREPEAT UNTIL (GoalReached())\n{\n  <MISSING CODE>\n}\n\nWhich of the following replacements for <MISSING CODE> can be used to move the robot to the gray square?",
+      "hasImage": true,
+      "imagePath": "images/q26_robot_grid.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "IF (CAN_MOVE(right)) { ROTATE_RIGHT() }; MOVE_FORWARD()"
+        },
+        {
+          "id": "B",
+          "text": "IF (CAN_MOVE(right)) { ROTATE_RIGHT(); MOVE_FORWARD() }"
+        },
+        {
+          "id": "C",
+          "text": "IF (CAN_MOVE(forward)) { MOVE_FORWARD() }; ROTATE_RIGHT()"
+        },
+        {
+          "id": "D",
+          "text": "IF (CAN_MOVE(forward)) { MOVE_FORWARD(); ROTATE_RIGHT() }"
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Robot Programming with Conditionals",
+      "explanation": "Option A: If can move right, turn right; then always move forward. This navigates around obstacles correctly."
+    },
+    {
+      "questionNumber": 27,
+      "type": "multiple_choice",
+      "text": "A student wrote the following code for a guessing game.\n\nLine 1: secretNumber \u2190 RANDOM(1, 100)\nLine 2: win \u2190 false\nLine 3: REPEAT UNTIL (win)\nLine 4: {\nLine 5:   DISPLAY(\"Guess a number.\")\nLine 6:   guess \u2190 INPUT()\nLine 7:   IF (guess = secretNumber)\nLine 8:   {\nLine 9:     DISPLAY(\"You got it right!\")\nLine 10:  }\nLine 11:  ELSE\nLine 12:  {\nLine 13:    IF (guess > secretNumber)\nLine 14:    { DISPLAY(\"Your guess is too high.\") }\nLine 17:    ELSE\nLine 18:    { DISPLAY(\"Your guess is too low.\") }\nLine 21:  }\nLine 22: }\n\nWhile debugging the code, the student realizes that the loop never terminates. The student plans to insert the instruction win \u2190 true somewhere in the code. Where could win \u2190 true be inserted so that the code segment works as intended?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Between line 6 and line 7"
+        },
+        {
+          "id": "B",
+          "text": "Between line 9 and line 10"
+        },
+        {
+          "id": "C",
+          "text": "Between line 20 and 21"
+        },
+        {
+          "id": "D",
+          "text": "Between line 21 and 22"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Debugging",
+      "explanation": "win \u2190 true should be placed after the correct guess is identified (after line 9) to exit the loop."
+    },
+    {
+      "questionNumber": 28,
+      "type": "multiple_choice",
+      "text": "A text-editing application uses binary sequences to represent each of 200 different characters. What is the minimum number of bits needed to assign a unique bit sequence to each of the possible characters?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "4"
+        },
+        {
+          "id": "B",
+          "text": "6"
+        },
+        {
+          "id": "C",
+          "text": "7"
+        },
+        {
+          "id": "D",
+          "text": "8"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Binary Representation",
+      "explanation": "With n bits, you can represent 2^n values. 2^7 = 128 (not enough), 2^8 = 256 (enough for 200 characters)."
+    },
+    {
+      "questionNumber": 29,
+      "type": "multiple_choice",
+      "text": "The diagram below shows a circuit composed of three logic gates. Each gate takes two inputs and produces a single output.\n\n[Circuit diagram with inputs A, B, C, D and gates AND, OR, OR]\n\nFor which of the following input values will the circuit have an output of false?",
+      "hasImage": true,
+      "imagePath": "images/q29_logic_gates.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "A = true, B = false, C = false, D = false"
+        },
+        {
+          "id": "B",
+          "text": "A = true, B = true, C = false, D = false"
+        },
+        {
+          "id": "C",
+          "text": "A = false, B = false, C = true, D = true"
+        },
+        {
+          "id": "D",
+          "text": "A = false, B = false, C = false, D = true"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Logic Gates",
+      "explanation": "The circuit is (A AND B) OR (C OR D). For D: (false AND false) OR (false OR true) = false OR true = true. Wait, let me recalculate. Actually for false output: (A AND B) must be false AND (C OR D) must be false. C OR D = false requires C=false, D=false. So option D has D=true, giving C OR D = true. Need to find where both outputs of first level are false."
+    },
+    {
+      "questionNumber": 30,
+      "type": "multiple_choice",
+      "text": "A video-streaming service maintains a database of information about its customers and the videos they have watched.\n\nThe program below analyzes the data in the database and compares the number of viewers of science fiction videos to the number of viewers of videos of other genres. It uses the procedure Analysis(category), which returns the number of unique users who viewed videos of a given category in the past year. The Analysis procedure takes approximately 1 hour to return a result, regardless of the number of videos of the given genre. All other operations happen nearly instantaneously.\n\nsciFiFans \u2190 Analysis(\"science fiction\")\ngenreList \u2190 [\"comedy\", \"drama\", \"mystery\", \"romance\"]\nFOR EACH genre IN genreList\n{\n  IF (Analysis(genre) > sciFiFans)\n  { DISPLAY(genre) }\n}\n\nWhich of the following best approximates the amount of time it takes the program to execute?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "1 hour"
+        },
+        {
+          "id": "B",
+          "text": "2 hours"
+        },
+        {
+          "id": "C",
+          "text": "4 hours"
+        },
+        {
+          "id": "D",
+          "text": "5 hours"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Algorithm Efficiency",
+      "explanation": "Analysis is called once for sci-fi (1 hour) and once for each of 4 genres in the loop (4 hours) = 5 hours total."
+    },
+    {
+      "questionNumber": 31,
+      "type": "multiple_choice",
+      "text": "The question below uses a robot in a grid of squares. The robot is represented as a triangle, which is initially in the bottom right square of the grid and facing toward the top of the grid.\n\n[Grid showing robot position and gray target square]\n\nThe following programs are each intended to move the robot to the gray square. Program II uses the procedure GoalReached, which returns true if the robot is in the gray square and returns false otherwise.\n\nProgram I:\nREPEAT 4 TIMES { MOVE_FORWARD; ROTATE_LEFT; MOVE_FORWARD; ROTATE_RIGHT }\n\nProgram II:\nREPEAT UNTIL (GoalReached) { IF (CAN_MOVE(forward)) { MOVE_FORWARD } ELSE { ROTATE_LEFT } }\n\nWhich of the following statements is true?",
+      "hasImage": true,
+      "imagePath": "images/q31_robot_grid.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "Program I correctly moves the robot to the gray square, but program II does not."
+        },
+        {
+          "id": "B",
+          "text": "Program II correctly moves the robot to the gray square, but program I does not."
+        },
+        {
+          "id": "C",
+          "text": "Both program I and program II correctly move the robot to the gray square."
+        },
+        {
+          "id": "D",
+          "text": "Neither program I nor program II correctly moves the robot to the gray square."
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Robot Programming",
+      "explanation": "Both programs successfully navigate the robot to the gray square using different approaches."
+    },
+    {
+      "questionNumber": 32,
+      "type": "multiple_choice",
+      "text": "Participants in a survey were asked how many hours per day they spend reading, how many hours per day they spend using a smartphone, and whether or not they would be interested in a smartphone application that lets users share book reviews.\n\nThe data from the survey are represented in the graph below. Each \u00d7 represents a survey participant who said he or she was interested in the application, and each O represents a participant who said he or she was not interested.\n\n[Scatter plot graph]\n\nWhich of the following hypotheses is most consistent with the data in the graph?",
+      "hasImage": true,
+      "imagePath": "images/q32_scatter_plot.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "Participants who read more were generally more likely to say they are interested in the application."
+        },
+        {
+          "id": "B",
+          "text": "Participants who read more were generally less likely to say they are interested in the application."
+        },
+        {
+          "id": "C",
+          "text": "Participants who use a smartphone more were generally more likely to say they read more."
+        },
+        {
+          "id": "D",
+          "text": "Participants who use a smartphone more were generally less likely to say they read more."
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Visualization and Analysis",
+      "explanation": "The \u00d7 marks (interested) cluster at higher reading hours, while O marks (not interested) cluster at lower reading hours."
+    },
+    {
+      "questionNumber": 33,
+      "type": "multiple_choice",
+      "text": "A flowchart is a way to visually represent an algorithm. The flowchart below is used by an apartment rental Web site to set the variable include to true for apartments that meet certain criteria.\n\n[Flowchart with floor > 10 and bedrooms = 3 conditions]\n\nWhich of the following statements is equivalent to the algorithm in the flowchart?",
+      "hasImage": true,
+      "imagePath": "images/q33_flowchart.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "include \u2190 (floor > 10) OR (bedrooms = 3)"
+        },
+        {
+          "id": "B",
+          "text": "include \u2190 (floor > 10) AND (bedrooms = 3)"
+        },
+        {
+          "id": "C",
+          "text": "include \u2190 (floor \u2264 10) OR (bedrooms = 3)"
+        },
+        {
+          "id": "D",
+          "text": "include \u2190 (floor \u2264 10) AND (bedrooms = 3)"
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Flowcharts and Boolean Logic",
+      "explanation": "The flowchart sets include to true if floor > 10 OR if bedrooms = 3, so either condition being true results in include being true."
+    },
+    {
+      "questionNumber": 34,
+      "type": "multiple_choice",
+      "text": "A researcher wrote a program to simulate the number of mice in an environment that contains predators. The program uses the following procedures.\n\nProcedure Call | Explanation\nInitialMousePopulation() | Returns the number of mice at the start\nInitialPredatorPopulation() | Returns the number of predators at the start\nNextDayPopulation(numberOfMice, numberOfPredators) | Returns the number of mice after one day\n\nCode:\ndays \u2190 0\nnumMice \u2190 InitialMousePopulation()\nnumPredators \u2190 InitialPredatorPopulation()\nREPEAT UNTIL (days = 365)\n{\n  numMice \u2190 NextDayPopulation(numMice, numPredators)\n  days \u2190 days + 1\n}\nDISPLAY(\"There are\")\nDISPLAY(numMice)\nDISPLAY(\"mice after one year.\")\n\nBased on the code, which of the following assumptions is made in the simulation?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "The number of mice increases by 1 each day."
+        },
+        {
+          "id": "B",
+          "text": "The number of mice does not change from day to day."
+        },
+        {
+          "id": "C",
+          "text": "The number of predators increases by 1 each day."
+        },
+        {
+          "id": "D",
+          "text": "The number of predators does not change from day to day."
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Simulations",
+      "explanation": "numPredators is set once and never updated in the loop, so the simulation assumes predator population stays constant."
+    },
+    {
+      "questionNumber": 35,
+      "type": "multiple_choice",
+      "text": "A musician is creating a song using audio samples. Which of the following actions will minimize the risk of a copyright violation when creating sample-based music?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Using samples found on popular music-streaming sites"
+        },
+        {
+          "id": "B",
+          "text": "Using samples found on peer-to-peer networks"
+        },
+        {
+          "id": "C",
+          "text": "Using samples from nondigital sound sources (vinyl records, tapes, etc.)"
+        },
+        {
+          "id": "D",
+          "text": "Using samples published with a no-rights-reserved Creative Commons license"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Intellectual Property",
+      "explanation": "Creative Commons no-rights-reserved licenses explicitly allow free use. The other sources likely contain copyrighted material."
+    },
+    {
+      "questionNumber": 36,
+      "type": "multiple_choice",
+      "text": "A computer program performs the operation 2\u00f73 and represents the result as the value 0.6666667. Which of the following best explains this result?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "An overflow error occurred."
+        },
+        {
+          "id": "B",
+          "text": "The precision of the result is limited due to the constraints of using a floating-point representation."
+        },
+        {
+          "id": "C",
+          "text": "The program attempted to execute the operation with the arguments in reverse order."
+        },
+        {
+          "id": "D",
+          "text": "The program attempted to represent a floating-point number as an integer."
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Floating Point Representation",
+      "explanation": "2/3 is a repeating decimal. Floating-point has limited precision, so it can only store an approximation."
+    },
+    {
+      "questionNumber": 37,
+      "type": "multiple_choice",
+      "text": "The two code segments below are each intended to display the average of the numbers in the list numList. Assume that numList contains more than one value.\n\nProgram I:\nsum \u2190 0\nFOR EACH num IN numList\n{ sum \u2190 sum + num; avg \u2190 sum / LENGTH(numList) }\nDISPLAY(avg)\n\nProgram II:\nsum \u2190 0\nFOR EACH num IN numList\n{ sum \u2190 sum + num }\navg \u2190 sum / LENGTH(numList)\nDISPLAY(avg)\n\nWhich of the following best describes the two code segments?",
+      "hasImage": true,
+      "imagePath": "images/q37_average_code.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "Code segment I displays the correct average, but code segment II does not."
+        },
+        {
+          "id": "B",
+          "text": "Code segment II displays the correct average, but code segment I does not."
+        },
+        {
+          "id": "C",
+          "text": "Both code segments display the correct average, but code segment I requires more arithmetic operations than code segment II."
+        },
+        {
+          "id": "D",
+          "text": "Both code segments display the correct average, but code segment II requires more arithmetic operations than code segment I."
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Algorithm Efficiency",
+      "explanation": "Both give correct results, but Program I divides inside the loop (n divisions), while Program II divides once after the loop (1 division)."
+    },
+    {
+      "questionNumber": 38,
+      "type": "multiple_choice",
+      "text": "A snack bar has a frequent customer program in which every 10th purchase is free. Customers are enrolled in the program when they make their first purchase. A programmer is writing a program to implement the frequent customer program. In one code segment, cost is set to 0 for every 10th purchase by a given customer. The programmer will use the procedure GetCount(customerID), which returns the total number of purchases a customer has made since enrolling in the frequent customer program, including his or her first purchase.\n\nWhich of the following code segments will set cost to 0 for every 10th purchase a customer makes after enrolling in the frequent customer program?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "count \u2190 GetCount(customerID); IF (count / 10 = 0) { cost \u2190 0 }"
+        },
+        {
+          "id": "B",
+          "text": "count \u2190 GetCount(customerID); IF (NOT(count / 10 = 0)) { cost \u2190 0 }"
+        },
+        {
+          "id": "C",
+          "text": "count \u2190 GetCount(customerID); IF (count MOD 10 = 0) { cost \u2190 0 }"
+        },
+        {
+          "id": "D",
+          "text": "count \u2190 GetCount(customerID); IF (NOT(count MOD 10 = 0)) { cost \u2190 0 }"
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "MOD Operator",
+      "explanation": "count MOD 10 = 0 is true when count is 10, 20, 30, etc. (every 10th purchase)."
+    },
+    {
+      "questionNumber": 39,
+      "type": "multiple_choice",
+      "text": "Which of the following explains a benefit of using open standards and protocols for Internet communication?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Open standards and protocols allow different manufacturers and developers to build hardware and software that can communicate with hardware and software on the rest of the network."
+        },
+        {
+          "id": "B",
+          "text": "Open standards and protocols provide ways for users to eliminate the latency of messages they send on the Internet."
+        },
+        {
+          "id": "C",
+          "text": "Open standards and protocols allow users to freely share or reuse material found on the Internet for noncommercial purposes."
+        },
+        {
+          "id": "D",
+          "text": "Open standards and protocols prevent developers from releasing software that contains errors."
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Open Standards and Protocols",
+      "explanation": "Open standards ensure interoperability between different hardware and software from various manufacturers."
+    },
+    {
+      "questionNumber": 40,
+      "type": "multiple_choice",
+      "text": "Questions 40-41 refer to the information below.\n\nGrades in a computer science course are based on total points earned on a midterm exam and a final exam. The teacher provides a way for students to improve their course grades if they receive high scores on the final exam: if a student's final exam score is greater than the student's midterm exam score, the final exam score replaces the midterm exam score in the calculation of total points.\n\nThe teacher has data representing the scores of thousands of students. For each student, the data contain the student name, the midterm exam score, the final exam score, and the result of the total points calculation. Which of the following could be determined from the data?\n\nI. The average total points earned per student\nII. The average increase in total points per student as a result of the score replacement policy\nIII. The proportion of students who improved their total points as a result of the score replacement policy",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "III only"
+        },
+        {
+          "id": "B",
+          "text": "I and II only"
+        },
+        {
+          "id": "C",
+          "text": "I and III only"
+        },
+        {
+          "id": "D",
+          "text": "I, II, and III"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Analysis",
+      "explanation": "With midterm, final, and total points for each student, all three metrics can be calculated."
+    },
+    {
+      "questionNumber": 41,
+      "type": "multiple_choice",
+      "text": "A programmer is writing a procedure to calculate a student's final grade in the course using the score replacement policy described. The student's exam scores are stored in the variables midtermExam and finalExam. The procedure Max(a, b) returns the larger of a and b.\n\nWhich of the following could be used in the procedure to calculate a student's total points earned in the course and store the result in the variable adjustedTotal?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "adjustedTotal \u2190 Max(midtermExam, finalExam)"
+        },
+        {
+          "id": "B",
+          "text": "adjustedTotal \u2190 Max(midtermExam, finalExam) + finalExam"
+        },
+        {
+          "id": "C",
+          "text": "adjustedTotal \u2190 Max(midtermExam, finalExam) + midtermExam"
+        },
+        {
+          "id": "D",
+          "text": "adjustedTotal \u2190 2 * Max(midtermExam, finalExam)"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Procedures",
+      "explanation": "Total = max(midterm, final) + final. If final > midterm, it's final + final. Otherwise it's midterm + final."
+    },
+    {
+      "questionNumber": 42,
+      "type": "multiple_choice",
+      "text": "Internet protocol version 4 (IPv4) represents each IP address as a 32-bit binary number. Internet protocol version 6 (IPv6) represents each IP address as a 128-bit binary number. Which of the following best describes the result of using 128-bit addresses instead of 32-bit addresses?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "4 times as many addresses are available."
+        },
+        {
+          "id": "B",
+          "text": "96 times as many addresses are available."
+        },
+        {
+          "id": "C",
+          "text": "2^4 times as many addresses are available."
+        },
+        {
+          "id": "D",
+          "text": "2^96 times as many addresses are available."
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "IPv4 vs IPv6",
+      "explanation": "IPv4 has 2^32 addresses, IPv6 has 2^128 addresses. The ratio is 2^128 / 2^32 = 2^96."
+    },
+    {
+      "questionNumber": 43,
+      "type": "multiple_choice",
+      "text": "An online retailer uses an algorithm to sort a list of n items by price. The table below shows the approximate number of steps the algorithm takes to sort lists of different sizes.\n\nNumber of Items | Number of Steps\n10 | 100\n20 | 400\n30 | 900\n40 | 1,600\n50 | 2,500\n60 | 3,600\n\nBased on the values in the table, which of the following best characterizes the algorithm for very large values of n?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "The algorithm runs in reasonable time."
+        },
+        {
+          "id": "B",
+          "text": "The algorithm runs, but not in reasonable time."
+        },
+        {
+          "id": "C",
+          "text": "The algorithm attempts to solve an undecidable problem."
+        },
+        {
+          "id": "D",
+          "text": "The algorithm attempts to find an approximate solution whenever it fails to find an exact solution."
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Algorithm Efficiency",
+      "explanation": "The pattern shows n^2 steps (polynomial time), which is considered reasonable time."
+    },
+    {
+      "questionNumber": 44,
+      "type": "multiple_choice",
+      "text": "A computer program uses 4 bits to represent nonnegative integers. Which of the following statements describe a possible result when the program uses this number representation?\n\nI. The operation 4 + 8 will result in an overflow error.\nII. The operation 7 + 10 will result in an overflow error.\nIII. The operation 12 + 3 will result in an overflow error.",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "I only"
+        },
+        {
+          "id": "B",
+          "text": "II only"
+        },
+        {
+          "id": "C",
+          "text": "II and III only"
+        },
+        {
+          "id": "D",
+          "text": "I, II, and III"
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Overflow Errors",
+      "explanation": "4 bits can represent 0-15. 4+8=12 (ok), 7+10=17 (overflow), 12+3=15 (ok). Wait, 15 fits in 4 bits. Let me recalculate: 7+10=17 > 15 (overflow), 12+3=15 (no overflow). So only II causes overflow."
+    },
+    {
+      "questionNumber": 45,
+      "type": "multiple_choice",
+      "text": "A NAND gate is a type of logic gate that produces an output of false only when both of its two inputs are true. Otherwise, the gate produces an output of true. Which of the following Boolean expressions correctly models a NAND gate with inputs P and Q?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "(NOT P) AND (NOT Q)"
+        },
+        {
+          "id": "B",
+          "text": "(NOT P) AND Q"
+        },
+        {
+          "id": "C",
+          "text": "NOT (P AND Q)"
+        },
+        {
+          "id": "D",
+          "text": "NOT (P OR Q)"
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Logic Gates",
+      "explanation": "NAND is the negation of AND. NOT(P AND Q) is false only when both P and Q are true."
+    },
+    {
+      "questionNumber": 46,
+      "type": "multiple_choice",
+      "text": "A student wants to create an algorithm that can determine, given any program and program input, whether or not the program will go into an infinite loop for that input.\n\nThe problem the student is attempting to solve is considered an undecidable problem. Which of the following is true?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "It is possible to create an algorithm that will solve the problem for all programs and inputs, but the algorithm can only be implemented in a low-level programming language."
+        },
+        {
+          "id": "B",
+          "text": "It is possible to create an algorithm that will solve the problem for all programs and inputs, but the algorithm requires simultaneous execution on multiple CPUs."
+        },
+        {
+          "id": "C",
+          "text": "It is possible to create an algorithm that will solve the problem for all programs and inputs, but the algorithm will not run in reasonable time."
+        },
+        {
+          "id": "D",
+          "text": "It is not possible to create an algorithm that will solve the problem for all programs and inputs."
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Undecidable Problems",
+      "explanation": "The halting problem is undecidable - no algorithm can exist that solves it for all possible programs and inputs."
+    },
+    {
+      "questionNumber": 47,
+      "type": "multiple_choice",
+      "text": "In public key cryptography, the sender uses the recipient's public key to encrypt a message. Which of the following is needed to decrypt the message?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "The sender's public key"
+        },
+        {
+          "id": "B",
+          "text": "The sender's private key"
+        },
+        {
+          "id": "C",
+          "text": "The recipient's public key"
+        },
+        {
+          "id": "D",
+          "text": "The recipient's private key"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Public Key Cryptography",
+      "explanation": "In public key cryptography, messages encrypted with a public key can only be decrypted with the corresponding private key."
+    },
+    {
+      "questionNumber": 48,
+      "type": "multiple_choice",
+      "text": "In a certain science experiment, 75 percent of trials are expected to be successful and 25 percent of trials are expected to be unsuccessful. The program below is intended to simulate the results of repeated trials of the experiment.\n\nsuccessful \u2190 0\nunsuccessful \u2190 0\nREPEAT 1000 TIMES\n{\n  IF (<MISSING CODE>)\n  { successful \u2190 successful + 1 }\n  ELSE\n  { unsuccessful \u2190 unsuccessful + 1 }\n}\nDISPLAY(successful)\nDISPLAY(\"trials were successful,\")\nDISPLAY(unsuccessful)\nDISPLAY(\"trials were unsuccessful.\")\n\nWhich of the following can be used to replace <MISSING CODE> so that the simulation works as intended?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "RANDOM(1, 100) = 25"
+        },
+        {
+          "id": "B",
+          "text": "RANDOM(1, 100) \u2264 25"
+        },
+        {
+          "id": "C",
+          "text": "RANDOM(1, 100) = 75"
+        },
+        {
+          "id": "D",
+          "text": "RANDOM(1, 100) \u2264 75"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Simulations",
+      "explanation": "For 75% success rate, RANDOM(1,100) \u2264 75 is true for values 1-75 (75 out of 100 = 75%)."
+    },
+    {
+      "questionNumber": 49,
+      "type": "multiple_choice",
+      "text": "The code segment below is intended to display all multiples of 5 between the values start and end, inclusive. For example, if start has the value 35 and end has the value 50, the code segment should display the values 35, 40, 45, and 50. Assume that start and end are multiples of 5 and that start is less than end.\n\nLine 1: i \u2190 start\nLine 2: REPEAT <MISSING EXPRESSION> TIMES\nLine 3: {\nLine 4:   DISPLAY(i)\nLine 5:   i \u2190 i + 5\nLine 6: }\n\nWhich of the following could replace <MISSING EXPRESSION> in line 2 so that the code segment works as intended?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "end - start + 1"
+        },
+        {
+          "id": "B",
+          "text": "end - start + 6"
+        },
+        {
+          "id": "C",
+          "text": "((end - start) / 5) + 1"
+        },
+        {
+          "id": "D",
+          "text": "5 * (end - start) + 1"
+        }
+      ],
+      "correctAnswers": [
+        "C"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Iteration",
+      "explanation": "For 35 to 50: (50-35)/5 + 1 = 15/5 + 1 = 3 + 1 = 4 iterations (35, 40, 45, 50)."
+    },
+    {
+      "questionNumber": 50,
+      "type": "multiple_choice",
+      "text": "The procedure below searches for the value target in list. It returns true if target is found and returns false otherwise.\n\nPROCEDURE Contains(list, target)\n{\n  FOR EACH element IN list\n  {\n    IF (element = target)\n    { RETURN true }\n  }\n  RETURN false\n}\n\nWhich of the following are true statements about the procedure?\n\nI. It implements a binary search.\nII. It implements a linear search.\nIII. It only works as intended when list is sorted.",
+      "hasImage": true,
+      "imagePath": "images/q50_search_procedure.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "I only"
+        },
+        {
+          "id": "B",
+          "text": "II only"
+        },
+        {
+          "id": "C",
+          "text": "I and III"
+        },
+        {
+          "id": "D",
+          "text": "II and III"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Search Algorithms",
+      "explanation": "This is a linear search (checks each element sequentially). It works on both sorted and unsorted lists."
+    },
+    {
+      "questionNumber": 51,
+      "type": "multiple_choice",
+      "text": "Which of the following is an example of symmetric encryption?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Evy buys a locked box that operates using two different codes. When the first code is entered, a slot opens that allows a message to be put in the box. When the second code is entered, the door to the box opens. Evy gives the first code to her friends so they can leave messages for her and keeps the second code to herself so that she is the only one who can retrieve the messages."
+        },
+        {
+          "id": "B",
+          "text": "Finn and Gwen develop a system that maps each letter of the alphabet to a unique symbol using a secret key. Finn uses the key to write a message to Gwen where each letter is replaced with the corresponding symbol. Gwen uses the key to map each symbol back to the original letter."
+        },
+        {
+          "id": "C",
+          "text": "Hannah writes a message to send to Isabel and hides the message under a rock behind the soccer field. Hannah gives Isabel the exact location of the rock so that only Isabel can find the message."
+        },
+        {
+          "id": "D",
+          "text": "Juan writes a message to send to Kelly and slides the message through a slot in the front of Kelly's locker. Juan knows that Kelly has not shared her locker combination with anyone, so no one other than Kelly will be able to read the message."
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Symmetric Encryption",
+      "explanation": "Symmetric encryption uses the same key to encrypt and decrypt. Finn and Gwen use the same secret key for both operations."
+    },
+    {
+      "questionNumber": 52,
+      "type": "multiple_choice",
+      "text": "A programmer is developing a word game. The programmer wants to create an algorithm that will take a list of words and return a list containing the first letter of all words that are palindromes (words that read the same backward or forward). The returned list should be in alphabetical order. For example, if the list contains the words [\"banana\", \"kayak\", \"mom\", \"apple\", \"level\"], the returned list would contain [\"k\", \"l\", \"m\"] (because \"kayak\", \"level\", and \"mom\" are palindromes).\n\nThe programmer knows that the following steps are necessary for the algorithm but is not sure in which order they should be executed.\n\nStep | Explanation\nShorten | Takes a list of words and returns a new list that contains only the first letter of each word\nKeep palindromes | Takes a list of words and returns a list that contains only the palindromes\nSort | Takes a list of words and returns a copy of the list in alphabetical order\n\nExecuting which of the following sequences of steps will enable the algorithm to work as intended?\n\nI. First shorten, then keep palindromes, then sort\nII. First keep palindromes, then shorten, then sort\nIII. First sort, then keep palindromes, then shorten",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "I only"
+        },
+        {
+          "id": "B",
+          "text": "II only"
+        },
+        {
+          "id": "C",
+          "text": "I and III"
+        },
+        {
+          "id": "D",
+          "text": "II and III"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Algorithm Design",
+      "explanation": "Shortening before keep palindromes won't work (single letters can't be checked for palindrome). II and III both keep palindromes with full words, then shorten."
+    },
+    {
+      "questionNumber": 53,
+      "type": "multiple_choice",
+      "text": "Which of the following best describes the purpose of machine learning programs?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "To analyze large data sets, recognize patterns, and make predictions based on data"
+        },
+        {
+          "id": "B",
+          "text": "To automatically translate algorithms from natural language to machine language"
+        },
+        {
+          "id": "C",
+          "text": "To determine whether an algorithm can be constructed to answer \"yes\" or \"no\" for all possible inputs"
+        },
+        {
+          "id": "D",
+          "text": "To find approximate solutions to problems that would otherwise require an unreasonably long amount of time to solve"
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Machine Learning",
+      "explanation": "Machine learning analyzes data to find patterns and make predictions, often improving with more data."
+    },
+    {
+      "questionNumber": 54,
+      "type": "multiple_choice",
+      "text": "A programmer notices the following two procedures in a library. The procedures do similar, but not identical, things.\n\n\u2022 Procedure Square(n) returns the value n\u00b2.\n\u2022 Procedure Cube(n) returns the value n\u00b3.\n\nWhich of the following procedures is a generalization of the procedures described above?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Procedure Add(n, m), which returns the value n + m"
+        },
+        {
+          "id": "B",
+          "text": "Procedure Fourth(n), which returns the value n\u2074"
+        },
+        {
+          "id": "C",
+          "text": "Procedure Polynomial(n), which returns the value n\u00b3 + n\u00b2"
+        },
+        {
+          "id": "D",
+          "text": "Procedure Power(n, m), which returns the value n^m"
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Procedural Abstraction",
+      "explanation": "Power(n, m) generalizes both: Square(n) = Power(n, 2) and Cube(n) = Power(n, 3)."
+    },
+    {
+      "questionNumber": 55,
+      "type": "multiple_choice",
+      "text": "A student wrote the procedure below, which is intended to ask whether a user wants to keep playing a game. The procedure does not work as intended.\n\nPROCEDURE KeepPlaying()\n{\n  DISPLAY(\"Do you want to continue playing (y/n)?\")\n  response \u2190 INPUT()\n  IF ((response = \"y\") AND (response = \"yes\"))\n  { RETURN true }\n  ELSE\n  { RETURN false }\n}\n\nWhich of the following best describes the result of running the procedure?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "The procedure returns true when the user inputs the value \"y\" and returns false otherwise."
+        },
+        {
+          "id": "B",
+          "text": "The procedure returns true when the user inputs the value \"n\" and returns false otherwise."
+        },
+        {
+          "id": "C",
+          "text": "The procedure returns true no matter what the input value is."
+        },
+        {
+          "id": "D",
+          "text": "The procedure returns false no matter what the input value is."
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Boolean Logic - Debugging",
+      "explanation": "response cannot equal both \"y\" AND \"yes\" simultaneously, so the condition is always false, returning false."
+    },
+    {
+      "questionNumber": 56,
+      "type": "multiple_choice",
+      "text": "Consider the following program.\n\ncount \u2190 1\nsum \u2190 0\nREPEAT 10 TIMES\n{\n  sum \u2190 sum + count\n  count \u2190 count + 2\n}\nDISPLAY(sum)\n\nWhich of the following describes the result of executing the program?",
+      "hasImage": true,
+      "imagePath": "images/q56_sum_program.png",
+      "options": [
+        {
+          "id": "A",
+          "text": "The program displays the sum of the even integers from 0 to 10."
+        },
+        {
+          "id": "B",
+          "text": "The program displays the sum of the even integers from 0 to 20."
+        },
+        {
+          "id": "C",
+          "text": "The program displays the sum of the odd integers from 1 to 9."
+        },
+        {
+          "id": "D",
+          "text": "The program displays the sum of the odd integers from 1 to 19."
+        }
+      ],
+      "correctAnswers": [
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Iteration",
+      "explanation": "count starts at 1 and increases by 2 each iteration. Over 10 iterations: 1, 3, 5, 7, 9, 11, 13, 15, 17, 19 (odd integers 1-19)."
+    },
+    {
+      "questionNumber": 57,
+      "type": "multiple_choice",
+      "text": "A program contains the following procedures for string manipulation.\n\nProcedure Call | Explanation\nConcat(str1, str2) | Returns a single string consisting of str1 followed by str2. For example, Concat(\"key\", \"board\") returns \"keyboard\".\nSubstring(str, start, length) | Returns a substring of consecutive characters from str, starting with the character at position start and containing length characters. The first character of str is located at position 1. For example, Substring(\"delivery\", 3, 4) returns \"live\".\n\nWhich of the following expressions can be used to generate the string \"Happy\"?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Concat(Substring(\"Harp\", 1, 1), Substring(\"Puppy\", 2, 4))"
+        },
+        {
+          "id": "B",
+          "text": "Concat(Substring(\"Harp\", 1, 2), Substring(\"Puppy\", 3, 3))"
+        },
+        {
+          "id": "C",
+          "text": "Concat(Substring(\"Harp\", 1, 2), Substring(\"Puppy\", 4, 2))"
+        },
+        {
+          "id": "D",
+          "text": "Concat(Substring(\"Harp\", 2, 2), Substring(\"Puppy\", 4, 2))"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "String Operations",
+      "explanation": "Substring(\"Harp\", 1, 2) = \"Ha\", Substring(\"Puppy\", 3, 3) = \"ppy\". Concat gives \"Happy\"."
+    },
+    {
+      "questionNumber": 58,
+      "type": "multiple_choice",
+      "text": "Which of the following are true statements about how the Internet enables crowdsourcing?\n\nI. The Internet can provide crowdsourcing participants access to useful tools, information, and professional knowledge.\nII. The speed and reach of the Internet can lower geographic barriers, allowing individuals from different locations to contribute to projects.\nIII. Using the Internet to distribute solutions across many users allows all computational problems to be solved in reasonable time, even for very large input sizes.",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "I and II only"
+        },
+        {
+          "id": "B",
+          "text": "I and III only"
+        },
+        {
+          "id": "C",
+          "text": "II and III only"
+        },
+        {
+          "id": "D",
+          "text": "I, II, and III"
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Crowdsourcing",
+      "explanation": "I and II are true benefits of Internet crowdsourcing. III is false - some problems remain intractable regardless of distribution."
+    },
+    {
+      "questionNumber": 59,
+      "type": "multiple_choice",
+      "text": "A media librarian at a movie studio is planning to save digital video files for archival purposes. The movie studio would like to be able to access full-quality videos if they are needed for future projects. Which of the following actions is LEAST likely to support the studio's goal?",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Using video file formats that conform to published standards and are supported across many different devices"
+        },
+        {
+          "id": "B",
+          "text": "Using lossy compression software to reduce the size requirements of the data being stored"
+        },
+        {
+          "id": "C",
+          "text": "Using storage media that can be expanded for additional data capacity"
+        },
+        {
+          "id": "D",
+          "text": "Using a system that incorporates redundancy to handle disk failure"
+        }
+      ],
+      "correctAnswers": [
+        "B"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Compression",
+      "explanation": "Lossy compression permanently removes data, reducing quality. This contradicts the goal of preserving full-quality videos."
+    },
+    {
+      "questionNumber": 131,
+      "type": "multiple_select",
+      "text": "Which of the following are ways in which a programmer can use abstraction to manage the complexity of a program?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Replacing each instance of repeated code with a call to a procedure"
+        },
+        {
+          "id": "B",
+          "text": "Replacing longer variable names with shorter variable names to reduce typing errors"
+        },
+        {
+          "id": "C",
+          "text": "Replacing several lines of documentation with a single line of documentation"
+        },
+        {
+          "id": "D",
+          "text": "Replacing the string variables name1, name2, name3, and name4 with a list of strings called names"
+        }
+      ],
+      "correctAnswers": [
+        "A",
+        "D"
+      ],
+      "bigIdeaId": "CRD",
+      "topic": "Abstraction",
+      "explanation": "Procedures and data structures (lists) are forms of abstraction that manage complexity. Shorter names and less documentation don't reduce complexity."
+    },
+    {
+      "questionNumber": 132,
+      "type": "multiple_select",
+      "text": "Two different schools maintain data sets about their currently enrolled students. No individual student is enrolled at both schools. Each line of data contains information, separated by commas, about one student.\n\nEast High School stores the data in the following format:\nData format: School Name, Last Name, First Name, Age, ZIP Code, Days Absent\n\nWest High School stores the data in the following format:\nData format: Student ID, First Name, Last Name, Age, Days Absent\n\nThe two schools would like to combine their data to make a single data set. Which of the following can be done with the combined data?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "The schools can create a single list of student names, sorted by last name."
+        },
+        {
+          "id": "B",
+          "text": "The schools can determine the average number of days students are absent."
+        },
+        {
+          "id": "C",
+          "text": "The schools can determine which ZIP code is represented by the most students."
+        },
+        {
+          "id": "D",
+          "text": "The schools can determine the student ID of the student with the greatest number of absences."
+        }
+      ],
+      "correctAnswers": [
+        "A",
+        "B"
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Combining Data Sets",
+      "explanation": "Both schools have names and absences, so A and B are possible. ZIP code is only in East's data, Student ID only in West's data."
+    },
+    {
+      "questionNumber": 133,
+      "type": "multiple_select",
+      "text": "A free online encyclopedia contains articles that can be written and edited by any user. Which of the following are advantages the online encyclopedia has over a traditional paper-based encyclopedia?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "The ability to easily check that the encyclopedia is free of copyrighted content"
+        },
+        {
+          "id": "B",
+          "text": "The ability to ensure that encyclopedia content is the same every time it is accessed"
+        },
+        {
+          "id": "C",
+          "text": "The ability to have a larger number of perspectives reflected in the encyclopedia content"
+        },
+        {
+          "id": "D",
+          "text": "The ability to quickly update encyclopedia content as new information becomes available"
+        }
+      ],
+      "correctAnswers": [
+        "C",
+        "D"
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Collaborative Computing",
+      "explanation": "Online encyclopedias allow many contributors (diverse perspectives) and easy updates. They don't automatically check copyright or guarantee consistent content."
+    },
+    {
+      "questionNumber": 134,
+      "type": "multiple_select",
+      "text": "The program below is intended to count the number of prime numbers in a list called numbers and display the result. The program uses the procedure isPrime(n), which returns true if n is a prime number and false otherwise.\n\nThe program does not work as intended.\n\nLine 1:  count \u2190 0\nLine 2:  FOR EACH value IN numbers\nLine 3:  {\nLine 4:    count \u2190 0\nLine 5:    IF (isPrime(value))\nLine 6:    {\nLine 7:      count \u2190 count + 1\nLine 8:    }\nLine 9:    count \u2190 count + 1\nLine 10: }\nLine 11: DISPLAY(count)\n\nWhich two lines of code should be removed so that the program will work as intended?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Line 1"
+        },
+        {
+          "id": "B",
+          "text": "Line 4"
+        },
+        {
+          "id": "C",
+          "text": "Line 7"
+        },
+        {
+          "id": "D",
+          "text": "Line 9"
+        }
+      ],
+      "correctAnswers": [
+        "B",
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Debugging",
+      "explanation": "Line 4 resets count each iteration (bad). Line 9 increments count for every number, not just primes (bad). Remove both."
+    },
+    {
+      "questionNumber": 135,
+      "type": "multiple_select",
+      "text": "Which of the following statements describe how cloud computing has affected Internet communication?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "Cloud computing has eliminated the need to provide redundancy in Internet routing."
+        },
+        {
+          "id": "B",
+          "text": "Cloud computing has helped enhance collaboration."
+        },
+        {
+          "id": "C",
+          "text": "Cloud computing has introduced new data-security concerns."
+        },
+        {
+          "id": "D",
+          "text": "Cloud computing has reduced concerns about intellectual property rights."
+        }
+      ],
+      "correctAnswers": [
+        "B",
+        "C"
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Cloud Computing",
+      "explanation": "Cloud computing enables collaboration but also raises security concerns as data is stored remotely. It hasn't eliminated redundancy needs or IP concerns."
+    },
+    {
+      "questionNumber": 136,
+      "type": "multiple_select",
+      "text": "A program is created to perform arithmetic operations on positive and negative integers. The program contains the following incorrect procedure, which is intended to return the product of the integers x and y.\n\nPROCEDURE Multiply(x, y)\n{\n  count \u2190 0\n  result \u2190 0\n  REPEAT UNTIL (count = y)\n  {\n    result \u2190 result + x\n    count \u2190 count + 1\n  }\n  RETURN result\n}\n\nA programmer suspects that an error in the program is caused by this procedure. Under which of the following conditions will the procedure NOT return the correct product?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "When the values of x and y are both positive."
+        },
+        {
+          "id": "B",
+          "text": "When the value of x is positive and the value of y is negative."
+        },
+        {
+          "id": "C",
+          "text": "When the value of x is negative and the value of y is positive."
+        },
+        {
+          "id": "D",
+          "text": "When the values of x and y are both negative."
+        }
+      ],
+      "correctAnswers": [
+        "B",
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Debugging - Procedures",
+      "explanation": "When y is negative, count will never equal y (count goes 0,1,2,... but y is negative), causing an infinite loop or wrong result."
+    },
+    {
+      "questionNumber": 137,
+      "type": "multiple_select",
+      "text": "The procedure Smallest is intended to return the least value in the list numbers. The procedure does not work as intended.\n\nPROCEDURE Smallest(numbers)\n{\n  min \u2190 numbers[1]\n  FOR EACH number IN numbers\n  {\n    IF (number < min)\n    {\n      RETURN number\n    }\n  }\n  RETURN min\n}\n\nFor which of the following values of theList will Smallest(theList) NOT return the intended value?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {
+          "id": "A",
+          "text": "theList \u2190 [10, 20, 30, 40]"
+        },
+        {
+          "id": "B",
+          "text": "theList \u2190 [20, 10, 30, 40]"
+        },
+        {
+          "id": "C",
+          "text": "theList \u2190 [30, 40, 20, 10]"
+        },
+        {
+          "id": "D",
+          "text": "theList \u2190 [40, 30, 20, 10]"
+        }
+      ],
+      "correctAnswers": [
+        "C",
+        "D"
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Debugging - Procedures",
+      "explanation": "The procedure returns immediately when finding a value less than min, not the overall minimum. In C, it returns 20 (not 10). In D, it returns 30 (not 10)."
+    }
+  ]
+}

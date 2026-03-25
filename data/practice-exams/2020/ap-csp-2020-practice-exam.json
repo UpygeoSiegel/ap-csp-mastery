@@ -1,0 +1,993 @@
+{
+  "examInfo": {
+    "title": "AP Computer Science Principles 2020 Practice Exam 1",
+    "year": 2020,
+    "totalQuestions": 67,
+    "singleSelectQuestions": 60,
+    "multiSelectQuestions": 7,
+    "timeLimit": "2 hours",
+    "source": "College Board"
+  },
+  "bigIdeas": {
+    "CRD": "Big Idea 1: Creative Development",
+    "DAT": "Big Idea 2: Data",
+    "AAP": "Big Idea 3: Algorithms and Programming",
+    "CSN": "Big Idea 4: Computer Systems and Networks",
+    "IOC": "Big Idea 5: Impact of Computing"
+  },
+  "questions": [
+    {
+      "questionNumber": 1,
+      "type": "single_select",
+      "text": "Consider the following program.\n\nx ← 2\nREPEAT 4 TIMES\n{\n    x ← x * 3\n}\n\nWhich of the following expressions represents the value stored in the variable x as a result of executing the program?",
+      "hasImage": true,
+      "imagePath": "images/q01_repeat_program.png",
+      "options": [
+        {"id": "A", "text": "2 * 3 * 3 * 3"},
+        {"id": "B", "text": "2 * 4 * 4 * 4"},
+        {"id": "C", "text": "2 * 3 * 3 * 3 * 3"},
+        {"id": "D", "text": "2 * 4 * 4 * 4 * 4"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Iteration and Expressions"
+    },
+    {
+      "questionNumber": 2,
+      "type": "single_select",
+      "text": "A small team of wildlife researchers is working on a project that uses motion-activated field cameras to capture images of animals at study sites. The team is considering using a \"citizen science\" approach to analyze the images. Which of the following best explains why such an approach is considered useful for this project?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Distributed individuals are likely to be more accurate in wildlife identification than the research team."},
+        {"id": "B", "text": "The image analysis is likely to be more consistent if completed by an individual citizen."},
+        {"id": "C", "text": "The image analysis is likely to require complex research methods."},
+        {"id": "D", "text": "The image analysis is likely to take a longer time for the research team than for a distributed group of individuals."}
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Crowdsourcing"
+    },
+    {
+      "questionNumber": 3,
+      "type": "single_select",
+      "text": "An algorithm is intended to display the following output.\n\nred red blue red red blue red red blue\n\nWhich of the following code segments can be used to display the intended output?",
+      "hasImage": true,
+      "imagePath": "images/q03_nested_loops.png",
+      "options": [
+        {"id": "A", "text": "REPEAT 2 TIMES { REPEAT 3 TIMES { DISPLAY(\"red\") } DISPLAY(\"blue\") }"},
+        {"id": "B", "text": "REPEAT 2 TIMES { REPEAT 3 TIMES { DISPLAY(\"blue\") } DISPLAY(\"red\") }"},
+        {"id": "C", "text": "REPEAT 3 TIMES { REPEAT 2 TIMES { DISPLAY(\"red\") } DISPLAY(\"blue\") }"},
+        {"id": "D", "text": "REPEAT 3 TIMES { REPEAT 2 TIMES { DISPLAY(\"blue\") } DISPLAY(\"red\") }"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Nested Iteration"
+    },
+    {
+      "questionNumber": 4,
+      "type": "single_select",
+      "text": "In a certain computer program, two positive integers are added together, resulting in an overflow error. Which of the following best explains why the error occurs?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "The program attempted to perform an operation that is considered an undecidable problem."},
+        {"id": "B", "text": "The precision of the result is limited due to the constraints of using a floating-point representation."},
+        {"id": "C", "text": "The program can only use a fixed number of bits to represent integers; the computed sum is greater than the maximum representable value."},
+        {"id": "D", "text": "The program cannot represent integers; the integers are converted into decimal approximations, leading to rounding errors."}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Integer Overflow"
+    },
+    {
+      "questionNumber": 5,
+      "type": "single_select",
+      "text": "The diagram below shows a circuit composed of three logic gates. Each gate takes two inputs and produces a single output.\n\nFor which of the following input values will the circuit have an output of true?",
+      "hasImage": true,
+      "imagePath": "images/q05_logic_gates.png",
+      "options": [
+        {"id": "A", "text": "A = true, B = true, C = true, D = false"},
+        {"id": "B", "text": "A = true, B = false, C = false, D = true"},
+        {"id": "C", "text": "A = false, B = true, C = true, D = true"},
+        {"id": "D", "text": "A = false, B = false, C = true, D = true"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Boolean Logic and Logic Gates"
+    },
+    {
+      "questionNumber": 6,
+      "type": "single_select",
+      "text": "The question below uses a robot in a grid of squares. The robot is represented as a triangle, which is initially in the bottom left square of the grid and facing right.\n\nThe following programs are each intended to move the robot to the gray square. Program II uses the procedure GoalReached, which returns true if the robot is in the gray square and returns false otherwise.\n\nWhich of the following statements best describes the correctness of the programs?",
+      "hasImage": true,
+      "imagePath": "images/q06_robot_grid.png",
+      "options": [
+        {"id": "A", "text": "Program I correctly moves the robot to the gray square, but program II does not."},
+        {"id": "B", "text": "Program II correctly moves the robot to the gray square, but program I does not."},
+        {"id": "C", "text": "Both program I and program II correctly move the robot to the gray square."},
+        {"id": "D", "text": "Neither program I nor program II correctly moves the robot to the gray square."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Robot Movement and Algorithms"
+    },
+    {
+      "questionNumber": 7,
+      "type": "single_select",
+      "text": "Flight simulation software, which imitates the experience of flying, is often used to train airline pilots. Which of the following is LEAST likely to be an advantage of using flight simulation software for this purpose?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Flight simulation software allows pilots to practice landing in a variety of different terrains and weather conditions without having to physically travel."},
+        {"id": "B", "text": "Flight simulation software could save money due to the cost of maintenance and fuel for actual training flights."},
+        {"id": "C", "text": "Flight simulation software provides a more realistic experience for pilots than actual training flights."},
+        {"id": "D", "text": "Flight simulation software allows for the testing of emergency air situations without serious consequences."}
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Benefits and Limitations of Simulations"
+    },
+    {
+      "questionNumber": 8,
+      "type": "single_select",
+      "text": "Which of the following actions are generally helpful in program development?\n\nI. Consulting potential users of the program to identify their concerns\nII. Writing and testing small code segments before adding them to the program\nIII. Collaborating with other individuals when developing a large program",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "I and II only"},
+        {"id": "B", "text": "I and III only"},
+        {"id": "C", "text": "II and III only"},
+        {"id": "D", "text": "I, II, and III"}
+      ],
+      "bigIdeaId": "CRD",
+      "topic": "Program Development Practices"
+    },
+    {
+      "questionNumber": 9,
+      "type": "single_select",
+      "text": "An Internet user has a need to send private data to another user. Which of the following provides the most security when transmitting private data?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Certifying the data with a Creative Commons license before sending it"},
+        {"id": "B", "text": "Sending the data using a high-bandwidth connection"},
+        {"id": "C", "text": "Sending the data using public-key encryption"},
+        {"id": "D", "text": "Sending the data using redundant routing"}
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Public Key Encryption"
+    },
+    {
+      "questionNumber": 10,
+      "type": "single_select",
+      "text": "Ticket prices for a science museum are shown in the following table.\n\nType of Ticket | General Admission Cost | Guided Tour Cost\nRegular (ages 13 and up) | $8 | $10\nChild (ages 12 and below) | $6 | $8\n\nA programmer is creating an algorithm to display the cost of a ticket based on the information in the table. The programmer uses the integer variable age for the age of the ticket recipient. The Boolean variable includesTour is true when the ticket is for a guided tour and is false when the ticket is for general admission.\n\nWhich of the following code segments correctly displays the cost of a ticket?",
+      "hasImage": true,
+      "imagePath": "images/q10_ticket_price.png",
+      "options": [
+        {"id": "A", "text": "cost ← 6; IF ((age > 12) OR includesTour) { cost ← cost + 2 }; DISPLAY(cost)"},
+        {"id": "B", "text": "cost ← 6; IF (age > 12) { cost ← cost + 2 }; IF (includesTour) { cost ← cost + 2 }; DISPLAY(cost)"},
+        {"id": "C", "text": "cost ← 6; IF (age > 12) { IF (includesTour) { cost ← cost + 2 } }; DISPLAY(cost)"},
+        {"id": "D", "text": "cost ← 6; IF (age > 12) { cost ← cost + 2 } ELSE { IF (includesTour) { cost ← cost + 2 } }; DISPLAY(cost)"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Selection and Conditionals"
+    },
+    {
+      "questionNumber": 11,
+      "type": "single_select",
+      "text": "A color in a computing application is represented by an RGB triplet that describes the amount of red, green, and blue, respectively, used to create the desired color. A selection of colors and their corresponding RGB triplets are shown in the following table. Each value is represented in decimal (base 10).\n\nAccording to information in the table, what color is represented by the binary RGB triplet (11111111, 11111111, 11110000)?",
+      "hasImage": true,
+      "imagePath": "images/q11_12_rgb_table.png",
+      "options": [
+        {"id": "A", "text": "Ivory"},
+        {"id": "B", "text": "Light yellow"},
+        {"id": "C", "text": "Neutral gray"},
+        {"id": "D", "text": "Vivid yellow"}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Binary Number Conversion"
+    },
+    {
+      "questionNumber": 12,
+      "type": "single_select",
+      "text": "What is the binary RGB triplet for the color indigo?",
+      "hasImage": true,
+      "imagePath": "images/q11_12_rgb_table.png",
+      "options": [
+        {"id": "A", "text": "(00100101, 00000000, 10000010)"},
+        {"id": "B", "text": "(00100101, 00000000, 01000001)"},
+        {"id": "C", "text": "(01001011, 00000000, 10000010)"},
+        {"id": "D", "text": "(01001011, 00000000, 01000001)"}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Binary Number Conversion"
+    },
+    {
+      "questionNumber": 13,
+      "type": "single_select",
+      "text": "A library system contains information for each book that was borrowed. Each time a person borrows or returns a book from the library, the following information is recorded in a database.\n\n• Name and the unique ID number of the person who was borrowing the book\n• Author, title, and the unique ID number of the book that was borrowed\n• Date that the book was borrowed\n• Date that the book was due to be returned\n• Date that the book was returned (or 0 if the book has not been returned yet)\n\nWhich of the following CANNOT be determined from the information collected by the system?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "The total number of books borrowed in a given year"},
+        {"id": "B", "text": "The total number of books that were never borrowed in a given year"},
+        {"id": "C", "text": "The total number of books that were returned past their due date in a given year"},
+        {"id": "D", "text": "The total number of people who borrowed at least one book in a given year"}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data and Information"
+    },
+    {
+      "questionNumber": 14,
+      "type": "single_select",
+      "text": "The following algorithm is intended to take a positive integer as input and display its individual digits in order from right to left. For example, if the input is 512, the algorithm should produce the output 2 1 5. Step 3 of the algorithm is missing.\n\nStep 1: Input a positive integer from the user and store it in the variable number.\nStep 2: Divide number by 10 and record the integer quotient and the remainder. The integer quotient is the quotient with any part after the decimal point dropped. For example, when 127 is divided by 10, the quotient is 12.7, the integer quotient is 12 and the remainder is 7.\nStep 3: (missing step)\nStep 4: Repeat steps 2 and 3 until number is 0.\n\nWhich of the following can be used as step 3 so that the algorithm works as intended?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Step 3: Display the remainder of number divided by 10 and store the remainder in number."},
+        {"id": "B", "text": "Step 3: Display the remainder of number divided by 10 and store the integer quotient in number."},
+        {"id": "C", "text": "Step 3: Display the integer quotient of number divided by 10 and store the remainder in number."},
+        {"id": "D", "text": "Step 3: Display the integer quotient of number divided by 10 and store the integer quotient in number."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Algorithms and Mathematical Operations"
+    },
+    {
+      "questionNumber": 15,
+      "type": "single_select",
+      "text": "Consider the two programs below.\n\nProgram A:\ni ← 1\nREPEAT UNTIL (i > 10)\n{\n    DISPLAY(i)\n    i ← i + 1\n}\n\nProgram B:\ni ← 0\nREPEAT UNTIL (i ≥ 10)\n{\n    i ← i + 1\n    DISPLAY(i)\n}\n\nWhich of the following best compares the values displayed by programs A and B?",
+      "hasImage": true,
+      "imagePath": "images/q15_program_comparison.png",
+      "options": [
+        {"id": "A", "text": "Program A and program B display identical values in the same order."},
+        {"id": "B", "text": "Program A and program B display the same values in different orders."},
+        {"id": "C", "text": "Program A and program B display the same number of values, but the values differ."},
+        {"id": "D", "text": "Program B displays one more value than program A."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Iteration and Loop Comparison"
+    },
+    {
+      "questionNumber": 16,
+      "type": "single_select",
+      "text": "A student wrote the following program to remove all occurrences of the strings \"the\" and \"a\" from the list wordList.\n\nLine 1: index ← LENGTH(wordList)\nLine 2: REPEAT UNTIL (index < 1)\nLine 3: {\nLine 4:     IF ((wordList[index] = \"the\") OR (wordList[index] = \"a\"))\nLine 5:     {\nLine 6:         REMOVE(wordList, index)\nLine 7:     }\nLine 8: }\n\nWhile debugging the program, the student realizes that the loop never terminates. Which of the following changes can be made so that the program works as intended?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Inserting index ← index + 1 between lines 6 and 7"},
+        {"id": "B", "text": "Inserting index ← index + 1 between lines 7 and 8"},
+        {"id": "C", "text": "Inserting index ← index - 1 between lines 6 and 7"},
+        {"id": "D", "text": "Inserting index ← index - 1 between lines 7 and 8"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "List Operations and Debugging"
+    },
+    {
+      "questionNumber": 17,
+      "type": "single_select",
+      "text": "Which of the following can be represented by a sequence of bits?\n\nI. An integer\nII. An alphanumeric character\nIII. A machine language instruction",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "I only"},
+        {"id": "B", "text": "III only"},
+        {"id": "C", "text": "I and II only"},
+        {"id": "D", "text": "I, II, and III"}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Binary Representation"
+    },
+    {
+      "questionNumber": 18,
+      "type": "single_select",
+      "text": "The grid below contains a robot represented as a triangle, initially facing right. The robot can move into a white or gray square but cannot move into a black region.\n\nThe code segment below uses the procedure GoalReached, which evaluates to true if the robot is in the gray square and evaluates to false otherwise.\n\nREPEAT UNTIL (GoalReached())\n{\n    <MISSING CODE>\n}\n\nWhich of the following replacements for <MISSING CODE> can be used to move the robot to the gray square?",
+      "hasImage": true,
+      "imagePath": "images/q18_robot_maze.png",
+      "options": [
+        {"id": "A", "text": "REPEAT UNTIL (CAN_MOVE(forward) = false) { ROTATE_RIGHT() } MOVE_FORWARD()"},
+        {"id": "B", "text": "REPEAT UNTIL (CAN_MOVE(forward) = false) { MOVE_FORWARD() } ROTATE_RIGHT()"},
+        {"id": "C", "text": "REPEAT UNTIL (CAN_MOVE(right)) { ROTATE_RIGHT() } MOVE_FORWARD()"},
+        {"id": "D", "text": "REPEAT UNTIL (CAN_MOVE(right)) { MOVE_FORWARD() } ROTATE_RIGHT()"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Robot Movement and Algorithms"
+    },
+    {
+      "questionNumber": 19,
+      "type": "single_select",
+      "text": "Questions 19-21 refer to graphs showing registered users by year and total amount of data stored for a file storage application over eight years.\n\nWhich of the following best describes the growth in the number of registered users for the first eight years of the application's existence?",
+      "hasImage": true,
+      "imagePath": "images/q19_21_graphs.png",
+      "options": [
+        {"id": "A", "text": "The number of registered users increased at about a constant rate each year for all eight years."},
+        {"id": "B", "text": "The number of registered users increased at about a constant rate for years 1 to 5 and then about doubled each year after that."},
+        {"id": "C", "text": "The number of registered users about doubled each year for years 1 to 5 and then increased at about a constant rate after that."},
+        {"id": "D", "text": "The number of registered users about doubled each year for all eight years."}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Visualization and Analysis"
+    },
+    {
+      "questionNumber": 20,
+      "type": "single_select",
+      "text": "Which of the following best describes the average amount of data stored per user for the first eight years of the application's existence?",
+      "hasImage": true,
+      "imagePath": "images/q19_21_graphs.png",
+      "options": [
+        {"id": "A", "text": "Across all eight years, the average amount of data stored per user was about 10 GB."},
+        {"id": "B", "text": "Across all eight years, the average amount of data stored per user was about 100 GB."},
+        {"id": "C", "text": "The average amount of data stored per user appears to increase by about 10 GB each year."},
+        {"id": "D", "text": "The average amount of data stored per user appears to increase by about 100 GB each year."}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Analysis"
+    },
+    {
+      "questionNumber": 21,
+      "type": "single_select",
+      "text": "Which of the following observations is most consistent with the information in the circle graph?",
+      "hasImage": true,
+      "imagePath": "images/q19_21_graphs.png",
+      "options": [
+        {"id": "A", "text": "Over 75% of the files stored are 1 MB in size or less."},
+        {"id": "B", "text": "Over 75% of the files stored are 10 MB in size or less."},
+        {"id": "C", "text": "Over 75% of the files stored are at least 100 KB in size."},
+        {"id": "D", "text": "Over 75% of the files stored are at least 1 MB in size."}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Visualization Interpretation"
+    },
+    {
+      "questionNumber": 22,
+      "type": "single_select",
+      "text": "Consider the following spinner, which is used to determine how pieces are to be moved on a game board. The region labeled \"Move 1 space\" is six times as large as each of the other two regions.\n\nWhich of the following code segments can be used to simulate the behavior of the spinner?",
+      "hasImage": true,
+      "imagePath": "images/q22_spinner.png",
+      "options": [
+        {"id": "A", "text": "spin ← RANDOM(1, 6); IF (spin = 1) { DISPLAY(\"Move 1 space\") } ELSE { IF (spin = 2) { DISPLAY(\"Move 2 spaces\") } ELSE { DISPLAY(\"Lose a turn\") } }"},
+        {"id": "B", "text": "spin ← RANDOM(1, 6); IF (spin = 1) { DISPLAY(\"Lose a turn\") } ELSE { IF (spin = 2) { DISPLAY(\"Move 2 spaces\") } ELSE { DISPLAY(\"Move 1 space\") } }"},
+        {"id": "C", "text": "spin ← RANDOM(1, 8); IF (spin = 1) { DISPLAY(\"Move 1 space\") } ELSE { IF (spin = 2) { DISPLAY(\"Move 2 spaces\") } ELSE { DISPLAY(\"Lose a turn\") } }"},
+        {"id": "D", "text": "spin ← RANDOM(1, 8); IF (spin = 1) { DISPLAY(\"Lose a turn\") } ELSE { IF (spin = 2) { DISPLAY(\"Move 2 spaces\") } ELSE { DISPLAY(\"Move 1 space\") } }"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Simulations and Random"
+    },
+    {
+      "questionNumber": 23,
+      "type": "single_select",
+      "text": "A flowchart is a way to visually represent an algorithm. The flowchart below is used by an application to set the Boolean variable available to true under certain conditions. The flowchart uses the Boolean variable weekday and the integer variable miles.\n\nWhich of the following statements is equivalent to the algorithm in the flowchart?",
+      "hasImage": true,
+      "imagePath": "images/q23_flowchart.png",
+      "options": [
+        {"id": "A", "text": "available ← (weekday) OR (miles < 20)"},
+        {"id": "B", "text": "available ← (weekday) AND (miles < 20)"},
+        {"id": "C", "text": "available ← (weekday) OR (miles ≥ 20)"},
+        {"id": "D", "text": "available ← (weekday) AND (miles ≥ 20)"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Flowcharts and Boolean Logic"
+    },
+    {
+      "questionNumber": 24,
+      "type": "single_select",
+      "text": "Consider the following program.\n\nval ← 0\nsum ← 0\nREPEAT 10 TIMES\n{\n    val ← val + 2\n    sum ← sum + val\n}\nDISPLAY(sum)\n\nWhich of the following describes the result of executing the program?",
+      "hasImage": true,
+      "imagePath": "images/q24_sum_program.png",
+      "options": [
+        {"id": "A", "text": "The program displays the sum of the even integers from 2 to 10."},
+        {"id": "B", "text": "The program displays the sum of the even integers from 2 to 20."},
+        {"id": "C", "text": "The program displays the sum of the odd integers from 1 to 9."},
+        {"id": "D", "text": "The program displays the sum of the odd integers from 1 to 19."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Iteration and Accumulator Patterns"
+    },
+    {
+      "questionNumber": 25,
+      "type": "single_select",
+      "text": "Which of the following statements correctly explain how the Internet is able to facilitate communication at a large scale?\n\nI. A central monitoring computer is used to track and maintain the connections of the Internet.\nII. Data is routed between points in multiple ways so that if a connection fails, the data can be rerouted around the inoperative connections.\nIII. Protocols for packets and routing are used so that computers from different manufacturers can communicate in a standard way.",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "I and II only"},
+        {"id": "B", "text": "I and III only"},
+        {"id": "C", "text": "II and III only"},
+        {"id": "D", "text": "I, II, and III"}
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Internet Architecture and Protocols"
+    },
+    {
+      "questionNumber": 26,
+      "type": "single_select",
+      "text": "A list of binary values (0 or 1) is used to represent a black-and-white image. Which of the following is LEAST likely to be stored as metadata associated with the image?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Copyright information for the image"},
+        {"id": "B", "text": "The date and time the image was created"},
+        {"id": "C", "text": "The dimensions (number of rows and columns of pixels) of the image"},
+        {"id": "D", "text": "A duplicate copy of the data"}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Metadata"
+    },
+    {
+      "questionNumber": 27,
+      "type": "single_select",
+      "text": "Which of the following best explains why it is not possible to use computers to solve every problem?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Current computer processing capabilities cannot improve significantly."},
+        {"id": "B", "text": "Large-scale problems require a crowdsourcing model, which is limited by the number of people available to work on the problem."},
+        {"id": "C", "text": "The ability of a computer to solve a problem is limited by the bandwidth of the computer's Internet connection."},
+        {"id": "D", "text": "There exist some problems that cannot be solved using any algorithm."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Undecidable Problems"
+    },
+    {
+      "questionNumber": 28,
+      "type": "single_select",
+      "text": "Assume that the variables alpha and beta each are initialized with a numeric value. Which of the following code segments can be used to interchange the values of alpha and beta using the temporary variable temp?\n\nI. temp ← alpha; alpha ← beta; beta ← temp\nII. temp ← alpha; beta ← alpha; alpha ← temp\nIII. temp ← beta; beta ← alpha; alpha ← temp",
+      "hasImage": true,
+      "imagePath": "images/q28_swap_code.png",
+      "options": [
+        {"id": "A", "text": "I and II only"},
+        {"id": "B", "text": "I and III only"},
+        {"id": "C", "text": "II and III only"},
+        {"id": "D", "text": "I, II, and III"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Variables and Assignment"
+    },
+    {
+      "questionNumber": 29,
+      "type": "single_select",
+      "text": "A person wants to transmit an audio file from a device to a second device. Which of the following scenarios best demonstrates the use of lossless compression of the original file?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "A device compresses the audio file before transmitting it to a second device. The second device restores the compressed file to its original version before playing it."},
+        {"id": "B", "text": "A device compresses the audio file by removing details that are not easily perceived by the human ear. The compressed file is transmitted to a second device, which plays it."},
+        {"id": "C", "text": "A device transmits the original audio file to a second device. The second device removes metadata from the file before playing it."},
+        {"id": "D", "text": "A device transmits the original audio file to a second device. The second device plays the transmitted file as is."}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Lossless vs Lossy Compression"
+    },
+    {
+      "questionNumber": 30,
+      "type": "single_select",
+      "text": "In the following program, assume that the variable n has been initialized with an integer value.\n\nIF (n ≥ 0)\n{\n    n ← n + 1\n}\nELSE\n{\n    n ← n * -1\n}\nIF (n ≥ 1)\n{\n    IF (n ≥ 30)\n    {\n        DISPLAY(\"too high\")\n    }\n    ELSE\n    {\n        IF (n ≥ 10)\n        {\n            DISPLAY(\"in range\")\n        }\n        ELSE\n        {\n            DISPLAY(\"too low\")\n        }\n    }\n}\nELSE\n{\n    DISPLAY(\"out of range\")\n}\n\nWhich of the following is NOT a possible value displayed by the program?",
+      "hasImage": true,
+      "imagePath": "images/q30_conditional.png",
+      "options": [
+        {"id": "A", "text": "too high"},
+        {"id": "B", "text": "in range"},
+        {"id": "C", "text": "too low"},
+        {"id": "D", "text": "out of range"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Nested Conditionals"
+    },
+    {
+      "questionNumber": 31,
+      "type": "single_select",
+      "text": "A student purchases a single-user license of a copyrighted application and wants other students to be able to use it at the same time. Under which of the following conditions is it considered acceptable for the student to share the application?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "When the application is shared only with students at the same school"},
+        {"id": "B", "text": "When the application is shared on a peer-to-peer network"},
+        {"id": "C", "text": "When the student gets permission from the copyright owner of the application"},
+        {"id": "D", "text": "When the student makes a copy of the application for another student to use only once"}
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Copyright and Intellectual Property"
+    },
+    {
+      "questionNumber": 32,
+      "type": "single_select",
+      "text": "A student's overall course grade in a certain class is based on the student's scores on individual assignments. The course grade is calculated by dropping the student's lowest individual assignment score and averaging the remaining scores.\n\nA programmer is writing a program to calculate a student's course grade using the process described. The programmer has the following procedures available:\n\nMin(numList) - Returns the minimum value in the list numList\nSum(numList) - Returns the sum of the values in the list numList\n\nThe student's individual assignment scores are stored in the list scores. Which of the following can be used to calculate a student's course grade and store the result in the variable finalGrade?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "finalGrade ← Sum(scores) / LENGTH(scores); finalGrade ← finalGrade - Min(scores)"},
+        {"id": "B", "text": "finalGrade ← Sum(scores) / (LENGTH(scores) - 1); finalGrade ← finalGrade - Min(scores)"},
+        {"id": "C", "text": "finalGrade ← Sum(scores) - Min(scores); finalGrade ← finalGrade / LENGTH(scores)"},
+        {"id": "D", "text": "finalGrade ← Sum(scores) - Min(scores); finalGrade ← finalGrade / (LENGTH(scores) - 1)"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Procedures and Algorithms"
+    },
+    {
+      "questionNumber": 33,
+      "type": "single_select",
+      "text": "An administrator at the school has data about hundreds of students in a particular course. While the administrator does not know the values of each student's individual assignment scores, the administrator does have the following information for each student:\n\n• The student name\n• A unique student ID number\n• The number of assignments for the course\n• The average assignment score before the lowest score was dropped\n• The course grade after the lowest score was dropped\n\nWhich of the following CANNOT be determined from this data alone?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "For a given student, the value of the highest assignment score"},
+        {"id": "B", "text": "For a given student, the value of the lowest assignment score"},
+        {"id": "C", "text": "For a given student, the change in course grade as a result of dropping the lowest score"},
+        {"id": "D", "text": "The proportion of students who improved their course grade as a result of dropping the lowest score"}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data and Information Limitations"
+    },
+    {
+      "questionNumber": 34,
+      "type": "single_select",
+      "text": "The following question uses a robot in a grid of squares. The robot is represented by a triangle, which is initially facing toward the top of the grid.\n\nConsider the procedure below.\n\nPROCEDURE BotMover(x)\n{\n    MOVE_FORWARD()\n    REPEAT x TIMES\n    {\n        ROTATE_RIGHT()\n    }\n    MOVE_FORWARD()\n}\n\nWhich of the following code segments will move the robot to the gray square along the path indicated by the arrows?",
+      "hasImage": true,
+      "imagePath": "images/q34_robot_procedure.png",
+      "options": [
+        {"id": "A", "text": "BotMover(1); BotMover(1); BotMover(0)"},
+        {"id": "B", "text": "BotMover(1); BotMover(2); BotMover(3)"},
+        {"id": "C", "text": "BotMover(1); BotMover(3); BotMover(0)"},
+        {"id": "D", "text": "BotMover(3); BotMover(1); BotMover(0)"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Procedures and Robot Movement"
+    },
+    {
+      "questionNumber": 35,
+      "type": "single_select",
+      "text": "A programmer notices the following two procedures in a library. The procedures do similar, but not identical, things.\n\n• Procedure MaxTwo(x, y) returns the greater of its two integer parameters.\n• Procedure MaxThree(x, y, z) returns the greatest of its three integer parameters.\n\nWhich of the following procedures is a generalization of the MaxTwo and MaxThree procedures?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Procedure Min(x, y), which returns the lesser of its two integer parameters"},
+        {"id": "B", "text": "Procedure Max(numList), which returns the maximum value in the list of integers numList"},
+        {"id": "C", "text": "Procedure MaxFour(w, x, y, z), which returns the greatest of its four integer parameters"},
+        {"id": "D", "text": "Procedure OverMax(numList, max), which returns the number of integers in numList that exceed the integer value max"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Abstraction and Generalization"
+    },
+    {
+      "questionNumber": 36,
+      "type": "single_select",
+      "text": "A group of planners are using a simulation to examine whether or not a park that they are designing is going to affect foot traffic in the area. The simulation uses a model that includes input variables for the park such as the number of entrances, sidewalks, and bike trails and the square footage of open space (grassy areas). The simulation can then be run multiple times using different values for the input variables to represent different park designs. However, the simulation takes a very long time to run. The planners update the model by removing some variables they consider less important than others. Of the following, which is the most likely effect the updated model will have on the simulation?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "The updated model is likely to decrease the runtime of the simulation because the time required for simulations generally depends on the complexity of the model used."},
+        {"id": "B", "text": "The updated model is likely to decrease the runtime of the simulation because simulations that use older models tend to require more time to run than simulations that use newer models."},
+        {"id": "C", "text": "The updated model is unlikely to decrease the runtime of the simulation because the simulation is computationally complex, regardless of the model used."},
+        {"id": "D", "text": "The updated model is unlikely to provide any benefit because removing details from a model will compromise the accuracy of the simulation."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Simulations and Models"
+    },
+    {
+      "questionNumber": 37,
+      "type": "single_select",
+      "text": "Consider the following procedure.\n\nProcedure Call: DrawLine(x1, y1, x2, y2)\nExplanation: Draws a line segment on a coordinate grid with endpoints at coordinates (x1, y1) and (x2, y2)\n\nThe DrawLine procedure is to be used to draw a figure on a coordinate grid consisting of four parallel line segments from (2,6) to (8,8), (2,6) to (8,6), (2,6) to (8,4), and (2,6) to (8,2).\n\nThe following code segment is intended to draw the figure.\n\nstartX ← 2\nstartY ← 6\nendX ← 8\nendY ← 8\nREPEAT 4 TIMES\n{\n    <MISSING CODE>\n}\n\nWhich of the following can be used to replace <MISSING CODE> so that the figure is drawn correctly?",
+      "hasImage": true,
+      "imagePath": "images/q37_drawline.png",
+      "options": [
+        {"id": "A", "text": "DrawLine(startX, startY, endX, endY); endY ← endY - 2"},
+        {"id": "B", "text": "DrawLine(startX, startY, endX, endY); endX ← endX - 2; endY ← endY - 2"},
+        {"id": "C", "text": "endY ← endY - 2; DrawLine(startX, startY, endX, endY)"},
+        {"id": "D", "text": "endX ← endX - 2; endY ← endY - 2; DrawLine(startX, startY, endX, endY)"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Procedures and Iteration"
+    },
+    {
+      "questionNumber": 38,
+      "type": "single_select",
+      "text": "Internet protocol version 6 (IPv6) has been introduced to replace the previous version (IPv4). Which of the following best describes a benefit of IPv6 over IPv4?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "IPv6 addresses are shorter than IPv4 addresses, which allows for faster routing of packets."},
+        {"id": "B", "text": "IPv6 allows for a greater number of addresses than IPv4, which allows more devices to be connected to the Internet."},
+        {"id": "C", "text": "IPv6 eliminates the use of hierarchy in addressing, making addresses easier to use."},
+        {"id": "D", "text": "IPv6 allows users to bypass older security protocols so that data can be sent peer-to-peer without the use of routers."}
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Internet Protocols (IPv4 vs IPv6)"
+    },
+    {
+      "questionNumber": 39,
+      "type": "single_select",
+      "text": "Assume that the list of numbers nums has more than 10 elements. The program below is intended to compute and display the sum of the first 10 elements of nums.\n\nLine 1: i ← 1\nLine 2: sum ← 0\nLine 3: REPEAT UNTIL (i > 10)\nLine 4: {\nLine 5:     i ← i + 1\nLine 6:     sum ← sum + nums[i]\nLine 7: }\nLine 8: DISPLAY(sum)\n\nWhich change, if any, is needed for the program to work as intended?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Lines 1 and 2 should be interchanged."},
+        {"id": "B", "text": "Line 3 should be changed to REPEAT UNTIL (i ≥ 10)."},
+        {"id": "C", "text": "Lines 5 and 6 should be interchanged."},
+        {"id": "D", "text": "No change is needed; the program works correctly."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Debugging and Iteration"
+    },
+    {
+      "questionNumber": 40,
+      "type": "single_select",
+      "text": "Which of the following best explains how a certificate authority is used in protecting data?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "A certificate authority certifies the safety of a particular Web site so that users know that it does not contain any viruses."},
+        {"id": "B", "text": "A certificate authority issues passwords that grant access to secure databases."},
+        {"id": "C", "text": "A certificate authority maintains a secure database that maps all Web domain names to the IP addresses of the servers where the sites are hosted."},
+        {"id": "D", "text": "A certificate authority verifies the authenticity of encryption keys used in secured communications."}
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Certificate Authorities and Encryption"
+    },
+    {
+      "questionNumber": 41,
+      "type": "single_select",
+      "text": "A photographer has a collection of digital pictures, each using the same file-naming format: a date tag, followed by a description, followed by the file extension \".jpg\". The photographer wants to write a code segment to extract the description from each file name, as shown in the following table.\n\nOriginal File Name | Extracted Description\n2016-05-22-Andrews-Graduation.jpg | Andrews-Graduation\n2016-07-04-Fireworks.jpg | Fireworks\n2017-10-18-Grandmas-Birthday.jpg | Grandmas-Birthday\n\nThe photographer has the following procedures available:\nTrimLeft(str, n) - Returns a copy of the string str with the n leftmost characters removed.\nTrimRight(str, n) - Returns a copy of the string str with the n rightmost characters removed.\n\nLet an original file name be stored in the string variable original. Which of the following statements will correctly extract the description and store it in the string variable descr?\n\nI. descr ← TrimLeft(TrimRight(original, 4), 11)\nII. descr ← TrimLeft(TrimRight(original, 11), 4)\nIII. descr ← TrimRight(TrimLeft(original, 11), 4)",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "I only"},
+        {"id": "B", "text": "II only"},
+        {"id": "C", "text": "I and III"},
+        {"id": "D", "text": "II and III"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "String Manipulation"
+    },
+    {
+      "questionNumber": 42,
+      "type": "single_select",
+      "text": "A programmer wants to determine whether a score is within 10 points of a given target. For example, if the target is 50, then the scores 40, 44, 50, 58, and 60 are all within 10 points of the target, while 38 and 61 are not.\n\nWhich of the following Boolean expressions will evaluate to true if and only if score is within 10 points of target?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "(score ≤ target + 10) AND (target + 10 ≤ score)"},
+        {"id": "B", "text": "(target + 10 ≤ score) AND (score ≤ target - 10)"},
+        {"id": "C", "text": "(score ≤ target - 10) AND (score ≤ target + 10)"},
+        {"id": "D", "text": "(target - 10 ≤ score) AND (score ≤ target + 10)"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Boolean Expressions"
+    },
+    {
+      "questionNumber": 43,
+      "type": "single_select",
+      "text": "Questions 43-44 refer to the information below.\n\nThe figure below shows two possible network configurations for devices P through V. A line between two devices indicates a connection. Devices can communicate only through the connections shown.\n\nIn which of the configurations is it possible to have redundant routing between devices Q and V?",
+      "hasImage": true,
+      "imagePath": "images/q43_44_network.png",
+      "options": [
+        {"id": "A", "text": "Configuration I only"},
+        {"id": "B", "text": "Configuration II only"},
+        {"id": "C", "text": "Both configuration I and configuration II"},
+        {"id": "D", "text": "Neither configuration I nor configuration II"}
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Network Redundancy and Routing"
+    },
+    {
+      "questionNumber": 44,
+      "type": "single_select",
+      "text": "In configuration I, what is the minimum number of connections that must be broken or removed before device T can no longer communicate with device U?",
+      "hasImage": true,
+      "imagePath": "images/q43_44_network.png",
+      "options": [
+        {"id": "A", "text": "One"},
+        {"id": "B", "text": "Two"},
+        {"id": "C", "text": "Three"},
+        {"id": "D", "text": "Four"}
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "Network Fault Tolerance"
+    },
+    {
+      "questionNumber": 45,
+      "type": "single_select",
+      "text": "Consider a game in which a player flips a fair coin three times. If all three coin flips have the same result (either all heads or all tails) the player wins. Otherwise, the player loses.\n\nWhich of the following code segments best simulates the behavior of the game?",
+      "hasImage": true,
+      "imagePath": "images/q45_coin_flip.png",
+      "options": [
+        {"id": "A", "text": "flip ← RANDOM(0, 3); IF (flip = 3) { DISPLAY(\"You lose.\") } ELSE { DISPLAY(\"You win!\") }"},
+        {"id": "B", "text": "flip ← RANDOM(0, 3); IF (flip = 3) OR (flip = 0) { DISPLAY(\"You win!\") } ELSE { DISPLAY(\"You lose.\") }"},
+        {"id": "C", "text": "sum ← 0; REPEAT 3 TIMES { sum ← sum + RANDOM(0, 1) }; IF (sum = 3) { DISPLAY(\"You win!\") } ELSE { DISPLAY(\"You lose.\") }"},
+        {"id": "D", "text": "sum ← 0; REPEAT 3 TIMES { sum ← sum + RANDOM(0, 1) }; IF (sum = 3) OR (sum = 0) { DISPLAY(\"You win!\") } ELSE { DISPLAY(\"You lose.\") }"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Simulations"
+    },
+    {
+      "questionNumber": 46,
+      "type": "single_select",
+      "text": "Which of the following best explains how IP addresses are assigned?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "As a new device is connected to the Internet, it is assigned an IP address to enable communication on the network."},
+        {"id": "B", "text": "IP addresses are assigned only to servers that host Web sites; user devices do not require an IP address."},
+        {"id": "C", "text": "New devices are connected to the Internet without an IP address, but are eventually assigned an IP address once they can be verified by a certificate authority."},
+        {"id": "D", "text": "New devices are connected to the Internet without an IP address; IP addresses are assigned only for encrypted communications."}
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "IP Addresses"
+    },
+    {
+      "questionNumber": 47,
+      "type": "single_select",
+      "text": "The procedure BinarySearch(numList, target) correctly implements a binary search algorithm on the list of numbers numList. The procedure returns an index where target occurs in numList, or -1 if target does not occur in numList. Which of the following conditions must be met in order for the procedure to work as intended?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "The length of numList must be even."},
+        {"id": "B", "text": "The list numList must not contain any duplicate values."},
+        {"id": "C", "text": "The values in numList must be in sorted order."},
+        {"id": "D", "text": "The value of target must not be equal to -1."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Binary Search"
+    },
+    {
+      "questionNumber": 48,
+      "type": "single_select",
+      "text": "Which of the following scenarios best exemplifies a phishing attack?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "A user connects to a public wireless network. An unauthorized individual intercepts data transmitted on the network, looking for private information that can be used to gain access to the user's accounts."},
+        {"id": "B", "text": "A user's e-mail account is overwhelmed with messages containing large attachments, which causes the account to exceed the maximum amount of data allowed and temporarily prevents the user from sending and receiving new messages."},
+        {"id": "C", "text": "A user receives an e-mail from a sender offering technical help with the user's computer. The e-mail prompts the user to start a help session by clicking a provided link and entering the username and password associated with the user's computer."},
+        {"id": "D", "text": "A user chooses a weak password for an online account. An unauthorized individual successfully guesses the user's password from a list of common passwords."}
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Phishing and Cybersecurity"
+    },
+    {
+      "questionNumber": 49,
+      "type": "single_select",
+      "text": "An office uses an application to assign work to its staff members. The application uses a binary sequence to represent each of 100 staff members. What is the minimum number of bits needed to assign a unique bit sequence to each staff member?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "5"},
+        {"id": "B", "text": "6"},
+        {"id": "C", "text": "7"},
+        {"id": "D", "text": "8"}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Binary Representation and Bits"
+    },
+    {
+      "questionNumber": 50,
+      "type": "single_select",
+      "text": "Consider the following algorithms. Each algorithm operates on a list containing n elements, where n is a very large integer.\n\nI. An algorithm that accesses each element in the list twice\nII. An algorithm that accesses each element in the list n times\nIII. An algorithm that accesses only the first 10 elements in the list, regardless of the size of the list\n\nWhich of the algorithms run in reasonable time?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "I only"},
+        {"id": "B", "text": "III only"},
+        {"id": "C", "text": "I and II only"},
+        {"id": "D", "text": "I, II, and III"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Algorithm Efficiency"
+    },
+    {
+      "questionNumber": 51,
+      "type": "single_select",
+      "text": "Which of the following best describes the impact of Creative Commons?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Creative Commons gives creators of digital content the ability to indicate how their works can be legally used and distributed, enabling broad access to digital information."},
+        {"id": "B", "text": "Creative Commons gives Internet users the right to legally use and distribute any previously copyrighted work, enabling broad access to digital information."},
+        {"id": "C", "text": "Creative Commons provides lossless transmission of messages, enabling reliable distribution of digital information."},
+        {"id": "D", "text": "Creative Commons provides private transmission of messages, enabling secure distribution of digital information."}
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Creative Commons and Licensing"
+    },
+    {
+      "questionNumber": 52,
+      "type": "single_select",
+      "text": "A biologist wrote a program to simulate the population of a sample of bacteria. The program uses the following procedures:\n\nInitialPopulation() - Returns the number of bacteria at the start of the simulation\nNextPopulation(currPop) - Based on the current value of currPop, returns the number of bacteria after one hour\n\nCode for the simulation is shown below.\n\nhours ← 0\nstartPop ← InitialPopulation()\ncurrentPop ← startPop\nREPEAT UNTIL ((hours ≥ 24) OR (currentPop ≤ 0))\n{\n    currentPop ← NextPopulation(currentPop)\n    hours ← hours + 1\n}\nDISPLAY(currentPop - startPop)\n\nWhich of the following are true statements about the simulation?\n\nI. The simulation continues until either 24 hours pass or the population reaches 0.\nII. The simulation displays the average change in population per hour over the course of the simulation.\nIII. The simulation displays the total population at the end of the simulation.",
+      "hasImage": true,
+      "imagePath": "images/q52_bacteria_sim.png",
+      "options": [
+        {"id": "A", "text": "I only"},
+        {"id": "B", "text": "II only"},
+        {"id": "C", "text": "III only"},
+        {"id": "D", "text": "I and II"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Simulations and Program Analysis"
+    },
+    {
+      "questionNumber": 53,
+      "type": "single_select",
+      "text": "A system is being developed to help pet owners locate lost pets. Which of the following best describes a system that uses crowdsourcing?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "A mobile application and collar that uses GPS technology to determine the pet's location and transmits the location when the owner refreshes the application"},
+        {"id": "B", "text": "A mobile application and collar that uses wireless technology to determine whether the pet is within 100 feet of the owner's phone and transmits a message to the owner when the pet is nearby"},
+        {"id": "C", "text": "A mobile application that allows users to report the location of a pet that appears to be lost and upload a photo that is made available to other users of the application"},
+        {"id": "D", "text": "A mobile application that transmits a message to all users any time a lost pet is returned to its owner"}
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Crowdsourcing"
+    },
+    {
+      "questionNumber": 54,
+      "type": "single_select",
+      "text": "Assume that the list originalList contains integer values and that the list newList is initially empty. The following code segment is intended to copy all even numbers from originalList to newList so that the numbers in newList appear in the same relative order as in originalList. The code segment may or may not work as intended.\n\nLine 1: FOR EACH number IN originalList\nLine 2: {\nLine 3:     IF (number MOD 2 = 0)\nLine 4:     {\nLine 5:         INSERT(newList, 1, number)\nLine 6:     }\nLine 7: }\n\nWhich of the following changes, if any, can be made so that the code segment works as intended?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Changing line 1 to FOR EACH number IN newList"},
+        {"id": "B", "text": "Changing line 3 to IF (number MOD 2 = 1)"},
+        {"id": "C", "text": "Changing line 5 to APPEND(newList, number)"},
+        {"id": "D", "text": "No change is needed; the code segment is correct as is."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "List Operations"
+    },
+    {
+      "questionNumber": 55,
+      "type": "single_select",
+      "text": "The following algorithm is intended to determine the average height, in centimeters, of a group of people in a room. Each person has a card, a pencil, and an eraser. Step 2 of the algorithm is missing.\n\nStep 1: All people stand up.\nStep 2: (missing step)\nStep 3: Each standing person finds another standing person and they form a pair. If a person cannot find an unpaired standing person, that person remains standing and waits until the next opportunity to form pairs.\nStep 4: In each pair, one person hands their card to the other person and sits down.\nStep 5: At this point, the standing person in each pair is holding two cards. The standing person in each pair replaces the top number on their card with the sum of the top numbers on the two cards and replaces the bottom number on their card with the sum of the bottom numbers on the two cards. The sitting partner's card is discarded.\nStep 6: Repeat steps 3–5 until there is only one person standing.\nStep 7: The last person standing divides the top number by the bottom number to determine the average height.\n\nWhich of the following can be used as step 2 so that the algorithm works as intended?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Step 2: Each person writes their height, in centimeters, at the top of the card and writes the number 1 at the bottom of the card."},
+        {"id": "B", "text": "Step 2: Each person writes their height, in centimeters, at the top of the card and writes the number 2 at the bottom of the card."},
+        {"id": "C", "text": "Step 2: Each person writes the number 1 at the top of the card and writes their height, in centimeters, at the bottom of the card."},
+        {"id": "D", "text": "Step 2: Each person writes the number 2 at the top of the card and writes their height, in centimeters, at the bottom of the card."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Algorithms - Parallel and Distributed Computing"
+    },
+    {
+      "questionNumber": 56,
+      "type": "single_select",
+      "text": "An online game collects data about each player's performance in the game. A program is used to analyze the data to make predictions about how players will perform in a new version of the game.\n\nThe procedure GetPrediction(idNum) returns a predicted score for the player with ID number idNum. Assume that all predicted scores are positive. The GetPrediction procedure takes approximately 1 minute to return a result. All other operations happen nearly instantaneously.\n\nTwo versions of the program are shown (Version I and Version II).\n\nWhich of the following best compares the execution times of the two versions of the program?",
+      "hasImage": true,
+      "imagePath": "images/q56_predictions.png",
+      "options": [
+        {"id": "A", "text": "Version I requires approximately 1 more minute to execute than version II."},
+        {"id": "B", "text": "Version I requires approximately 5 more minutes to execute than version II."},
+        {"id": "C", "text": "Version II requires approximately 1 more minute to execute than version I."},
+        {"id": "D", "text": "Version II requires approximately 5 more minutes to execute than version I."}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Algorithm Efficiency"
+    },
+    {
+      "questionNumber": 57,
+      "type": "single_select",
+      "text": "The transmission control protocol (TCP) and Internet protocol (IP) are used in Internet communication. Which of the following best describes the purpose of these protocols?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "To ensure that communications between devices on the Internet are above a minimum transmission speed"},
+        {"id": "B", "text": "To ensure that private data is inaccessible to unauthorized devices on the Internet"},
+        {"id": "C", "text": "To establish a common standard for sending messages between devices on the Internet"},
+        {"id": "D", "text": "To validate the ownership of encryption keys used in Internet communication"}
+      ],
+      "bigIdeaId": "CSN",
+      "topic": "TCP/IP Protocols"
+    },
+    {
+      "questionNumber": 58,
+      "type": "single_select",
+      "text": "The following procedure is intended to return true if at least two of the three parameters are equal in value and is intended to return false otherwise.\n\nPROCEDURE AnyPairs(x, y, z)\n{\n    IF (x = y)\n    {\n        RETURN(true)\n    }\n    ELSE\n    {\n        RETURN(y = z)\n    }\n}\n\nFor which of the following procedure calls does the procedure NOT return the intended value?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "AnyPairs(\"bat\", \"cat\", \"rat\")"},
+        {"id": "B", "text": "AnyPairs(\"bat\", \"bat\", \"rat\")"},
+        {"id": "C", "text": "AnyPairs(\"bat\", \"cat\", \"bat\")"},
+        {"id": "D", "text": "AnyPairs(\"bat\", \"cat\", \"cat\")"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Procedures and Testing"
+    },
+    {
+      "questionNumber": 59,
+      "type": "single_select",
+      "text": "Which of the following is NOT an advantage of using open-source software?",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Open-source software is generally free or lower in cost than commercially available software."},
+        {"id": "B", "text": "The availability of source code makes it possible to customize open-source software to a user's individual needs."},
+        {"id": "C", "text": "The original developer of open-source software provides free or low-cost support for users installing and running the software."},
+        {"id": "D", "text": "Unlike commercial software, which can become obsolete when the company that created it goes out of business, open-source software can be updated without the involvement of the original programmers."}
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Open Source Software"
+    },
+    {
+      "questionNumber": 60,
+      "type": "single_select",
+      "text": "Consider two lists of numbers called list1 and list2. A programmer wants to determine how many different values appear in both lists. For example, if list1 contains [10, 10, 20, 30, 40, 50, 60] and list2 contains [20, 20, 40, 60, 80], then there are three different values that appear in both lists (20, 40, and 60).\n\nThe programmer has the following procedures available:\n\nCombine(myList1, myList2) - Creates a new list containing the elements from myList1 followed by the entries from myList2.\nRemoveAllDups(myList) - Creates a new list containing the elements of myList with any duplicate values removed.\n\nWhich of the following can be used to assign the intended value to count?",
+      "hasImage": true,
+      "imagePath": "images/q60_combine_lists.png",
+      "options": [
+        {"id": "A", "text": "bothList ← Combine(list1, list2); uniqueList ← RemoveAllDups(bothList); count ← LENGTH(bothList) - LENGTH(uniqueList)"},
+        {"id": "B", "text": "newList1 ← RemoveAllDups(list1); newList2 ← RemoveAllDups(list2); bothList ← Combine(newList1, newList2); count ← LENGTH(list1) + LENGTH(list2) - LENGTH(bothList)"},
+        {"id": "C", "text": "newList1 ← RemoveAllDups(list1); newList2 ← RemoveAllDups(list2); bothList ← Combine(newList1, newList2); count ← LENGTH(newList1) + LENGTH(newList2) - LENGTH(bothList)"},
+        {"id": "D", "text": "newList1 ← RemoveAllDups(list1); newList2 ← RemoveAllDups(list2); bothList ← Combine(newList1, newList2); uniqueList ← RemoveAllDups(bothList); count ← LENGTH(bothList) - LENGTH(uniqueList)"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "List Operations and Algorithms"
+    },
+    {
+      "questionNumber": 131,
+      "type": "multi_select",
+      "selectCount": 2,
+      "text": "Which of the following actions are likely to be helpful in reducing the digital divide?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Designing new technologies intended only for advanced users"},
+        {"id": "B", "text": "Designing new technologies to be accessible to individuals with different physical abilities"},
+        {"id": "C", "text": "Implementing government regulations restricting citizens' access to Web content"},
+        {"id": "D", "text": "Having world governments support the construction of network infrastructure"}
+      ],
+      "bigIdeaId": "IOC",
+      "topic": "Digital Divide"
+    },
+    {
+      "questionNumber": 132,
+      "type": "multi_select",
+      "selectCount": 2,
+      "text": "Assume that the Boolean variable x is assigned the value true and the Boolean variable y is assigned the value false. Which of the following will display the value true?\n\nSelect two answers.",
+      "hasImage": true,
+      "imagePath": "images/q132_boolean.png",
+      "options": [
+        {"id": "A", "text": "IF (x) { DISPLAY(x OR y) }"},
+        {"id": "B", "text": "IF (x OR y) { DISPLAY(x) }"},
+        {"id": "C", "text": "IF (x OR y) { DISPLAY(x AND y) }"},
+        {"id": "D", "text": "IF (x AND y) { DISPLAY(x OR y) }"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Boolean Logic"
+    },
+    {
+      "questionNumber": 133,
+      "type": "multi_select",
+      "selectCount": 2,
+      "text": "A bookstore has a database containing information about each book for sale in the store. A sample portion of the database is shown below with columns: Author, Title, Selling Price, Genre, Quantity Available.\n\nA store employee wants to calculate the total amount of money the store will receive if they sell all of the available science fiction books. Which columns in the database can be ignored and still allow the employee to perform this calculation?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Author"},
+        {"id": "B", "text": "Title"},
+        {"id": "C", "text": "Genre"},
+        {"id": "D", "text": "Quantity Available"}
+      ],
+      "bigIdeaId": "DAT",
+      "topic": "Data Filtering"
+    },
+    {
+      "questionNumber": 134,
+      "type": "multi_select",
+      "selectCount": 2,
+      "text": "The following procedure is intended to return the value of x times y, where x and y are integers. Multiplication is implemented using repeated additions.\n\nPROCEDURE Multiply(x, y)\n{\n    count ← 0\n    result ← 0\n    REPEAT UNTIL (count ≥ y)\n    {\n        result ← result + x\n        count ← count + 1\n    }\n    RETURN(result)\n}\n\nFor which of the following procedure calls does the procedure NOT return the intended value?\n\nSelect two answers.",
+      "hasImage": true,
+      "imagePath": "images/q134_multiply.png",
+      "options": [
+        {"id": "A", "text": "Multiply(2, 5)"},
+        {"id": "B", "text": "Multiply(2, -5)"},
+        {"id": "C", "text": "Multiply(-2, 5)"},
+        {"id": "D", "text": "Multiply(-2, -5)"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Procedures and Testing"
+    },
+    {
+      "questionNumber": 135,
+      "type": "multi_select",
+      "selectCount": 2,
+      "text": "A program contains the following procedures for string manipulation.\n\nConcat(str1, str2) - Returns a single string consisting of str1 followed by str2.\nSubstring(str, start, length) - Returns a substring of consecutive characters from str, starting with the character at position start and containing length characters. The first character of str is located at position 1.\n\nWhich of the following can be used to store the string \"jackalope\" in the string variable animal?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "animal ← Substring(\"antelope\", 5, 4); animal ← Concat(animal, \"a\"); animal ← Concat(Substring(\"jackrabbit\", 1, 4), animal)"},
+        {"id": "B", "text": "animal ← Substring(\"antelope\", 5, 4); animal ← Concat(\"a\", animal); animal ← Concat(Substring(\"jackrabbit\", 1, 4), animal)"},
+        {"id": "C", "text": "animal ← Substring(\"jackrabbit\", 1, 4); animal ← Concat(animal, \"a\"); animal ← Concat(animal, Substring(\"antelope\", 5, 4))"},
+        {"id": "D", "text": "animal ← Substring(\"jackrabbit\", 1, 4); animal ← Concat(animal, \"a\"); animal ← Concat(Substring(\"antelope\", 5, 4), animal)"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "String Manipulation"
+    },
+    {
+      "questionNumber": 136,
+      "type": "multi_select",
+      "selectCount": 2,
+      "text": "In mathematics, a perfect number is a type of integer. The procedure IsPerfect(num) returns true if num is a perfect number and returns false otherwise.\n\nThe following program is intended to count and display the number of perfect numbers between the integers start and end, inclusive. Assume that start is less than end. The program does not work as intended.\n\nLine 1: currentNum ← start\nLine 2: count ← 0\nLine 3: REPEAT UNTIL (currentNum > end)\nLine 4: {\nLine 5:     count ← count + 1\nLine 6:     IF (IsPerfect(currentNum))\nLine 7:     {\nLine 8:         count ← count + 1\nLine 9:         currentNum ← currentNum + 1\nLine 10:    }\nLine 11:    currentNum ← currentNum + 1\nLine 12: }\nLine 13: DISPLAY(count)\n\nWhich two lines of code should be removed so that the program will work as intended?\n\nSelect two answers.",
+      "hasImage": false,
+      "options": [
+        {"id": "A", "text": "Line 5"},
+        {"id": "B", "text": "Line 8"},
+        {"id": "C", "text": "Line 9"},
+        {"id": "D", "text": "Line 11"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Debugging"
+    },
+    {
+      "questionNumber": 137,
+      "type": "multi_select",
+      "selectCount": 2,
+      "text": "The procedure NumOccurrences is intended to count and return the number of times targetWord appears in the list wordList. The procedure does not work as intended.\n\nPROCEDURE NumOccurrences(wordList, targetWord)\n{\n    count ← 0\n    FOR EACH word IN wordList\n    {\n        count ← 0\n        IF (word = targetWord)\n        {\n            count ← count + 1\n        }\n    }\n    RETURN(count)\n}\n\nFor which of the following code segments will the call to NumOccurrences NOT return the intended value?\n\nSelect two answers.",
+      "hasImage": true,
+      "imagePath": "images/q137_numoccurrences.png",
+      "options": [
+        {"id": "A", "text": "treeList ← [\"birch\", \"maple\", \"birch\"]; numOccurrences(treeList, \"birch\")"},
+        {"id": "B", "text": "treeList ← [\"birch\", \"maple\", \"oak\"]; numOccurrences(treeList, \"maple\")"},
+        {"id": "C", "text": "treeList ← [\"birch\", \"maple\", \"oak\"]; numOccurrences(treeList, \"oak\")"},
+        {"id": "D", "text": "treeList ← [\"birch\", \"maple\", \"oak\"]; numOccurrences(treeList, \"spruce\")"}
+      ],
+      "bigIdeaId": "AAP",
+      "topic": "Debugging and Testing"
+    }
+  ]
+}
