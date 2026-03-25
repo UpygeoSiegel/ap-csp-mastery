@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CSP Ready</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            min-height: calc(100vh - 200px);
+        }
+        .sidebar {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1rem;
+            height: fit-content;
+            position: sticky;
+            top: 1rem;
+        }
+        .sidebar h3 {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            color: var(--gray-500);
+        }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 0.25rem;
+        }
+        .sidebar-item:hover {
+            background: var(--gray-50);
+        }
+        .sidebar-item.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .sidebar-item .count {
+            background: var(--gray-200);
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+        }
+        .sidebar-item.active .count {
+            background: rgba(255,255,255,0.2);
+        }
+        .topic-item {
+            padding-left: 1.5rem;
+            font-size: 0.875rem;
+        }
+        .main-content {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+        }
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .content-header h2 {
+            margin: 0;
+        }
+        .question-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .question-card {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+        }
+        .question-card.deactivated {
+            opacity: 0.6;
+            border-color: var(--gray-300);
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .question-text {
+            flex: 1;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        .question-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge.type-mc {
+            background: rgb(59 130 246 / 0.1);
+            color: var(--primary-blue);
+        }
+        .badge.type-ms {
+            background: rgb(139 92 246 / 0.1);
+            color: #7c3aed;
+        }
+        .badge.difficulty-easy {
+            background: rgb(34 197 94 / 0.1);
+            color: var(--success-green);
+        }
+        .badge.difficulty-medium {
+            background: rgb(234 179 8 / 0.1);
+            color: #b45309;
+        }
+        .badge.difficulty-hard {
+            background: rgb(239 68 68 / 0.1);
+            color: var(--danger-red);
+        }
+        .badge.deactivated {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+        .question-options {
+            margin: 0.75rem 0;
+            padding-left: 1rem;
+        }
+        .question-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0;
+            font-size: 0.875rem;
+        }
+        .question-option.correct {
+            color: var(--success-green);
+            font-weight: 500;
+        }
+        .question-option .check {
+            color: var(--success-green);
+        }
+        .question-stats {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .question-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        .btn-icon {
+            padding: 0.375rem;
+            background: var(--gray-200);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-icon:hover {
+            background: var(--gray-300);
+        }
+        .btn-icon.danger:hover {
+            background: rgb(239 68 68 / 0.2);
+            color: var(--danger-red);
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 700px;
+            margin: auto;
+        }
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            margin: 0;
+        }
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .option-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        .option-row input[type="text"] {
+            flex: 1;
+        }
+        .option-row input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+        .option-row .btn-icon {
+            flex-shrink: 0;
+        }
+        .add-option-btn {
+            padding: 0.5rem;
+            border: 2px dashed var(--gray-300);
+            background: transparent;
+            border-radius: var(--border-radius);
+            color: var(--gray-500);
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .add-option-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-500);
+        }
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+        .search-box svg {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+        .filter-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .filter-row select {
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .dashboard-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-secondary {
+            padding: 0.5rem 1rem;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="dashboard-header">
+                <div class="logo">
+                    <h1>CSP Ready</h1>
+                    <span>Admin Dashboard</span>
+                </div>
+                <div class="user-info">
+                    <span id="user-name">Admin</span>
+                    <button id="logout-btn" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="admin-layout">
+                <aside class="sidebar">
+                    <h3>Big Ideas</h3>
+                    <div id="sidebar-content">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </aside>
+
+                <section class="main-content">
+                    <div id="main-content">
+                        <div class="empty-state">
+                            <h3>Welcome to the Admin Dashboard</h3>
+                            <p>Select a topic from the sidebar to manage questions.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 CSP Ready. Admin Portal.</p>
+        </footer>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Question Modal -->
+    <div id="question-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Add Question</h3>
+                <button class="btn-icon" onclick="closeQuestionModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="question-form">
+                <div class="modal-body">
+                    <input type="hidden" id="question-id">
+                    <input type="hidden" id="question-topic-id">
+
+                    <div class="form-group">
+                        <label for="question-text">Question Text *</label>
+                        <textarea id="question-text" required placeholder="Enter the question text..."></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="question-type">Question Type *</label>
+                            <select id="question-type" required>
+                                <option value="multiple_choice">Multiple Choice (single answer)</option>
+                                <option value="multiple_select">Multiple Select (multiple answers)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="question-difficulty">Difficulty</label>
+                            <select id="question-difficulty">
+                                <option value="easy">Easy</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Answer Options * <span style="font-weight: normal; color: var(--gray-500);">(Check correct answers)</span></label>
+                        <div id="options-container" class="options-container">
+                            <!-- Options will be added here -->
+                        </div>
+                        <button type="button" class="add-option-btn" onclick="addOption()" style="margin-top: 0.75rem; width: 100%;">
+                            + Add Option
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="question-explanation">Explanation (shown after answering)</label>
+                        <textarea id="question-explanation" placeholder="Explain why the correct answer is correct..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeQuestionModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Delete Question</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this question? This action cannot be undone.</p>
+                <input type="hidden" id="delete-question-id">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn-primary" style="background: var(--danger-red);" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = window.location.origin + '/api';
+        const token = localStorage.getItem('authToken');
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+        if (!token || userData.role !== 'admin') {
+            window.location.href = '/admin/login.html';
+        }
+
+        // State
+        let bigIdeas = [];
+        let currentTopicId = null;
+        let currentQuestions = [];
+        let expandedBigIdeas = {};
+
+        // Display user name
+        document.getElementById('user-name').textContent = userData.displayName || 'Admin';
+
+        // Logout handler
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/';
+        });
+
+        // Load big ideas and topics
+        async function loadSidebar() {
+            try {
+                const response = await fetch(`${apiBase}/admin/big-ideas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        window.location.href = '/admin/login.html';
+                        return;
+                    }
+                    throw new Error('Failed to load');
+                }
+
+                const data = await response.json();
+                bigIdeas = data.bigIdeas;
+                renderSidebar();
+
+            } catch (error) {
+                console.error('Error loading sidebar:', error);
+                document.getElementById('sidebar-content').innerHTML = `
+                    <div class="empty-state">
+                        <p>Error loading content</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderSidebar() {
+            const container = document.getElementById('sidebar-content');
+
+            container.innerHTML = bigIdeas.map(bi => `
+                <div class="big-idea-section">
+                    <div class="sidebar-item" onclick="toggleBigIdea('${bi.id}')" style="border-left: 3px solid ${bi.color || '#3B82F6'}">
+                        <span>${bi.shortName || bi.name}</span>
+                        <span class="count">${bi.questionCount}</span>
+                    </div>
+                    <div id="topics-${bi.id}" class="topics-list" style="display: ${expandedBigIdeas[bi.id] ? 'block' : 'none'};">
+                        <!-- Topics loaded dynamically -->
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function toggleBigIdea(bigIdeaId) {
+            expandedBigIdeas[bigIdeaId] = !expandedBigIdeas[bigIdeaId];
+            const topicsContainer = document.getElementById(`topics-${bigIdeaId}`);
+
+            if (expandedBigIdeas[bigIdeaId]) {
+                topicsContainer.style.display = 'block';
+
+                // Load topics if not already loaded
+                if (!topicsContainer.dataset.loaded) {
+                    topicsContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+                    try {
+                        const response = await fetch(`${apiBase}/admin/big-ideas/${bigIdeaId}/topics`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const data = await response.json();
+
+                        topicsContainer.innerHTML = data.topics.map(topic => `
+                            <div class="sidebar-item topic-item ${currentTopicId === topic.id ? 'active' : ''}"
+                                 onclick="loadTopic('${topic.id}', '${escapeHtml(topic.name)}')">
+                                <span>${topic.name}</span>
+                                <span class="count">${topic.questionCount}</span>
+                            </div>
+                        `).join('');
+
+                        topicsContainer.dataset.loaded = 'true';
+                    } catch (error) {
+                        topicsContainer.innerHTML = '<p style="padding: 0.5rem; color: var(--gray-500);">Error loading topics</p>';
+                    }
+                }
+            } else {
+                topicsContainer.style.display = 'none';
+            }
+        }
+
+        async function loadTopic(topicId, topicName) {
+            currentTopicId = topicId;
+
+            // Update sidebar active state
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.topic-item').classList.add('active');
+
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+            try {
+                const response = await fetch(`${apiBase}/admin/topics/${topicId}/questions`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                currentQuestions = data.questions;
+                renderQuestions(data.topic, data.questions);
+
+            } catch (error) {
+                console.error('Error loading topic:', error);
+                mainContent.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Error loading questions</h3>
+                        <p>Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderQuestions(topic, questions) {
+            const mainContent = document.getElementById('main-content');
+
+            mainContent.innerHTML = `
+                <div class="content-header">
+                    <div>
+                        <h2>${topic.name}</h2>
+                        <p style="color: var(--gray-500); margin: 0;">${questions.length} questions</p>
+                    </div>
+                    <button class="btn-primary" onclick="openAddQuestionModal()">
+                        + Add Question
+                    </button>
+                </div>
+
+                <div class="search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search questions..." oninput="filterQuestions()">
+                </div>
+
+                <div class="filter-row">
+                    <select id="filter-difficulty" onchange="filterQuestions()">
+                        <option value="">All Difficulties</option>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                    <select id="filter-type" onchange="filterQuestions()">
+                        <option value="">All Types</option>
+                        <option value="multiple_choice">Multiple Choice</option>
+                        <option value="multiple_select">Multiple Select</option>
+                    </select>
+                    <select id="filter-status" onchange="filterQuestions()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="deactivated">Deactivated</option>
+                    </select>
+                </div>
+
+                <div id="questions-list" class="question-list">
+                    ${renderQuestionsList(questions)}
+                </div>
+            `;
+        }
+
+        function renderQuestionsList(questions) {
+            if (questions.length === 0) {
+                return `
+                    <div class="empty-state">
+                        <h3>No questions found</h3>
+                        <p>Add some questions to this topic.</p>
+                    </div>
+                `;
+            }
+
+            return questions.map((q, index) => `
+                <div class="question-card ${q.deactivated ? 'deactivated' : ''}" data-question-id="${q.id}">
+                    <div class="question-header">
+                        <div class="question-text">${index + 1}. ${escapeHtml(q.text)}</div>
+                        <div class="question-badges">
+                            <span class="badge type-${q.type === 'multiple_choice' ? 'mc' : 'ms'}">
+                                ${q.type === 'multiple_choice' ? 'MC' : 'MS'}
+                            </span>
+                            <span class="badge difficulty-${q.difficulty || 'medium'}">
+                                ${q.difficulty || 'medium'}
+                            </span>
+                            ${q.deactivated ? '<span class="badge deactivated">Deactivated</span>' : ''}
+                        </div>
+                    </div>
+
+                    <div class="question-options">
+                        ${q.options.map(opt => `
+                            <div class="question-option ${q.correctAnswers.includes(opt.id) ? 'correct' : ''}">
+                                ${q.correctAnswers.includes(opt.id) ? '<span class="check">&#10003;</span>' : '<span>&bull;</span>'}
+                                ${escapeHtml(opt.text)}
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${q.explanation ? `<p style="font-size: 0.875rem; color: var(--gray-600); margin-top: 0.5rem;"><strong>Explanation:</strong> ${escapeHtml(q.explanation)}</p>` : ''}
+
+                    ${q.stats ? `
+                        <div class="question-stats">
+                            <span>Attempts: ${q.stats.totalAttempts}</span>
+                            <span>Correct: ${q.stats.correctPercentage !== null ? q.stats.correctPercentage + '%' : 'N/A'}</span>
+                        </div>
+                    ` : ''}
+
+                    <div class="question-actions">
+                        <button class="btn-secondary btn-sm" onclick="openEditQuestionModal('${q.id}')">Edit</button>
+                        <button class="btn-secondary btn-sm" onclick="toggleQuestion('${q.id}')">${q.deactivated ? 'Activate' : 'Deactivate'}</button>
+                        <button class="btn-secondary btn-sm" style="color: var(--danger-red);" onclick="openDeleteModal('${q.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterQuestions() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const difficultyFilter = document.getElementById('filter-difficulty').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            const statusFilter = document.getElementById('filter-status').value;
+
+            const filtered = currentQuestions.filter(q => {
+                const matchesSearch = q.text.toLowerCase().includes(searchTerm) ||
+                    q.options.some(o => o.text.toLowerCase().includes(searchTerm));
+                const matchesDifficulty = !difficultyFilter || q.difficulty === difficultyFilter;
+                const matchesType = !typeFilter || q.type === typeFilter;
+                const matchesStatus = !statusFilter ||
+                    (statusFilter === 'active' && !q.deactivated) ||
+                    (statusFilter === 'deactivated' && q.deactivated);
+
+                return matchesSearch && matchesDifficulty && matchesType && matchesStatus;
+            });
+
+            document.getElementById('questions-list').innerHTML = renderQuestionsList(filtered);
+        }
+
+        // Question Modal Functions
+        let optionCount = 0;
+
+        function openAddQuestionModal() {
+            document.getElementById('modal-title').textContent = 'Add Question';
+            document.getElementById('question-id').value = '';
+            document.getElementById('question-topic-id').value = currentTopicId;
+            document.getElementById('question-text').value = '';
+            document.getElementById('question-type').value = 'multiple_choice';
+            document.getElementById('question-difficulty').value = 'medium';
+            document.getElementById('question-explanation').value = '';
+
+            // Reset options
+            optionCount = 0;
+            document.getElementById('options-container').innerHTML = '';
+            addOption();
+            addOption();
+            addOption();
+            addOption();
+
+            document.getElementById('question-modal').classList.add('active');
+        }
+
+        function openEditQuestionModal(questionId) {
+            const question = currentQuestions.find(q => q.id === questionId);
+            if (!question) return;
+
+            document.getElementById('modal-title').textContent = 'Edit Question';
+            document.getElementById('question-id').value = question.id;
+            document.getElementById('question-topic-id').value = question.topicId;
+            document.getElementById('question-text').value = question.text;
+            document.getElementById('question-type').value = question.type;
+            document.getElementById('question-difficulty').value = question.difficulty || 'medium';
+            document.getElementById('question-explanation').value = question.explanation || '';
+
+            // Set options
+            optionCount = 0;
+            document.getElementById('options-container').innerHTML = '';
+            question.options.forEach(opt => {
+                addOption(opt.text, opt.id, question.correctAnswers.includes(opt.id));
+            });
+
+            document.getElementById('question-modal').classList.add('active');
+        }
+
+        function closeQuestionModal() {
+            document.getElementById('question-modal').classList.remove('active');
+        }
+
+        function addOption(text = '', id = '', isCorrect = false) {
+            optionCount++;
+            const container = document.getElementById('options-container');
+            const optionId = id || `new-option-${optionCount}`;
+
+            const optionRow = document.createElement('div');
+            optionRow.className = 'option-row';
+            optionRow.innerHTML = `
+                <input type="checkbox" name="correct-answer" value="${optionId}" ${isCorrect ? 'checked' : ''}>
+                <input type="text" placeholder="Option ${optionCount}" value="${escapeHtml(text)}" data-option-id="${optionId}" required>
+                <button type="button" class="btn-icon danger" onclick="removeOption(this)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            `;
+            container.appendChild(optionRow);
+        }
+
+        function removeOption(btn) {
+            const container = document.getElementById('options-container');
+            if (container.children.length > 2) {
+                btn.closest('.option-row').remove();
+            } else {
+                showToast('At least 2 options are required', 'warning');
+            }
+        }
+
+        // Form submission
+        document.getElementById('question-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const questionId = document.getElementById('question-id').value;
+            const topicId = document.getElementById('question-topic-id').value;
+            const text = document.getElementById('question-text').value;
+            const type = document.getElementById('question-type').value;
+            const difficulty = document.getElementById('question-difficulty').value;
+            const explanation = document.getElementById('question-explanation').value;
+
+            // Get options and correct answers
+            const optionRows = document.querySelectorAll('.option-row');
+            const options = [];
+            const correctAnswers = [];
+
+            optionRows.forEach(row => {
+                const textInput = row.querySelector('input[type="text"]');
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                const optionId = textInput.dataset.optionId;
+
+                options.push({
+                    id: optionId,
+                    text: textInput.value
+                });
+
+                if (checkbox.checked) {
+                    correctAnswers.push(optionId);
+                }
+            });
+
+            if (correctAnswers.length === 0) {
+                showToast('Please select at least one correct answer', 'error');
+                return;
+            }
+
+            const questionData = {
+                topicId,
+                text,
+                type,
+                options,
+                correctAnswers,
+                explanation,
+                difficulty
+            };
+
+            try {
+                let response;
+                if (questionId) {
+                    // Update existing question
+                    response = await fetch(`${apiBase}/admin/questions/${questionId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(questionData)
+                    });
+                } else {
+                    // Create new question
+                    response = await fetch(`${apiBase}/admin/questions`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(questionData)
+                    });
+                }
+
+                if (response.ok) {
+                    showToast(questionId ? 'Question updated!' : 'Question created!', 'success');
+                    closeQuestionModal();
+                    loadTopic(currentTopicId, '');
+                    loadSidebar(); // Refresh counts
+                } else {
+                    const data = await response.json();
+                    showToast(data.error || 'Failed to save question', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving question:', error);
+                showToast('Failed to save question', 'error');
+            }
+        });
+
+        async function toggleQuestion(questionId) {
+            try {
+                const response = await fetch(`${apiBase}/admin/questions/${questionId}/toggle`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showToast(data.message, 'success');
+                    loadTopic(currentTopicId, '');
+                } else {
+                    showToast('Failed to toggle question', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to toggle question', 'error');
+            }
+        }
+
+        // Delete Modal Functions
+        function openDeleteModal(questionId) {
+            document.getElementById('delete-question-id').value = questionId;
+            document.getElementById('delete-modal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('active');
+        }
+
+        async function confirmDelete() {
+            const questionId = document.getElementById('delete-question-id').value;
+
+            try {
+                const response = await fetch(`${apiBase}/admin/questions/${questionId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    showToast('Question deleted', 'success');
+                    closeDeleteModal();
+                    loadTopic(currentTopicId, '');
+                    loadSidebar(); // Refresh counts
+                } else {
+                    showToast('Failed to delete question', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to delete question', 'error');
+            }
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+        });
+
+        // Initial load
+        loadSidebar();
+    </script>
+</body>
+</html>

@@ -12,7 +12,7 @@ router.get('/:topicId', async (req, res) => {
   try {
     const { topicId } = req.params;
 
-    // Get topic with all questions
+    // Get topic
     const topicDoc = await db.collection('topics').doc(topicId).get();
     if (!topicDoc.exists) {
       return res.status(404).json({ error: 'Topic not found' });
@@ -20,9 +20,19 @@ router.get('/:topicId', async (req, res) => {
 
     const topic = topicDoc.data();
 
+    // Get questions from questions collection
+    const questionsSnapshot = await db.collection('questions')
+      .where('topicId', '==', topicId)
+      .get();
+
+    const questions = questionsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
     // Separate AI-generated and custom questions
-    const aiQuestions = topic.questions.filter(q => !q.isCustom);
-    const customQuestions = topic.questions.filter(q => q.isCustom);
+    const aiQuestions = questions.filter(q => !q.isCustom);
+    const customQuestions = questions.filter(q => q.isCustom);
 
     res.json({
       topicId,
@@ -30,8 +40,8 @@ router.get('/:topicId', async (req, res) => {
       topicUnit: topic.unit,
       aiQuestions,
       customQuestions,
-      totalQuestions: topic.questions.length,
-      activeQuestions: topic.questions.filter(q => !q.deactivated).length
+      totalQuestions: questions.length,
+      activeQuestions: questions.filter(q => !q.deactivated).length
     });
 
   } catch (error) {
@@ -84,7 +94,7 @@ router.post('/:topicId', async (req, res) => {
       return res.status(400).json({ error: 'Multiple choice questions can only have one correct answer' });
     }
 
-    // Get topic document
+    // Get topic document to get metadata
     const topicDoc = await db.collection('topics').doc(topicId).get();
     if (!topicDoc.exists) {
       return res.status(404).json({ error: 'Topic not found' });
@@ -92,27 +102,27 @@ router.post('/:topicId', async (req, res) => {
 
     const topic = topicDoc.data();
 
-    // Create new question
+    // Create new question in questions collection
+    const questionId = crypto.randomUUID();
     const newQuestion = {
-      id: crypto.randomUUID(),
+      id: questionId,
       text: text.trim(),
       type,
       options,
       correctAnswers,
       explanation: explanation.trim(),
+      topicId,
+      topicName: topic.name,
+      bigIdeaId: topic.bigIdeaId,
       isCustom: true,
       addedBy: teacherId,
       addedAt: new Date(),
-      deactivated: false
+      deactivated: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
-    // Add question to topic
-    const updatedQuestions = [...topic.questions, newQuestion];
-
-    await db.collection('topics').doc(topicId).update({
-      questions: updatedQuestions,
-      updatedAt: new Date()
-    });
+    await db.collection('questions').doc(questionId).set(newQuestion);
 
     res.status(201).json({
       message: 'Question added successfully',
@@ -132,28 +142,25 @@ router.put('/:topicId/:questionId', async (req, res) => {
     const { text, type, options, correctAnswers, explanation } = req.body;
     const teacherId = req.user.uid;
 
-    // Get topic document
-    const topicDoc = await db.collection('topics').doc(topicId).get();
-    if (!topicDoc.exists) {
-      return res.status(404).json({ error: 'Topic not found' });
-    }
-
-    const topic = topicDoc.data();
-
-    // Find the question
-    const questionIndex = topic.questions.findIndex(q => q.id === questionId);
-    if (questionIndex === -1) {
+    // Get question document
+    const questionDoc = await db.collection('questions').doc(questionId).get();
+    if (!questionDoc.exists) {
       return res.status(404).json({ error: 'Question not found' });
     }
 
-    const question = topic.questions[questionIndex];
+    const question = questionDoc.data();
+
+    // Verify question belongs to topic
+    if (question.topicId !== topicId) {
+      return res.status(400).json({ error: 'Question does not belong to this topic' });
+    }
 
     // Only allow editing custom questions added by this teacher
     if (!question.isCustom || question.addedBy !== teacherId) {
       return res.status(403).json({ error: 'Can only edit your own custom questions' });
     }
 
-    // Validate input (same validation as POST)
+    // Validate input
     if (!text || !type || !options || !correctAnswers || !explanation) {
       return res.status(400).json({ error: 'All fields are required' });
     }
@@ -198,13 +205,7 @@ router.put('/:topicId/:questionId', async (req, res) => {
       updatedAt: new Date()
     };
 
-    const updatedQuestions = [...topic.questions];
-    updatedQuestions[questionIndex] = updatedQuestion;
-
-    await db.collection('topics').doc(topicId).update({
-      questions: updatedQuestions,
-      updatedAt: new Date()
-    });
+    await db.collection('questions').doc(questionId).update(updatedQuestion);
 
     res.json({
       message: 'Question updated successfully',
@@ -223,54 +224,51 @@ router.patch('/:topicId/:questionId/toggle', async (req, res) => {
     const { topicId, questionId } = req.params;
     const teacherId = req.user.uid;
 
-    // Get topic document
-    const topicDoc = await db.collection('topics').doc(topicId).get();
-    if (!topicDoc.exists) {
-      return res.status(404).json({ error: 'Topic not found' });
-    }
-
-    const topic = topicDoc.data();
-
-    // Find the question
-    const questionIndex = topic.questions.findIndex(q => q.id === questionId);
-    if (questionIndex === -1) {
+    // Get question document
+    const questionDoc = await db.collection('questions').doc(questionId).get();
+    if (!questionDoc.exists) {
       return res.status(404).json({ error: 'Question not found' });
     }
 
-    const question = topic.questions[questionIndex];
+    const question = questionDoc.data();
+
+    // Verify question belongs to topic
+    if (question.topicId !== topicId) {
+      return res.status(400).json({ error: 'Question does not belong to this topic' });
+    }
 
     // For custom questions, only the creator can deactivate
     if (question.isCustom && question.addedBy !== teacherId) {
       return res.status(403).json({ error: 'Can only modify your own custom questions' });
     }
 
-    // Toggle deactivated status
-    const updatedQuestion = {
-      ...question,
-      deactivated: !question.deactivated,
-      deactivatedBy: !question.deactivated ? teacherId : null,
-      deactivatedAt: !question.deactivated ? new Date() : null
-    };
+    // Check that we still have enough active questions if deactivating
+    if (!question.deactivated) {
+      const activeQuestionsSnapshot = await db.collection('questions')
+        .where('topicId', '==', topicId)
+        .where('deactivated', '==', false)
+        .get();
 
-    const updatedQuestions = [...topic.questions];
-    updatedQuestions[questionIndex] = updatedQuestion;
-
-    // Check that we still have enough active questions
-    const activeQuestions = updatedQuestions.filter(q => !q.deactivated);
-    if (activeQuestions.length < 5) {
-      return res.status(400).json({ 
-        error: 'Cannot deactivate question: at least 5 active questions are required for quizzes' 
-      });
+      if (activeQuestionsSnapshot.size <= 5) {
+        return res.status(400).json({
+          error: 'Cannot deactivate question: at least 5 active questions are required for quizzes'
+        });
+      }
     }
 
-    await db.collection('topics').doc(topicId).update({
-      questions: updatedQuestions,
+    // Toggle deactivated status
+    const updatedQuestion = {
+      deactivated: !question.deactivated,
+      deactivatedBy: !question.deactivated ? teacherId : null,
+      deactivatedAt: !question.deactivated ? new Date() : null,
       updatedAt: new Date()
-    });
+    };
+
+    await db.collection('questions').doc(questionId).update(updatedQuestion);
 
     res.json({
       message: `Question ${updatedQuestion.deactivated ? 'deactivated' : 'reactivated'} successfully`,
-      question: updatedQuestion
+      question: { ...question, ...updatedQuestion }
     });
 
   } catch (error) {
@@ -285,42 +283,40 @@ router.delete('/:topicId/:questionId', async (req, res) => {
     const { topicId, questionId } = req.params;
     const teacherId = req.user.uid;
 
-    // Get topic document
-    const topicDoc = await db.collection('topics').doc(topicId).get();
-    if (!topicDoc.exists) {
-      return res.status(404).json({ error: 'Topic not found' });
-    }
-
-    const topic = topicDoc.data();
-
-    // Find the question
-    const questionIndex = topic.questions.findIndex(q => q.id === questionId);
-    if (questionIndex === -1) {
+    // Get question document
+    const questionDoc = await db.collection('questions').doc(questionId).get();
+    if (!questionDoc.exists) {
       return res.status(404).json({ error: 'Question not found' });
     }
 
-    const question = topic.questions[questionIndex];
+    const question = questionDoc.data();
+
+    // Verify question belongs to topic
+    if (question.topicId !== topicId) {
+      return res.status(400).json({ error: 'Question does not belong to this topic' });
+    }
 
     // Only allow deleting custom questions added by this teacher
     if (!question.isCustom || question.addedBy !== teacherId) {
       return res.status(403).json({ error: 'Can only delete your own custom questions' });
     }
 
-    // Remove the question
-    const updatedQuestions = topic.questions.filter(q => q.id !== questionId);
-
     // Check that we still have enough active questions
-    const activeQuestions = updatedQuestions.filter(q => !q.deactivated);
-    if (activeQuestions.length < 5) {
-      return res.status(400).json({ 
-        error: 'Cannot delete question: at least 5 active questions are required for quizzes' 
+    const activeQuestionsSnapshot = await db.collection('questions')
+      .where('topicId', '==', topicId)
+      .where('deactivated', '==', false)
+      .get();
+
+    // Count how many will remain (exclude the one being deleted)
+    const remainingActive = activeQuestionsSnapshot.docs.filter(doc => doc.id !== questionId).length;
+    if (remainingActive < 5) {
+      return res.status(400).json({
+        error: 'Cannot delete question: at least 5 active questions are required for quizzes'
       });
     }
 
-    await db.collection('topics').doc(topicId).update({
-      questions: updatedQuestions,
-      updatedAt: new Date()
-    });
+    // Delete the question
+    await db.collection('questions').doc(questionId).delete();
 
     res.json({ message: 'Question deleted successfully' });
 
@@ -343,6 +339,16 @@ router.get('/:topicId/stats', async (req, res) => {
 
     const topic = topicDoc.data();
 
+    // Get questions from questions collection
+    const questionsSnapshot = await db.collection('questions')
+      .where('topicId', '==', topicId)
+      .get();
+
+    const questions = questionsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
     // Analyze question usage and performance
     const questionStats = {};
 
@@ -352,10 +358,10 @@ router.get('/:topicId/stats', async (req, res) => {
       .get();
 
     // Initialize stats for all questions
-    topic.questions.forEach(q => {
+    questions.forEach(q => {
       questionStats[q.id] = {
         id: q.id,
-        text: q.text.substring(0, 100) + '...', // Truncated text
+        text: q.text.substring(0, 100) + '...',
         type: q.type,
         isCustom: q.isCustom,
         deactivated: q.deactivated || false,
@@ -393,13 +399,13 @@ router.get('/:topicId/stats', async (req, res) => {
     });
 
     // Summary statistics
-    const totalQuestions = topic.questions.length;
-    const activeQuestions = topic.questions.filter(q => !q.deactivated).length;
-    const customQuestions = topic.questions.filter(q => q.isCustom).length;
-    const aiQuestions = topic.questions.filter(q => !q.isCustom).length;
+    const totalQuestions = questions.length;
+    const activeQuestions = questions.filter(q => !q.deactivated).length;
+    const customQuestions = questions.filter(q => q.isCustom).length;
+    const aiQuestions = questions.filter(q => !q.isCustom).length;
 
     const usedQuestions = Object.values(questionStats).filter(s => s.timesUsed > 0).length;
-    const averageCorrectRate = usedQuestions > 0 ? 
+    const averageCorrectRate = usedQuestions > 0 ?
       Math.round(Object.values(questionStats)
         .filter(s => s.timesUsed > 0)
         .reduce((sum, s) => sum + s.correctRate, 0) / usedQuestions) : 0;
@@ -424,7 +430,7 @@ router.get('/:topicId/stats', async (req, res) => {
   }
 });
 
-// Bulk import questions (for future enhancement)
+// Bulk import questions
 router.post('/:topicId/bulk-import', async (req, res) => {
   try {
     const { topicId } = req.params;
@@ -441,7 +447,7 @@ router.post('/:topicId/bulk-import', async (req, res) => {
       if (!q.text || !q.type || !q.options || !q.correctAnswers || !q.explanation) {
         return res.status(400).json({ error: `Question ${i + 1}: All fields are required` });
       }
-      
+
       if (!['multiple_choice', 'multiple_select'].includes(q.type)) {
         return res.status(400).json({ error: `Question ${i + 1}: Invalid question type` });
       }
@@ -459,32 +465,45 @@ router.post('/:topicId/bulk-import', async (req, res) => {
 
     const topic = topicDoc.data();
 
-    // Process questions
-    const newQuestions = questions.map(q => ({
-      id: crypto.randomUUID(),
-      text: q.text.trim(),
-      type: q.type,
-      options: q.options,
-      correctAnswers: q.correctAnswers,
-      explanation: q.explanation.trim(),
-      isCustom: true,
-      addedBy: teacherId,
-      addedAt: new Date(),
-      deactivated: false
-    }));
+    // Process and add questions to collection
+    const batch = db.batch();
+    const newQuestions = [];
 
-    // Add questions to topic
-    const updatedQuestions = [...topic.questions, ...newQuestions];
+    for (const q of questions) {
+      const questionId = crypto.randomUUID();
+      const newQuestion = {
+        id: questionId,
+        text: q.text.trim(),
+        type: q.type,
+        options: q.options,
+        correctAnswers: q.correctAnswers,
+        explanation: q.explanation.trim(),
+        topicId,
+        topicName: topic.name,
+        bigIdeaId: topic.bigIdeaId,
+        isCustom: true,
+        addedBy: teacherId,
+        addedAt: new Date(),
+        deactivated: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
 
-    await db.collection('topics').doc(topicId).update({
-      questions: updatedQuestions,
-      updatedAt: new Date()
-    });
+      batch.set(db.collection('questions').doc(questionId), newQuestion);
+      newQuestions.push(newQuestion);
+    }
+
+    await batch.commit();
+
+    // Get total question count
+    const totalQuestionsSnapshot = await db.collection('questions')
+      .where('topicId', '==', topicId)
+      .get();
 
     res.status(201).json({
       message: `${newQuestions.length} questions imported successfully`,
       importedQuestions: newQuestions.length,
-      totalQuestions: updatedQuestions.length
+      totalQuestions: totalQuestionsSnapshot.size
     });
 
   } catch (error) {

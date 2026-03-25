@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Details - CSP Ready</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        .back-link:hover {
+            color: var(--primary-blue);
+        }
+        .class-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .class-info h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.75rem;
+        }
+        .class-code {
+            display: inline-block;
+            background: var(--gray-100);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--border-radius);
+            font-family: monospace;
+            font-size: 1rem;
+            color: var(--primary-blue);
+        }
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .view-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gray-200);
+            background: var(--white);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .view-btn:hover {
+            border-color: var(--primary-blue);
+        }
+        .view-btn.active {
+            border-color: var(--primary-blue);
+            background: var(--primary-blue);
+            color: white;
+        }
+        .matrix-container {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+        .matrix-scroll {
+            overflow-x: auto;
+        }
+        .progress-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        .progress-matrix th,
+        .progress-matrix td {
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .progress-matrix th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-700);
+            white-space: nowrap;
+        }
+        .progress-matrix th.topic-header {
+            font-size: 0.75rem;
+            max-width: 100px;
+            white-space: normal;
+            vertical-align: bottom;
+        }
+        .progress-matrix th.clickable {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .progress-matrix th.clickable:hover {
+            background: var(--gray-100);
+        }
+        .progress-matrix td:first-child,
+        .progress-matrix th:first-child {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background: var(--white);
+            z-index: 1;
+            min-width: 150px;
+        }
+        .progress-matrix th:first-child {
+            background: var(--gray-50);
+            z-index: 2;
+        }
+        .progress-matrix tbody tr:hover td {
+            background: var(--gray-50);
+        }
+        .progress-matrix tbody tr:hover td:first-child {
+            background: var(--gray-100);
+        }
+        .student-name {
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+        .status-cell {
+            min-width: 50px;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            min-width: 36px;
+        }
+        .status-badge.passed {
+            background: rgb(22 163 74 / 0.1);
+            color: var(--success-green);
+        }
+        .status-badge.available {
+            background: rgb(26 86 219 / 0.1);
+            color: var(--primary-blue);
+        }
+        .status-badge.locked {
+            background: var(--gray-100);
+            color: var(--gray-400);
+        }
+        .score-with-attempts {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .attempt-count {
+            font-size: 0.65rem;
+            color: var(--gray-500);
+            font-weight: 400;
+        }
+        .progress-cell {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        .progress-cell.high {
+            color: var(--success-green);
+        }
+        .progress-cell.medium {
+            color: var(--warning-orange);
+        }
+        .progress-cell.low {
+            color: var(--gray-500);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-500);
+        }
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-secondary {
+            padding: 0.5rem 1rem;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+        .unit-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .section-title h3 {
+            margin: 0;
+            font-size: 1.125rem;
+        }
+        .back-to-units {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--border-radius);
+            transition: background-color 0.2s;
+        }
+        .back-to-units:hover {
+            background: var(--gray-100);
+            color: var(--primary-blue);
+        }
+        .status-badge.clickable {
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .status-badge.clickable:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .modal-header h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.25rem;
+        }
+        .modal-header p {
+            margin: 0;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-500);
+            padding: 0;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: var(--gray-700);
+        }
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .attempt-selector {
+            margin-bottom: 1.5rem;
+        }
+        .attempt-selector label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .attempt-selector select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+        .attempt-summary {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: var(--border-radius);
+        }
+        .attempt-stat {
+            text-align: center;
+        }
+        .attempt-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .attempt-stat-value.passed {
+            color: var(--success-green);
+        }
+        .attempt-stat-value.failed {
+            color: var(--danger-red);
+        }
+        .attempt-stat-label {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+        .question-review {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .question-review-header {
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .question-review-header.correct {
+            background: rgba(22, 163, 74, 0.1);
+            border-left: 3px solid var(--success-green);
+        }
+        .question-review-header.incorrect {
+            background: rgba(220, 38, 38, 0.1);
+            border-left: 3px solid var(--danger-red);
+        }
+        .question-review-body {
+            padding: 1rem;
+        }
+        .question-text-review {
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+        .answer-row {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+        .answer-row.student-answer {
+            background: rgba(26, 86, 219, 0.05);
+            border: 1px solid rgba(26, 86, 219, 0.2);
+        }
+        .answer-row.correct-answer {
+            background: rgba(22, 163, 74, 0.05);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+        }
+        .answer-label {
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-right: 0.5rem;
+        }
+        .time-spent {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        .explanation-box {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+        .explanation-box strong {
+            color: var(--gray-700);
+        }
+        .no-attempts {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-500);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="logo">
+                    <h1>CSP Ready</h1>
+                    <span>Teacher Dashboard</span>
+                </div>
+                <div class="user-info">
+                    <span id="user-name">Loading...</span>
+                    <button id="logout-btn" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <a href="/teacher/dashboard.html" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Dashboard
+            </a>
+
+            <div class="class-header">
+                <div class="class-info">
+                    <h2 id="class-name">Loading...</h2>
+                    <div class="class-code" id="class-code">---</div>
+                </div>
+            </div>
+
+            <div id="section-header" class="section-title" style="display: none;">
+                <span id="back-to-units" class="back-to-units">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Units
+                </span>
+                <h3 id="selected-unit-name"></h3>
+            </div>
+
+            <div class="matrix-container">
+                <div class="matrix-scroll">
+                    <table class="progress-matrix" id="matrix-table">
+                        <thead>
+                            <tr id="header-row">
+                                <th>Student</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrix-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 CSP Ready. Built for AP Computer Science Principles educators.</p>
+        </footer>
+    </div>
+
+    <!-- Attempt Details Modal -->
+    <div id="attempt-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modal-title">Quiz Attempt Details</h3>
+                    <p id="modal-subtitle">Loading...</p>
+                </div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <div class="no-attempts">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = window.location.origin + '/api';
+        const token = localStorage.getItem('authToken');
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        document.getElementById('user-name').textContent = userData.displayName || userData.email || 'Teacher';
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/';
+        });
+
+        // Get class ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const classId = urlParams.get('id');
+
+        if (!classId) {
+            window.location.href = '/teacher/dashboard.html';
+        }
+
+        // State
+        let matrixData = null;
+        let currentView = 'units'; // 'units' or 'topics'
+        let selectedBigIdeaId = null;
+
+        // Back to units handler
+        document.getElementById('back-to-units').addEventListener('click', () => {
+            showUnitsView();
+        });
+
+        async function loadMatrix(bigIdeaId = null) {
+            try {
+                let url = `${apiBase}/classes/${classId}/matrix`;
+                if (bigIdeaId) {
+                    url += `?bigIdeaId=${bigIdeaId}`;
+                }
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load class data');
+                }
+
+                matrixData = await response.json();
+
+                // Update class info
+                document.getElementById('class-name').textContent = matrixData.classInfo.name;
+                document.getElementById('class-code').textContent = matrixData.classInfo.code;
+                document.title = `${matrixData.classInfo.name} - CSP Ready`;
+
+                if (bigIdeaId) {
+                    showTopicsView(bigIdeaId);
+                } else {
+                    showUnitsView();
+                }
+
+            } catch (error) {
+                console.error('Failed to load matrix:', error);
+                document.getElementById('matrix-body').innerHTML = `
+                    <tr>
+                        <td colspan="100" class="empty-state">
+                            <h3>Error Loading Data</h3>
+                            <p>Please try refreshing the page.</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function showUnitsView() {
+            currentView = 'units';
+            selectedBigIdeaId = null;
+            document.getElementById('section-header').style.display = 'none';
+
+            const { classInfo, bigIdeas, students } = matrixData;
+
+            // Build header row with Big Ideas
+            const headerRow = document.getElementById('header-row');
+            headerRow.innerHTML = '<th>Student</th>';
+
+            bigIdeas.forEach(bigIdea => {
+                const th = document.createElement('th');
+                th.className = 'topic-header clickable';
+                th.innerHTML = `
+                    <span class="unit-indicator" style="background-color: ${bigIdea.color || '#3B82F6'}"></span>
+                    ${bigIdea.shortName || bigIdea.name}
+                `;
+                th.title = `Click to view ${bigIdea.name} topics`;
+                th.onclick = () => selectBigIdea(bigIdea.id);
+                headerRow.appendChild(th);
+            });
+
+            const progressTh = document.createElement('th');
+            progressTh.textContent = 'Overall';
+            headerRow.appendChild(progressTh);
+
+            // Build body
+            const tbody = document.getElementById('matrix-body');
+
+            if (students.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="${bigIdeas.length + 2}" class="empty-state">
+                            <h3>No Students Yet</h3>
+                            <p>Students can join using the class code: ${classInfo.code}</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = students.map(student => {
+                let cells = `<td class="student-name">${student.displayName || student.username}</td>`;
+
+                bigIdeas.forEach(bigIdea => {
+                    const pct = student.bigIdeaProgress[bigIdea.id] || 0;
+                    const colorClass = pct >= 80 ? 'high' : (pct >= 40 ? 'medium' : 'low');
+                    cells += `<td class="progress-cell ${colorClass}">${pct}%</td>`;
+                });
+
+                const overallClass = student.completionPercentage >= 80 ? 'high' : (student.completionPercentage >= 40 ? 'medium' : 'low');
+                cells += `<td class="progress-cell ${overallClass}">${student.completionPercentage}%</td>`;
+
+                return `<tr>${cells}</tr>`;
+            }).join('');
+        }
+
+        function selectBigIdea(bigIdeaId) {
+            selectedBigIdeaId = bigIdeaId;
+            loadMatrix(bigIdeaId);
+        }
+
+        function showTopicsView(bigIdeaId) {
+            currentView = 'topics';
+            selectedBigIdeaId = bigIdeaId;
+
+            const bigIdea = matrixData.bigIdeas.find(bi => bi.id === bigIdeaId);
+            document.getElementById('section-header').style.display = 'flex';
+            document.getElementById('selected-unit-name').innerHTML = `
+                <span class="unit-indicator" style="background-color: ${bigIdea.color || '#3B82F6'}"></span>
+                ${bigIdea.name}
+            `;
+
+            const { classInfo, topics, students } = matrixData;
+
+            // Build header row with topics
+            const headerRow = document.getElementById('header-row');
+            headerRow.innerHTML = '<th>Student</th>';
+
+            topics.forEach(topic => {
+                const th = document.createElement('th');
+                th.className = 'topic-header';
+                th.textContent = topic.name;
+                th.title = topic.name;
+                headerRow.appendChild(th);
+            });
+
+            const progressTh = document.createElement('th');
+            progressTh.textContent = 'Progress';
+            headerRow.appendChild(progressTh);
+
+            // Build body
+            const tbody = document.getElementById('matrix-body');
+
+            if (students.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="${topics.length + 2}" class="empty-state">
+                            <h3>No Students Yet</h3>
+                            <p>Students can join using the class code: ${classInfo.code}</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = students.map(student => {
+                let cells = `<td class="student-name">${student.displayName || student.username}</td>`;
+                let passedInUnit = 0;
+
+                topics.forEach(topic => {
+                    const progress = student.progress[topic.id];
+                    let badgeClass = 'locked';
+                    let badgeText = '-';
+                    let isClickable = false;
+                    let attemptCount = 0;
+
+                    if (progress) {
+                        badgeClass = progress.status;
+                        attemptCount = progress.attemptCount || 0;
+                        if (progress.status === 'passed') {
+                            passedInUnit++;
+                            isClickable = true;
+                            if (progress.bestScore !== null) {
+                                badgeText = `${progress.bestScore}/5`;
+                            } else {
+                                badgeText = '✓';
+                            }
+                        } else if (progress.status === 'available') {
+                            isClickable = attemptCount > 0;
+                            badgeText = '...';
+                        }
+                    }
+
+                    const clickAttr = isClickable
+                        ? `clickable" onclick="openAttemptModal('${student.id}', '${topic.id}', '${student.displayName || student.username}', '${topic.name}')`
+                        : '';
+
+                    const attemptLabel = attemptCount > 0 ? `<span class="attempt-count">${attemptCount} attempt${attemptCount > 1 ? 's' : ''}</span>` : '';
+
+                    cells += `
+                        <td class="status-cell">
+                            <div class="score-with-attempts">
+                                <span class="status-badge ${badgeClass} ${clickAttr}">${badgeText}</span>
+                                ${attemptLabel}
+                            </div>
+                        </td>
+                    `;
+                });
+
+                const unitPct = topics.length > 0 ? Math.round((passedInUnit / topics.length) * 100) : 0;
+                const colorClass = unitPct >= 80 ? 'high' : (unitPct >= 40 ? 'medium' : 'low');
+                cells += `<td class="progress-cell ${colorClass}">${unitPct}%</td>`;
+
+                return `<tr>${cells}</tr>`;
+            }).join('');
+        }
+
+        // Modal functions
+        let currentAttemptData = null;
+
+        function openAttemptModal(studentId, topicId, studentName, topicName) {
+            document.getElementById('modal-title').textContent = `${studentName}`;
+            document.getElementById('modal-subtitle').textContent = topicName;
+            document.getElementById('modal-body').innerHTML = '<div class="no-attempts">Loading...</div>';
+            document.getElementById('attempt-modal').classList.add('active');
+
+            fetchAttemptDetails(studentId, topicId);
+        }
+
+        function closeModal() {
+            document.getElementById('attempt-modal').classList.remove('active');
+            currentAttemptData = null;
+        }
+
+        // Close modal on overlay click
+        document.getElementById('attempt-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'attempt-modal') {
+                closeModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        async function fetchAttemptDetails(studentId, topicId) {
+            try {
+                const response = await fetch(
+                    `${apiBase}/classes/${classId}/students/${studentId}/topics/${topicId}/attempts`,
+                    {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Failed to load attempt details');
+                }
+
+                currentAttemptData = await response.json();
+                renderAttemptDetails(0); // Show most recent attempt by default
+
+            } catch (error) {
+                console.error('Error fetching attempts:', error);
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="no-attempts">
+                        <p>Error loading attempt details</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderAttemptDetails(attemptIndex) {
+            const { student, topic, attempts } = currentAttemptData;
+            const modalBody = document.getElementById('modal-body');
+
+            if (!attempts || attempts.length === 0) {
+                modalBody.innerHTML = '<div class="no-attempts">No attempts recorded yet.</div>';
+                return;
+            }
+
+            const attempt = attempts[attemptIndex];
+            const attemptDate = new Date(attempt.timestamp).toLocaleString();
+            const totalTimeFormatted = formatTime(attempt.totalTimeMs || 0);
+
+            let html = '';
+
+            // Attempt selector if multiple attempts
+            if (attempts.length > 1) {
+                html += `
+                    <div class="attempt-selector">
+                        <label>Select Attempt:</label>
+                        <select onchange="renderAttemptDetails(parseInt(this.value))">
+                            ${attempts.map((a, i) => `
+                                <option value="${i}" ${i === attemptIndex ? 'selected' : ''}>
+                                    Attempt ${attempts.length - i} - ${new Date(a.timestamp).toLocaleDateString()} - Score: ${a.score}/5 ${a.passed ? '(Passed)' : ''}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                `;
+            }
+
+            // Attempt summary
+            html += `
+                <div class="attempt-summary">
+                    <div class="attempt-stat">
+                        <div class="attempt-stat-value ${attempt.passed ? 'passed' : 'failed'}">${attempt.score}/5</div>
+                        <div class="attempt-stat-label">Score</div>
+                    </div>
+                    <div class="attempt-stat">
+                        <div class="attempt-stat-value">${attempt.passed ? 'Yes' : 'No'}</div>
+                        <div class="attempt-stat-label">Passed</div>
+                    </div>
+                    <div class="attempt-stat">
+                        <div class="attempt-stat-value">${totalTimeFormatted}</div>
+                        <div class="attempt-stat-label">Total Time</div>
+                    </div>
+                    <div class="attempt-stat">
+                        <div class="attempt-stat-value" style="font-size: 1rem;">${attemptDate}</div>
+                        <div class="attempt-stat-label">Date</div>
+                    </div>
+                </div>
+            `;
+
+            // Questions review
+            if (attempt.answers && attempt.answers.length > 0) {
+                html += '<h4 style="margin-bottom: 1rem;">Questions</h4>';
+
+                attempt.answers.forEach((answer, i) => {
+                    const timeFormatted = formatTime(answer.timeSpentMs || 0);
+
+                    html += `
+                        <div class="question-review">
+                            <div class="question-review-header ${answer.correct ? 'correct' : 'incorrect'}">
+                                <span>Question ${i + 1}</span>
+                                <span class="time-spent">Time: ${timeFormatted}</span>
+                            </div>
+                            <div class="question-review-body">
+                                <div class="question-text-review">${answer.questionText || 'Question text not available'}</div>
+
+                                <div class="answer-row student-answer">
+                                    <span class="answer-label">Student's Answer:</span>
+                                    ${answer.selectedAnswerTexts ? answer.selectedAnswerTexts.join(', ') : answer.selectedAnswerIds.join(', ')}
+                                </div>
+
+                                ${!answer.correct ? `
+                                    <div class="answer-row correct-answer">
+                                        <span class="answer-label">Correct Answer:</span>
+                                        ${answer.correctAnswerTexts ? answer.correctAnswerTexts.join(', ') : answer.correctAnswerIds.join(', ')}
+                                    </div>
+                                ` : ''}
+
+                                ${answer.explanation ? `
+                                    <div class="explanation-box">
+                                        <strong>Explanation:</strong> ${answer.explanation}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<div class="no-attempts">No question details available for this attempt.</div>';
+            }
+
+            modalBody.innerHTML = html;
+        }
+
+        function formatTime(ms) {
+            if (!ms || ms === 0) return '0s';
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+
+            if (minutes > 0) {
+                return `${minutes}m ${remainingSeconds}s`;
+            }
+            return `${seconds}s`;
+        }
+
+        loadMatrix();
+    </script>
+</body>
+</html>

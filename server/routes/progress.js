@@ -9,6 +9,7 @@ router.use(verifyToken);
 router.get('/:studentId', async (req, res) => {
   try {
     const { studentId } = req.params;
+    const { classId } = req.query;
     const requestingUser = req.user;
 
     // Students can only view their own progress
@@ -16,14 +17,15 @@ router.get('/:studentId', async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
+    // Get student data
+    const studentDoc = await db.collection('users').doc(studentId).get();
+    if (!studentDoc.exists) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+    const student = studentDoc.data();
+
     // Teachers can view progress for students in their classes
     if (requestingUser.role === 'teacher') {
-      const studentDoc = await db.collection('users').doc(studentId).get();
-      if (!studentDoc.exists) {
-        return res.status(404).json({ error: 'Student not found' });
-      }
-
-      const student = studentDoc.data();
       const studentClassIds = student.classIds || [];
 
       // Check if teacher owns any of the student's classes
@@ -32,11 +34,23 @@ router.get('/:studentId', async (req, res) => {
         .get();
 
       const teacherClassIds = teacherClassesSnapshot.docs.map(doc => doc.id);
-      const hasAccess = studentClassIds.some(classId => teacherClassIds.includes(classId));
+      const hasAccess = studentClassIds.some(cid => teacherClassIds.includes(cid));
 
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied to this student' });
       }
+    }
+
+    // Determine which class to show progress for
+    let studentClassId = classId;
+    if (!studentClassId) {
+      // Default to first class
+      studentClassId = student.classIds && student.classIds.length > 0 ? student.classIds[0] : null;
+    }
+
+    // Verify student is in this class
+    if (studentClassId && student.classIds && !student.classIds.includes(studentClassId)) {
+      return res.status(403).json({ error: 'Student is not in this class' });
     }
 
     // Get all topics ordered by their sequence
@@ -48,17 +62,6 @@ router.get('/:studentId', async (req, res) => {
 
     for (const topicDoc of topicsSnapshot.docs) {
       const topic = { id: topicDoc.id, ...topicDoc.data() };
-
-      // Get student's class (for students, use their class; for teachers, get it from context)
-      let studentClassId;
-      if (requestingUser.role === 'student') {
-        studentClassId = requestingUser.classIds[0];
-      } else {
-        // For teachers, get the student's class
-        const studentDoc = await db.collection('users').doc(studentId).get();
-        const student = studentDoc.data();
-        studentClassId = student.classIds[0];
-      }
 
       // Get progress for this topic
       const progressQuery = await db.collection('studentProgress')
@@ -447,15 +450,16 @@ router.post('/reset', verifyTeacher, async (req, res) => {
 // Helper function to unlock next topic
 async function unlockNextTopicForStudent(studentId, currentTopicId, classId) {
   try {
-    // Get current topic order
+    // Get current topic order and bigIdeaId
     const currentTopicDoc = await db.collection('topics').doc(currentTopicId).get();
     if (!currentTopicDoc.exists) return;
 
     const currentTopic = currentTopicDoc.data();
     const nextOrder = currentTopic.order + 1;
 
-    // Find next topic
+    // Find next topic within the same Big Idea
     const nextTopicSnapshot = await db.collection('topics')
+      .where('bigIdeaId', '==', currentTopic.bigIdeaId)
       .where('order', '==', nextOrder)
       .limit(1)
       .get();

@@ -43,6 +43,14 @@ const verifyTeacher = async (req, res, next) => {
   next();
 };
 
+// Middleware to verify user is an admin
+const verifyAdmin = async (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+  next();
+};
+
 // Middleware to verify user is a student
 const verifyStudent = async (req, res, next) => {
   if (!req.user || req.user.role !== 'student') {
@@ -88,5 +96,6 @@ module.exports = {
   verifyToken,
   verifyTeacher,
   verifyStudent,
+  verifyAdmin,
   verifyClassAccess
 };

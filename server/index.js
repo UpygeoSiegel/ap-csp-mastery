@@ -12,6 +12,8 @@ const classRoutes = require('./routes/classes');
 const progressRoutes = require('./routes/progress');
 const quizRoutes = require('./routes/quizzes');
 const questionRoutes = require('./routes/questions');
+const topicRoutes = require('./routes/topics');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +29,8 @@ app.use('/api/classes', classRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/questions', questionRoutes);
+app.use('/api/topics', topicRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Serve static files
 app.get('/', (req, res) => {
@@ -39,6 +43,14 @@ app.get('/student/dashboard', (req, res) => {
 
 app.get('/teacher/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/teacher/dashboard.html'));
+});
+
+app.get('/admin/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/admin/dashboard.html'));
+});
+
+app.get('/admin/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/admin/login.html'));
 });
 
 // Health check endpoint

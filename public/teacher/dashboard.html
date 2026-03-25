@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - CSP Ready</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .dashboard-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-secondary {
+            padding: 0.5rem 1rem;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .class-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .class-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .class-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .class-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--gray-900);
+        }
+        .class-code {
+            display: inline-block;
+            background: var(--gray-100);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--border-radius);
+            font-family: monospace;
+            font-size: 1rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        .class-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        .empty-state h3 {
+            margin-bottom: 1rem;
+            color: var(--gray-700);
+        }
+        .empty-state p {
+            color: var(--gray-500);
+            margin-bottom: 1.5rem;
+        }
+        .create-class-form {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .create-class-form h3 {
+            margin-bottom: 1rem;
+        }
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .form-row .btn-primary {
+            width: auto;
+            white-space: nowrap;
+        }
+        .class-card-wrapper {
+            position: relative;
+        }
+        .kebab-menu {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            z-index: 10;
+        }
+        .kebab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .kebab-btn:hover {
+            background: var(--gray-100);
+        }
+        .kebab-btn svg {
+            color: var(--gray-500);
+        }
+        .kebab-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 140px;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+        .kebab-dropdown.active {
+            display: block;
+        }
+        .kebab-item {
+            display: block;
+            width: 100%;
+            padding: 0.625rem 1rem;
+            text-align: left;
+            background: none;
+            border: none;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .kebab-item:hover {
+            background: var(--gray-50);
+        }
+        .kebab-item.delete {
+            color: var(--danger-red);
+        }
+        .kebab-item.archive {
+            color: var(--warning-orange);
+        }
+        .kebab-item.unarchive {
+            color: var(--success-green);
+        }
+        .archived-badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            background: var(--warning-orange);
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+        .class-card.archived {
+            opacity: 0.7;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
+            width: 100%;
+            padding: 1.5rem;
+        }
+        .modal h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.125rem;
+        }
+        .modal p {
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+        .btn-modal-cancel {
+            padding: 0.5rem 1rem;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-modal-cancel:hover {
+            background: var(--gray-300);
+        }
+        .btn-modal-confirm {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-modal-confirm.delete {
+            background: var(--danger-red);
+            color: white;
+        }
+        .btn-modal-confirm.delete:hover {
+            background: rgb(185 28 28);
+        }
+        .btn-modal-confirm.archive {
+            background: var(--warning-orange);
+            color: white;
+        }
+        .btn-modal-confirm.archive:hover {
+            background: rgb(217 119 6);
+        }
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .view-btn {
+            padding: 0.5rem 1rem;
+            background: var(--white);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .view-btn:hover {
+            border-color: var(--primary-blue);
+        }
+        .view-btn.active {
+            border-color: var(--primary-blue);
+            background: var(--primary-blue);
+            color: white;
+        }
+        .settings-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .settings-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .settings-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+        .settings-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            background: var(--white);
+        }
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        .radio-option input {
+            margin: 0;
+        }
+        .settings-help {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+        .class-settings-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.625rem;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            padding: 0.125rem 0.375rem;
+            border-radius: 9999px;
+            margin-left: 0.5rem;
+        }
+        .settings-modal-content {
+            max-width: 500px;
+        }
+        .settings-modal-content .form-group {
+            margin-bottom: 1rem;
+        }
+        .settings-modal-content label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+        .settings-modal-content select,
+        .settings-modal-content input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="dashboard-header">
+                <div class="logo">
+                    <h1>CSP Ready</h1>
+                    <span>Teacher Dashboard</span>
+                </div>
+                <div class="user-info">
+                    <a href="/teacher/item-analysis.html" class="btn-secondary" style="text-decoration: none;">Item Analysis</a>
+                    <span id="user-name">Loading...</span>
+                    <button id="logout-btn" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="create-class-form">
+                <h3>Create New Class</h3>
+                <form id="create-class-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="class-name">Class Name</label>
+                            <input type="text" id="class-name" name="className" required placeholder="e.g., Period 1 AP CSP">
+                        </div>
+                        <button type="submit" class="btn-primary">Create Class</button>
+                    </div>
+                    <div class="settings-row">
+                        <div class="settings-group">
+                            <label for="wait-time">Retake Wait Time</label>
+                            <select id="wait-time" name="retakeWaitMinutes">
+                                <option value="0">No wait (immediate retake)</option>
+                                <option value="30">30 minutes</option>
+                                <option value="60">1 hour</option>
+                                <option value="90">1.5 hours</option>
+                                <option value="120">2 hours</option>
+                                <option value="180">3 hours</option>
+                                <option value="240">4 hours</option>
+                                <option value="360">6 hours</option>
+                                <option value="480">8 hours</option>
+                            </select>
+                            <p class="settings-help">Time students must wait before retaking a quiz</p>
+                        </div>
+                        <div class="settings-group">
+                            <label>Quiz Progression</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="progressionMode" value="linear" checked>
+                                    <span>Linear</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="progressionMode" value="unlocked">
+                                    <span>All Unlocked</span>
+                                </label>
+                            </div>
+                            <p class="settings-help">Linear: Students must pass each quiz to unlock the next. All Unlocked: All quizzes available immediately.</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="active" onclick="setClassView('active')">Active Classes</button>
+                <button class="view-btn" data-view="archived" onclick="setClassView('archived')">Archived</button>
+            </div>
+
+            <h2 style="margin-bottom: 1.5rem;" id="classes-title">Your Classes</h2>
+
+            <div id="classes-container" class="dashboard-grid">
+                <div class="empty-state">
+                    <h3>No Classes Yet</h3>
+                    <p>Create your first class to get started. Students will use the class code to join.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 CSP Ready. Built for AP Computer Science Principles educators.</p>
+        </footer>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal">
+            <h3 id="modal-title">Confirm Action</h3>
+            <p id="modal-message">Are you sure?</p>
+            <div class="modal-buttons">
+                <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-modal-confirm" id="modal-confirm-btn" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal settings-modal-content">
+            <h3>Class Settings</h3>
+            <form id="settings-form">
+                <input type="hidden" id="settings-class-id">
+                <div class="form-group">
+                    <label for="settings-class-name">Class Name</label>
+                    <input type="text" id="settings-class-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="settings-wait-time">Retake Wait Time</label>
+                    <select id="settings-wait-time">
+                        <option value="0">No wait (immediate retake)</option>
+                        <option value="30">30 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="90">1.5 hours</option>
+                        <option value="120">2 hours</option>
+                        <option value="180">3 hours</option>
+                        <option value="240">4 hours</option>
+                        <option value="360">6 hours</option>
+                        <option value="480">8 hours</option>
+                    </select>
+                    <p class="settings-help">Time students must wait before retaking a quiz</p>
+                </div>
+                <div class="form-group">
+                    <label>Quiz Progression</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="settingsProgressionMode" value="linear">
+                            <span>Linear</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="settingsProgressionMode" value="unlocked">
+                            <span>All Unlocked</span>
+                        </label>
+                    </div>
+                    <p class="settings-help">Linear: Students must pass each quiz to unlock the next. All Unlocked: All quizzes available immediately.</p>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal-cancel" onclick="closeSettingsModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" style="padding: 0.5rem 1rem;">Save Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = window.location.origin + '/api';
+
+        // Check if user is logged in
+        const token = localStorage.getItem('authToken');
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // State
+        let allClasses = [];
+        let currentView = 'active'; // 'active' or 'archived'
+        let pendingAction = null; // { type: 'delete' | 'archive' | 'unarchive', classId, className }
+
+        // Display user name
+        document.getElementById('user-name').textContent = userData.displayName || userData.email || 'Teacher';
+
+        // Logout handler
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/';
+        });
+
+        // Create class handler
+        document.getElementById('create-class-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const className = document.getElementById('class-name').value;
+            const retakeWaitMinutes = parseInt(document.getElementById('wait-time').value) || 0;
+            const progressionMode = document.querySelector('input[name="progressionMode"]:checked').value;
+
+            try {
+                const response = await fetch(`${apiBase}/classes`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name: className,
+                        retakeWaitMinutes,
+                        progressionMode
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Class created successfully!', 'success');
+                    document.getElementById('class-name').value = '';
+                    document.getElementById('wait-time').value = '0';
+                    document.querySelector('input[name="progressionMode"][value="linear"]').checked = true;
+                    loadClasses();
+                } else {
+                    showToast(data.error || 'Failed to create class', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to create class', 'error');
+            }
+        });
+
+        // View toggle
+        function setClassView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === view);
+            });
+            document.getElementById('classes-title').textContent =
+                view === 'active' ? 'Your Classes' : 'Archived Classes';
+            renderClasses();
+        }
+
+        // Load classes
+        async function loadClasses() {
+            try {
+                const response = await fetch(`${apiBase}/classes`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.classes) {
+                    allClasses = data.classes;
+
+                    // Load status for each class to determine available actions
+                    await Promise.all(allClasses.map(async (cls) => {
+                        try {
+                            const statusResponse = await fetch(`${apiBase}/classes/${cls.id}/status`, {
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            if (statusResponse.ok) {
+                                const status = await statusResponse.json();
+                                cls.canDelete = status.canDelete;
+                                cls.canArchive = status.canArchive;
+                            }
+                        } catch (err) {
+                            console.error('Failed to get status for class:', cls.id);
+                        }
+                    }));
+
+                    renderClasses();
+                } else {
+                    allClasses = [];
+                    renderClasses();
+                }
+            } catch (error) {
+                console.error('Failed to load classes:', error);
+            }
+        }
+
+        function renderClasses() {
+            const container = document.getElementById('classes-container');
+            const filteredClasses = allClasses.filter(cls =>
+                currentView === 'archived' ? cls.archived : !cls.archived
+            );
+
+            if (filteredClasses.length === 0) {
+                const message = currentView === 'archived'
+                    ? '<h3>No Archived Classes</h3><p>Archived classes will appear here.</p>'
+                    : '<h3>No Classes Yet</h3><p>Create your first class to get started. Students will use the class code to join.</p>';
+                container.innerHTML = `<div class="empty-state">${message}</div>`;
+                return;
+            }
+
+            container.innerHTML = filteredClasses.map(cls => {
+                const isArchived = cls.archived;
+                let menuItems = '';
+
+                // Settings option is always available
+                menuItems += `
+                    <button class="kebab-item" onclick="event.preventDefault(); event.stopPropagation(); closeAllMenus(); openSettingsModal('${cls.id}', '${escapeHtml(cls.name)}', ${cls.retakeWaitMinutes || 0}, '${cls.progressionMode || 'linear'}')">
+                        Settings
+                    </button>
+                `;
+
+                if (isArchived) {
+                    menuItems += `
+                        <button class="kebab-item unarchive" onclick="event.preventDefault(); event.stopPropagation(); closeAllMenus(); showUnarchiveConfirm('${cls.id}', '${escapeHtml(cls.name)}')">
+                            Unarchive
+                        </button>
+                    `;
+                } else {
+                    if (cls.canArchive) {
+                        menuItems += `
+                            <button class="kebab-item archive" onclick="event.preventDefault(); event.stopPropagation(); closeAllMenus(); showArchiveConfirm('${cls.id}', '${escapeHtml(cls.name)}')">
+                                Archive
+                            </button>
+                        `;
+                    }
+                    if (cls.canDelete) {
+                        menuItems += `
+                            <button class="kebab-item delete" onclick="event.preventDefault(); event.stopPropagation(); closeAllMenus(); showDeleteConfirm('${cls.id}', '${escapeHtml(cls.name)}')">
+                                Delete
+                            </button>
+                        `;
+                    }
+                }
+
+                const kebabMenu = `
+                    <div class="kebab-menu">
+                        <button class="kebab-btn" onclick="event.preventDefault(); event.stopPropagation(); toggleMenu(this)">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="5" r="2"/>
+                                <circle cx="12" cy="12" r="2"/>
+                                <circle cx="12" cy="19" r="2"/>
+                            </svg>
+                        </button>
+                        <div class="kebab-dropdown">
+                            ${menuItems}
+                        </div>
+                    </div>
+                `;
+
+                // Format settings badges
+                const waitTimeText = formatWaitTime(cls.retakeWaitMinutes || 0);
+                const progressionText = cls.progressionMode === 'unlocked' ? 'Unlocked' : 'Linear';
+
+                return `
+                    <div class="class-card-wrapper">
+                        ${isArchived ? '<span class="archived-badge">Archived</span>' : ''}
+                        ${kebabMenu}
+                        <a href="/teacher/class.html?id=${cls.id}" class="class-card-link">
+                            <div class="class-card ${isArchived ? 'archived' : ''}">
+                                <h3>${escapeHtml(cls.name)}</h3>
+                                <div class="class-code">${cls.code}</div>
+                                <p style="color: var(--gray-500); font-size: 0.875rem;">
+                                    Share this code with your students
+                                    <span class="class-settings-badge">${waitTimeText}</span>
+                                    <span class="class-settings-badge">${progressionText}</span>
+                                </p>
+                                <div class="class-stats">
+                                    <div class="stat">
+                                        <div class="stat-value">${cls.studentCount || 0}</div>
+                                        <div class="stat-label">Students</div>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="stat-value">${cls.completionPercentage || 0}%</div>
+                                        <div class="stat-label">Avg Progress</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Kebab menu functions
+        function toggleMenu(btn) {
+            const dropdown = btn.nextElementSibling;
+            const isOpen = dropdown.classList.contains('active');
+            closeAllMenus();
+            if (!isOpen) {
+                dropdown.classList.add('active');
+            }
+        }
+
+        function closeAllMenus() {
+            document.querySelectorAll('.kebab-dropdown').forEach(menu => {
+                menu.classList.remove('active');
+            });
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.kebab-menu')) {
+                closeAllMenus();
+            }
+        });
+
+        // Modal functions
+        function showDeleteConfirm(classId, className) {
+            pendingAction = { type: 'delete', classId, className };
+            document.getElementById('modal-title').textContent = 'Delete Class';
+            document.getElementById('modal-message').textContent =
+                `Are you sure you want to delete "${className}"? This action cannot be undone.`;
+            document.getElementById('modal-confirm-btn').textContent = 'Delete';
+            document.getElementById('modal-confirm-btn').className = 'btn-modal-confirm delete';
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        function showArchiveConfirm(classId, className) {
+            pendingAction = { type: 'archive', classId, className };
+            document.getElementById('modal-title').textContent = 'Archive Class';
+            document.getElementById('modal-message').textContent =
+                `Are you sure you want to archive "${className}"? The class will be moved to the Archived tab but all data will be preserved.`;
+            document.getElementById('modal-confirm-btn').textContent = 'Archive';
+            document.getElementById('modal-confirm-btn').className = 'btn-modal-confirm archive';
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        function showUnarchiveConfirm(classId, className) {
+            pendingAction = { type: 'unarchive', classId, className };
+            document.getElementById('modal-title').textContent = 'Unarchive Class';
+            document.getElementById('modal-message').textContent =
+                `Are you sure you want to unarchive "${className}"? The class will be moved back to your active classes.`;
+            document.getElementById('modal-confirm-btn').textContent = 'Unarchive';
+            document.getElementById('modal-confirm-btn').className = 'btn-modal-confirm archive';
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('confirm-modal').classList.remove('active');
+            pendingAction = null;
+        }
+
+        async function confirmAction() {
+            if (!pendingAction) return;
+
+            const { type, classId, className } = pendingAction;
+            closeModal();
+
+            try {
+                let response;
+                if (type === 'delete') {
+                    response = await fetch(`${apiBase}/classes/${classId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                } else if (type === 'archive') {
+                    response = await fetch(`${apiBase}/classes/${classId}/archive`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                } else if (type === 'unarchive') {
+                    response = await fetch(`${apiBase}/classes/${classId}/unarchive`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                }
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const actionLabel = type === 'delete' ? 'deleted' : (type === 'archive' ? 'archived' : 'unarchived');
+                    showToast(`Class ${actionLabel} successfully!`, 'success');
+                    loadClasses();
+                } else {
+                    showToast(data.error || `Failed to ${type} class`, 'error');
+                }
+            } catch (error) {
+                showToast(`Failed to ${type} class`, 'error');
+            }
+        }
+
+        // Close modal on overlay click
+        document.getElementById('confirm-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'confirm-modal') {
+                closeModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeSettingsModal();
+            }
+        });
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Format wait time for display
+        function formatWaitTime(minutes) {
+            if (minutes === 0) return 'No wait';
+            if (minutes < 60) return `${minutes}m wait`;
+            const hours = minutes / 60;
+            return hours === 1 ? '1h wait' : `${hours}h wait`;
+        }
+
+        // Settings modal functions
+        function openSettingsModal(classId, className, waitMinutes, progressionMode) {
+            document.getElementById('settings-class-id').value = classId;
+            document.getElementById('settings-class-name').value = className;
+            document.getElementById('settings-wait-time').value = waitMinutes.toString();
+            document.querySelector(`input[name="settingsProgressionMode"][value="${progressionMode}"]`).checked = true;
+            document.getElementById('settings-modal').classList.add('active');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('active');
+        }
+
+        // Settings form submit handler
+        document.getElementById('settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const classId = document.getElementById('settings-class-id').value;
+            const name = document.getElementById('settings-class-name').value;
+            const retakeWaitMinutes = parseInt(document.getElementById('settings-wait-time').value) || 0;
+            const progressionMode = document.querySelector('input[name="settingsProgressionMode"]:checked').value;
+
+            try {
+                const response = await fetch(`${apiBase}/classes/${classId}/settings`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name,
+                        retakeWaitMinutes,
+                        progressionMode
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Settings updated successfully!', 'success');
+                    closeSettingsModal();
+                    loadClasses();
+                } else {
+                    showToast(data.error || 'Failed to update settings', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to update settings', 'error');
+            }
+        });
+
+        // Close settings modal on overlay click
+        document.getElementById('settings-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'settings-modal') {
+                closeSettingsModal();
+            }
+        });
+
+        // Initial load
+        loadClasses();
+    </script>
+</body>
+</html>

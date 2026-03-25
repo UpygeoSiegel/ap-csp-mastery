@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Idea - CSP Ready</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .breadcrumb-item {
+            color: var(--gray-500);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .breadcrumb-item:hover {
+            color: var(--primary-blue);
+        }
+        .breadcrumb-item.active {
+            color: var(--gray-900);
+            font-weight: 500;
+        }
+        .breadcrumb-separator {
+            color: var(--gray-400);
+        }
+        .big-idea-header {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .big-idea-header h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.75rem;
+        }
+        .big-idea-header p {
+            color: var(--gray-600);
+            margin: 0;
+        }
+        .big-idea-progress {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .big-idea-progress .progress-bar {
+            flex: 1;
+            height: 10px;
+        }
+        .progress-text {
+            font-weight: 600;
+            color: var(--primary-blue);
+            min-width: 60px;
+        }
+        .topics-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .topic-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .topic-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .topic-card.locked {
+            opacity: 0.7;
+        }
+        .topic-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            flex-shrink: 0;
+        }
+        .topic-card.passed .topic-number {
+            background: var(--success-green);
+            color: white;
+        }
+        .topic-card.available .topic-number {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .topic-info {
+            flex: 1;
+        }
+        .topic-info h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.125rem;
+        }
+        .topic-info p {
+            margin: 0;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+        .topic-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        .topic-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .topic-score {
+            text-align: center;
+        }
+        .topic-score .score-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .topic-score .score-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        .btn-start {
+            padding: 0.75rem 1.5rem;
+            white-space: nowrap;
+        }
+        .btn-start:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-badge.passed {
+            background: rgb(22 163 74 / 0.1);
+            color: var(--success-green);
+        }
+        .status-badge.available {
+            background: rgb(26 86 219 / 0.1);
+            color: var(--primary-blue);
+        }
+        .status-badge.locked {
+            background: var(--gray-100);
+            color: var(--gray-500);
+        }
+        .status-badge.wait {
+            background: rgb(234 179 8 / 0.1);
+            color: #b45309;
+        }
+        .wait-time {
+            font-size: 0.75rem;
+            color: #b45309;
+            margin-top: 0.25rem;
+        }
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-500);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-secondary {
+            padding: 0.5rem 1rem;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="logo">
+                    <h1>CSP Ready</h1>
+                    <span>Student Dashboard</span>
+                </div>
+                <div class="user-info">
+                    <span id="user-name">Loading...</span>
+                    <button id="logout-btn" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <nav class="breadcrumb">
+                <a href="/student/dashboard.html" class="breadcrumb-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    Big Ideas
+                </a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item active" id="breadcrumb-current">Loading...</span>
+            </nav>
+
+            <div id="content">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 CSP Ready. Built for AP Computer Science Principles educators.</p>
+        </footer>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        const apiBase = window.location.origin + '/api';
+        const token = localStorage.getItem('authToken');
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Get bigIdeaId and classId from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const bigIdeaId = urlParams.get('id');
+        const classId = urlParams.get('classId');
+
+        if (!bigIdeaId) {
+            window.location.href = '/student/dashboard.html';
+        }
+
+        document.getElementById('user-name').textContent = userData.displayName || userData.username || 'Student';
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/';
+        });
+
+        async function loadBigIdea() {
+            try {
+                const url = classId
+                    ? `${apiBase}/topics/big-ideas/${bigIdeaId}?classId=${classId}`
+                    : `${apiBase}/topics/big-ideas/${bigIdeaId}`;
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load');
+                }
+
+                const data = await response.json();
+                renderBigIdea(data);
+
+            } catch (error) {
+                console.error('Error loading big idea:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="loading-state">
+                        <h3>Error loading content</h3>
+                        <p>Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderBigIdea(data) {
+            const { bigIdea, topics } = data;
+
+            // Calculate overall progress
+            const passedCount = topics.filter(t => t.status === 'passed').length;
+            const progressPercent = topics.length > 0 ? Math.round((passedCount / topics.length) * 100) : 0;
+
+            document.title = `${bigIdea.shortName || bigIdea.name} - CSP Ready`;
+
+            // Update breadcrumb
+            document.getElementById('breadcrumb-current').textContent = bigIdea.shortName || bigIdea.name;
+
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="big-idea-header" style="border-left: 4px solid ${bigIdea.color || '#3B82F6'}">
+                    <h2>${bigIdea.name}</h2>
+                    <p>${bigIdea.description}</p>
+                    <div class="big-idea-progress">
+                        <span style="color: var(--gray-600);">Progress:</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${progressPercent === 100 ? 'success' : ''}" style="width: ${progressPercent}%"></div>
+                        </div>
+                        <span class="progress-text">${passedCount}/${topics.length}</span>
+                    </div>
+                </div>
+
+                <h2 style="margin-bottom: 1.5rem;">Topics</h2>
+
+                <div class="topics-list">
+                    ${topics.map((topic, index) => renderTopicCard(topic, index)).join('')}
+                </div>
+            `;
+        }
+
+        function renderTopicCard(topic, index) {
+            const statusClass = topic.status;
+            const isLocked = topic.status === 'locked';
+            const isPassed = topic.status === 'passed';
+            const hasWaitTime = topic.waitUntil && topic.remainingMinutes > 0;
+
+            // Format remaining wait time
+            let waitTimeText = '';
+            if (hasWaitTime) {
+                const mins = topic.remainingMinutes;
+                if (mins >= 60) {
+                    const hours = Math.floor(mins / 60);
+                    const remainingMins = mins % 60;
+                    waitTimeText = remainingMins > 0
+                        ? `${hours}h ${remainingMins}m remaining`
+                        : `${hours}h remaining`;
+                } else {
+                    waitTimeText = `${mins}m remaining`;
+                }
+            }
+
+            return `
+                <div class="topic-card ${statusClass}">
+                    <div class="topic-number">${isPassed ? '&#10003;' : index + 1}</div>
+                    <div class="topic-info">
+                        <h3>${topic.name}</h3>
+                        <p>${topic.description}</p>
+                        ${topic.attemptCount > 0 ? `
+                        <div class="topic-meta">
+                            <span>${topic.attemptCount} attempt${topic.attemptCount > 1 ? 's' : ''}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="topic-actions">
+                        ${topic.bestScore !== null ? `
+                            <div class="topic-score">
+                                <div class="score-value">${topic.bestScore}/5</div>
+                                <div class="score-label">Best Score</div>
+                            </div>
+                        ` : ''}
+                        <div style="text-align: center;">
+                            <span class="status-badge ${hasWaitTime ? 'wait' : statusClass}">
+                                ${hasWaitTime ? 'Wait' : (isPassed ? 'Passed' : (isLocked ? 'Locked' : 'Available'))}
+                            </span>
+                            ${hasWaitTime ? `<div class="wait-time">${waitTimeText}</div>` : ''}
+                        </div>
+                        <button class="btn-primary btn-start"
+                                ${isLocked || hasWaitTime ? 'disabled' : ''}
+                                onclick="startQuiz('${topic.id}')">
+                            ${hasWaitTime ? 'Wait' : (isPassed ? 'Retake' : (isLocked ? 'Locked' : 'Start Quiz'))}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startQuiz(topicId) {
+            if (!classId) {
+                showToast('Please select a class first', 'warning');
+                return;
+            }
+            window.location.href = `/student/quiz.html?topicId=${topicId}&classId=${classId}&bigIdeaId=${bigIdeaId}`;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        loadBigIdea();
+    </script>
+</body>
+</html>

@@ -78,10 +78,6 @@
                     <form id="student-login-form" class="auth-form active">
                         <h3>Student Login</h3>
                         <div class="form-group">
-                            <label for="student-login-class-code">Class Code</label>
-                            <input type="text" id="student-login-class-code" name="classCode" required maxlength="6" style="text-transform: uppercase;">
-                        </div>
-                        <div class="form-group">
                             <label for="student-login-username">Username</label>
                             <input type="text" id="student-login-username" name="username" required>
                         </div>
@@ -105,7 +101,7 @@
                         </div>
                         <div class="form-group">
                             <label for="student-username">Username</label>
-                            <input type="text" id="student-username" name="username" required placeholder="Unique within your class">
+                            <input type="text" id="student-username" name="username" required placeholder="Choose a unique username">
                         </div>
                         <div class="form-group">
                             <label for="student-signup-password">Password</label>
@@ -153,14 +149,23 @@
     <!-- Toast Notifications -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Firebase Configuration -->
-    <script type="module">
-        // Firebase configuration will be added here
-        window.firebaseConfig = {
-            // Add your Firebase config here when setting up the frontend
+    <!-- Firebase Client SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjfe2zgokw6CAkmdSM7TeLH0VBYYBRhQs", // You need to add your Firebase API key
+            authDomain: "ap-csp-mastery.firebaseapp.com",
+            projectId: "ap-csp-mastery"
         };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        window.firebaseAuth = firebase.auth();
     </script>
-    
+
     <script src="js/auth.js"></script>
 </body>
 </html>

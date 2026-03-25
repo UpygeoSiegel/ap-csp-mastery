@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - CSP Ready</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .quiz-header {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .quiz-header h2 {
+            margin: 0 0 0.5rem 0;
+        }
+        .quiz-progress {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .quiz-progress .progress-bar {
+            flex: 1;
+            height: 8px;
+        }
+        .quiz-progress-text {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            min-width: 80px;
+        }
+        .question-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .question-number {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 0.5rem;
+        }
+        .question-text {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--gray-900);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-item:hover {
+            border-color: var(--primary-blue);
+            background: rgba(26, 86, 219, 0.05);
+        }
+        .option-item.selected {
+            border-color: var(--primary-blue);
+            background: rgba(26, 86, 219, 0.1);
+        }
+        .option-item.correct {
+            border-color: var(--success-green);
+            background: rgba(22, 163, 74, 0.1);
+        }
+        .option-item.incorrect {
+            border-color: var(--danger-red);
+            background: rgba(220, 38, 38, 0.1);
+        }
+        .option-item input {
+            margin-right: 1rem;
+        }
+        .option-text {
+            flex: 1;
+        }
+        .quiz-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .quiz-actions button {
+            min-width: 120px;
+        }
+        .results-container {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            text-align: center;
+        }
+        .results-score {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 1rem 0;
+        }
+        .results-score.passed {
+            color: var(--success-green);
+        }
+        .results-score.failed {
+            color: var(--danger-red);
+        }
+        .results-message {
+            font-size: 1.25rem;
+            color: var(--gray-700);
+            margin-bottom: 2rem;
+        }
+        .results-details {
+            text-align: left;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .result-item {
+            background: var(--gray-50);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .result-item.correct {
+            border-left: 4px solid var(--success-green);
+        }
+        .result-item.incorrect {
+            border-left: 4px solid var(--danger-red);
+        }
+        .result-question {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .result-answer {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        .result-explanation {
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .breadcrumb-item {
+            color: var(--gray-500);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .breadcrumb-item:hover {
+            color: var(--primary-blue);
+        }
+        .breadcrumb-item.active {
+            color: var(--gray-900);
+            font-weight: 500;
+        }
+        .breadcrumb-separator {
+            color: var(--gray-400);
+        }
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-500);
+        }
+        .error-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--danger-red);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1>CSP Ready</h1>
+                <span>Quiz</span>
+            </div>
+        </header>
+
+        <main class="main quiz-container">
+            <nav class="breadcrumb" id="breadcrumb">
+                <a href="/student/dashboard.html" class="breadcrumb-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    Big Ideas
+                </a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="#" class="breadcrumb-item" id="breadcrumb-bigidea">Topics</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item active" id="breadcrumb-topic">Quiz</span>
+            </nav>
+
+            <div id="quiz-content">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading quiz...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 CSP Ready. Built for AP Computer Science Principles educators.</p>
+        </footer>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        const apiBase = window.location.origin + '/api';
+        const token = localStorage.getItem('authToken');
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Get topic, class, and bigIdea from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const topicId = urlParams.get('topicId');
+        const classId = urlParams.get('classId');
+        const bigIdeaId = urlParams.get('bigIdeaId');
+
+        // Build back URL for topics page
+        const topicsUrl = bigIdeaId
+            ? `/student/big-idea.html?id=${bigIdeaId}&classId=${classId}`
+            : '/student/dashboard.html';
+
+        // Update breadcrumb links
+        document.getElementById('breadcrumb-bigidea').href = topicsUrl;
+
+        if (!topicId || !classId) {
+            window.location.href = '/student/dashboard.html';
+        }
+
+        // Quiz state
+        let quizData = null;
+        let currentQuestionIndex = 0;
+        let answers = {};
+        let questionTimes = {}; // Track time spent per question
+        let questionStartTime = null; // When current question was shown
+
+        async function startQuiz() {
+            try {
+                const response = await fetch(`${apiBase}/quizzes/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ topicId, classId })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Check if this is a wait time error
+                    if (data.waitRequired && data.remainingMinutes) {
+                        const mins = data.remainingMinutes;
+                        let waitText = '';
+                        if (mins >= 60) {
+                            const hours = Math.floor(mins / 60);
+                            const remainingMins = mins % 60;
+                            waitText = remainingMins > 0
+                                ? `${hours} hour${hours > 1 ? 's' : ''} and ${remainingMins} minute${remainingMins > 1 ? 's' : ''}`
+                                : `${hours} hour${hours > 1 ? 's' : ''}`;
+                        } else {
+                            waitText = `${mins} minute${mins > 1 ? 's' : ''}`;
+                        }
+                        showWaitError(waitText);
+                    } else {
+                        showError(data.error || 'Failed to start quiz');
+                    }
+                    return;
+                }
+
+                quizData = data;
+
+                // Update breadcrumb with topic name
+                document.getElementById('breadcrumb-topic').textContent = quizData.topicName;
+
+                // Update breadcrumb with big idea name if available
+                if (quizData.bigIdeaName) {
+                    document.getElementById('breadcrumb-bigidea').textContent = quizData.bigIdeaName;
+                }
+
+                renderQuiz();
+
+            } catch (error) {
+                console.error('Start quiz error:', error);
+                showError('Failed to start quiz. Please try again.');
+            }
+        }
+
+        function recordTimeForCurrentQuestion() {
+            if (questionStartTime !== null && quizData) {
+                const questionId = quizData.questions[currentQuestionIndex].id;
+                const timeSpent = Date.now() - questionStartTime;
+                // Add to existing time (in case they revisit the question)
+                questionTimes[questionId] = (questionTimes[questionId] || 0) + timeSpent;
+            }
+        }
+
+        function renderQuiz() {
+            // Record time for previous question before rendering new one
+            recordTimeForCurrentQuestion();
+
+            // Start timing the new question
+            questionStartTime = Date.now();
+
+            const content = document.getElementById('quiz-content');
+            const question = quizData.questions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
+
+            content.innerHTML = `
+                <div class="quiz-header">
+                    <h2>${quizData.topicName}</h2>
+                    <div class="quiz-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <span class="quiz-progress-text">Question ${currentQuestionIndex + 1} of ${quizData.questions.length}</span>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-number">Question ${currentQuestionIndex + 1}</div>
+                    <div class="question-text">${question.text}</div>
+                    <div class="options-list">
+                        ${question.options.map(option => `
+                            <label class="option-item ${isOptionSelected(question.id, option.id) ? 'selected' : ''}"
+                                   onclick="selectOption('${question.id}', '${option.id}', '${question.type}')">
+                                <input type="${question.type === 'multiple_select' ? 'checkbox' : 'radio'}"
+                                       name="question-${question.id}"
+                                       value="${option.id}"
+                                       ${isOptionSelected(question.id, option.id) ? 'checked' : ''}>
+                                <span class="option-text">${option.text}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="quiz-actions">
+                    <button class="btn-secondary" onclick="previousQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''}>
+                        Previous
+                    </button>
+                    ${currentQuestionIndex === quizData.questions.length - 1 ? `
+                        <button class="btn-primary" onclick="submitQuiz()">
+                            Submit Quiz
+                        </button>
+                    ` : `
+                        <button class="btn-primary" onclick="nextQuestion()">
+                            Next
+                        </button>
+                    `}
+                </div>
+            `;
+        }
+
+        function isOptionSelected(questionId, optionId) {
+            const selected = answers[questionId] || [];
+            return selected.includes(optionId);
+        }
+
+        function selectOption(questionId, optionId, questionType) {
+            if (questionType === 'multiple_select') {
+                // Toggle selection for multiple select
+                if (!answers[questionId]) {
+                    answers[questionId] = [];
+                }
+                const index = answers[questionId].indexOf(optionId);
+                if (index > -1) {
+                    answers[questionId].splice(index, 1);
+                } else {
+                    answers[questionId].push(optionId);
+                }
+            } else {
+                // Single selection for multiple choice
+                answers[questionId] = [optionId];
+            }
+            renderQuiz();
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < quizData.questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuiz();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuiz();
+            }
+        }
+
+        async function submitQuiz() {
+            // Record time for current question before submitting
+            recordTimeForCurrentQuestion();
+
+            // Check if all questions are answered
+            const unanswered = quizData.questions.filter(q => !answers[q.id] || answers[q.id].length === 0);
+            if (unanswered.length > 0) {
+                showToast(`Please answer all questions. ${unanswered.length} remaining.`, 'warning');
+                // Restart timing since they're staying on this question
+                questionStartTime = Date.now();
+                return;
+            }
+
+            try {
+                const submissionData = {
+                    attemptId: quizData.attemptId,
+                    topicId: topicId,
+                    classId: classId,
+                    answers: Object.entries(answers).map(([questionId, selectedAnswerIds]) => ({
+                        questionId,
+                        selectedAnswerIds,
+                        timeSpentMs: questionTimes[questionId] || 0
+                    }))
+                };
+
+                const response = await fetch(`${apiBase}/quizzes/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(submissionData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showToast(data.error || 'Failed to submit quiz', 'error');
+                    return;
+                }
+
+                renderResults(data);
+
+            } catch (error) {
+                console.error('Submit quiz error:', error);
+                showToast('Failed to submit quiz. Please try again.', 'error');
+            }
+        }
+
+        function renderResults(results) {
+            const content = document.getElementById('quiz-content');
+            const scoreClass = results.passed ? 'passed' : 'failed';
+
+            content.innerHTML = `
+                <div class="results-container">
+                    <h2>${results.passed ? 'Congratulations!' : 'Keep Practicing!'}</h2>
+                    <div class="results-score ${scoreClass}">${results.score}/${results.totalQuestions}</div>
+                    <p class="results-message">${results.message}</p>
+
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <a href="${topicsUrl}" class="btn-secondary" style="text-decoration: none;">
+                            Back to Topics
+                        </a>
+                        ${!results.passed ? `
+                            <button class="btn-primary" onclick="location.reload()">
+                                Try Again
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <div class="results-details">
+                        <h3>Review Your Answers</h3>
+                        ${results.results.map((result, index) => `
+                            <div class="result-item ${result.correct ? 'correct' : 'incorrect'}">
+                                <div class="result-question">${index + 1}. ${result.question.text}</div>
+                                <div class="result-answer">
+                                    Your answer: ${getOptionTexts(result.question.options, result.selectedAnswerIds)}
+                                    ${!result.correct ? `<br>Correct answer: ${getOptionTexts(result.question.options, result.correctAnswerIds)}` : ''}
+                                </div>
+                                ${result.explanation ? `
+                                    <div class="result-explanation">
+                                        <strong>Explanation:</strong> ${result.explanation}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getOptionTexts(options, ids) {
+            return ids.map(id => {
+                const option = options.find(o => o.id === id);
+                return option ? option.text : 'Unknown';
+            }).join(', ');
+        }
+
+        function showError(message) {
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="error-state">
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                    <a href="${topicsUrl}" class="btn-primary" style="display: inline-block; margin-top: 1rem; text-decoration: none;">
+                        Back to Topics
+                    </a>
+                </div>
+            `;
+        }
+
+        function showWaitError(waitTime) {
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="results-container" style="text-align: center;">
+                    <h2>Practice Time!</h2>
+                    <div style="font-size: 4rem; margin: 1rem 0;">&#9203;</div>
+                    <p class="results-message" style="color: var(--gray-700);">
+                        Please wait <strong>${waitTime}</strong> before retaking this quiz.
+                    </p>
+                    <p style="color: var(--gray-500); margin-bottom: 2rem;">
+                        Use this time to review the material and practice the concepts.
+                    </p>
+                    <a href="${topicsUrl}" class="btn-primary" style="display: inline-block; text-decoration: none;">
+                        Back to Topics
+                    </a>
+                </div>
+            `;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Start the quiz
+        startQuiz();
+    </script>
+</body>
+</html>

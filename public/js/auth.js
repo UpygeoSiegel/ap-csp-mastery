@@ -95,25 +95,36 @@ class CSPReady {
         }
     }
 
-    // Check username availability
+    // Check username availability (only on signup form)
     async checkUsernameAvailability() {
-        const username = document.getElementById('student-username').value;
-        const classCode = document.getElementById('student-class-code').value;
+        // Only check if the student tab and signup form are both currently active
+        const studentForms = document.getElementById('student-forms');
+        const signupForm = document.getElementById('student-signup-form');
 
-        if (!username || !classCode || classCode.length !== 6) return;
+        if (!studentForms || !studentForms.classList.contains('active')) {
+            return;
+        }
+        if (!signupForm || !signupForm.classList.contains('active')) {
+            return;
+        }
+
+        const usernameInput = document.getElementById('student-username');
+        const username = usernameInput?.value?.trim();
+
+        if (!username) return;
 
         try {
             const response = await fetch(`${this.apiBase}/auth/check-username`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, classCode })
+                body: JSON.stringify({ username })
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 if (!data.available) {
-                    this.showToast('Username already taken in this class', 'warning');
+                    this.showToast('Username already taken. Please choose a different one.', 'warning');
                 }
             }
         } catch (error) {
@@ -125,35 +136,49 @@ class CSPReady {
     async handleTeacherLogin(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
-        
+
         this.showLoading();
-        
+
         try {
-            // Note: In a real implementation, you would use Firebase Auth here
-            // This is a simplified version for demonstration
-            const response = await fetch(`${this.apiBase}/auth/login`, {
+            const email = formData.get('email');
+            const password = formData.get('password');
+
+            // Sign in with Firebase Auth
+            const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(email, password);
+            const idToken = await userCredential.user.getIdToken();
+
+            // Verify with backend and get user data
+            const response = await fetch(`${this.apiBase}/auth/verify-login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: formData.get('email'),
-                    password: formData.get('password'),
-                    isTeacher: true
-                })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({ isTeacher: true })
             });
 
             const data = await response.json();
 
             if (response.ok) {
+                // Store auth data
+                localStorage.setItem('authToken', idToken);
+                localStorage.setItem('userData', JSON.stringify(data.user));
+
                 this.showToast('Login successful!', 'success');
-                // Redirect to teacher dashboard
                 setTimeout(() => {
                     window.location.href = '/teacher/dashboard';
                 }, 1000);
             } else {
+                await window.firebaseAuth.signOut();
                 this.showToast(data.error, 'error');
             }
         } catch (error) {
-            this.showToast('Login failed. Please try again.', 'error');
+            console.error('Login error:', error);
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                this.showToast('Invalid email or password', 'error');
+            } else {
+                this.showToast('Login failed. Please try again.', 'error');
+            }
         } finally {
             this.hideLoading();
         }
@@ -197,34 +222,63 @@ class CSPReady {
     async handleStudentLogin(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
-        
+
         this.showLoading();
-        
+
         try {
-            const response = await fetch(`${this.apiBase}/auth/login`, {
+            const username = formData.get('username');
+            const password = formData.get('password');
+
+            // First, get the email from backend by username
+            const loginResponse = await fetch(`${this.apiBase}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    classCode: formData.get('classCode'),
-                    username: formData.get('username'),
-                    password: formData.get('password'),
-                    isTeacher: false
-                })
+                body: JSON.stringify({ username, password, isTeacher: false })
+            });
+
+            const loginData = await loginResponse.json();
+
+            if (!loginResponse.ok) {
+                this.showToast(loginData.error || 'Invalid credentials', 'error');
+                return;
+            }
+
+            // Sign in with Firebase Auth using the email from backend
+            const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(loginData.email, password);
+            const idToken = await userCredential.user.getIdToken();
+
+            // Verify with backend and get user data
+            const response = await fetch(`${this.apiBase}/auth/verify-login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({ isTeacher: false })
             });
 
             const data = await response.json();
 
             if (response.ok) {
+                // Store auth data
+                localStorage.setItem('authToken', idToken);
+                localStorage.setItem('userData', JSON.stringify(data.user));
+
                 this.showToast('Login successful!', 'success');
-                // Redirect to student dashboard
                 setTimeout(() => {
                     window.location.href = '/student/dashboard';
                 }, 1000);
             } else {
+                await window.firebaseAuth.signOut();
                 this.showToast(data.error, 'error');
             }
         } catch (error) {
-            this.showToast('Login failed. Please try again.', 'error');
+            console.error('Login error:', error);
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                this.showToast('Invalid username or password', 'error');
+            } else {
+                this.showToast('Login failed. Please try again.', 'error');
+            }
         } finally {
             this.hideLoading();
         }

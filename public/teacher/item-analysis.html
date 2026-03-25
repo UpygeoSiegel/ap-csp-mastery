@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Analysis - CSP Ready</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        .back-link:hover {
+            color: var(--primary-blue);
+        }
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        .page-header h2 {
+            margin: 0 0 0.5rem 0;
+        }
+        .page-header p {
+            color: var(--gray-600);
+            margin: 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .stat-value.success {
+            color: var(--success-green);
+        }
+        .stat-value.warning {
+            color: var(--warning-orange);
+        }
+        .stat-value.danger {
+            color: var(--danger-red);
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+        .topics-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .topic-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+        .topic-header {
+            padding: 1rem 1.5rem;
+            background: var(--gray-50);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .topic-header:hover {
+            background: var(--gray-100);
+        }
+        .topic-header h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+        .topic-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+        }
+        .topic-meta span {
+            color: var(--gray-600);
+        }
+        .topic-meta .percentage {
+            font-weight: 600;
+        }
+        .topic-meta .percentage.high {
+            color: var(--success-green);
+        }
+        .topic-meta .percentage.medium {
+            color: var(--warning-orange);
+        }
+        .topic-meta .percentage.low {
+            color: var(--danger-red);
+        }
+        .topic-body {
+            display: none;
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .topic-body.open {
+            display: block;
+        }
+        .question-item {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .question-item:last-child {
+            margin-bottom: 0;
+        }
+        .question-header {
+            padding: 1rem;
+            background: var(--gray-50);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .question-text {
+            flex: 1;
+            font-weight: 500;
+        }
+        .question-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        .question-stats .stat {
+            text-align: center;
+        }
+        .question-stats .stat-num {
+            font-weight: 600;
+        }
+        .question-stats .stat-num.high {
+            color: var(--success-green);
+        }
+        .question-stats .stat-num.medium {
+            color: var(--warning-orange);
+        }
+        .question-stats .stat-num.low {
+            color: var(--danger-red);
+        }
+        .question-stats .stat-lbl {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        .options-breakdown {
+            padding: 1rem;
+        }
+        .options-breakdown h4 {
+            margin: 0 0 0.75rem 0;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        .option-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .option-text {
+            flex: 1;
+            font-size: 0.875rem;
+            min-width: 0;
+        }
+        .option-text.correct {
+            color: var(--success-green);
+            font-weight: 500;
+        }
+        .option-bar-container {
+            width: 150px;
+            height: 20px;
+            background: var(--gray-100);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .option-bar-fill {
+            height: 100%;
+            background: var(--gray-400);
+            transition: width 0.3s;
+        }
+        .option-bar-fill.correct {
+            background: var(--success-green);
+        }
+        .option-bar-fill.incorrect-popular {
+            background: var(--danger-red);
+        }
+        .option-percentage {
+            width: 45px;
+            text-align: right;
+            font-size: 0.875rem;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-500);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-secondary {
+            padding: 0.5rem 1rem;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-500);
+        }
+        .expand-icon {
+            transition: transform 0.2s;
+        }
+        .expand-icon.open {
+            transform: rotate(180deg);
+        }
+        .deactivated {
+            opacity: 0.5;
+        }
+        .deactivated-badge {
+            background: var(--gray-200);
+            color: var(--gray-600);
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="logo">
+                    <h1>CSP Ready</h1>
+                    <span>Item Analysis</span>
+                </div>
+                <div class="user-info">
+                    <span id="user-name">Loading...</span>
+                    <button id="logout-btn" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <a href="/teacher/dashboard.html" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Dashboard
+            </a>
+
+            <div class="page-header">
+                <h2>Item Analysis</h2>
+                <p>Review question performance across all students to identify areas for improvement.</p>
+            </div>
+
+            <div id="summary-stats" class="stats-grid">
+                <!-- Summary stats will be loaded here -->
+            </div>
+
+            <h3 style="margin-bottom: 1rem;">Topics</h3>
+
+            <div id="topics-container" class="topics-container">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading statistics...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 CSP Ready. Built for AP Computer Science Principles educators.</p>
+        </footer>
+    </div>
+
+    <script>
+        const apiBase = window.location.origin + '/api';
+        const token = localStorage.getItem('authToken');
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        document.getElementById('user-name').textContent = userData.displayName || userData.email || 'Teacher';
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/';
+        });
+
+        // State
+        let topicsData = null;
+        let loadedTopicStats = {};
+
+        async function loadSummary() {
+            try {
+                const response = await fetch(`${apiBase}/topics/stats/summary`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load summary');
+                }
+
+                topicsData = await response.json();
+                renderSummary();
+                renderTopics();
+
+            } catch (error) {
+                console.error('Error loading summary:', error);
+                document.getElementById('topics-container').innerHTML = `
+                    <div class="no-data">
+                        <p>Error loading statistics. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderSummary() {
+            const { topics } = topicsData;
+
+            // Calculate overall stats
+            let totalAttempts = 0;
+            let totalCorrect = 0;
+            let topicsWithData = 0;
+
+            topics.forEach(topic => {
+                if (topic.stats.totalQuestionAttempts > 0) {
+                    totalAttempts += topic.stats.totalQuestionAttempts;
+                    totalCorrect += Math.round(topic.stats.totalQuestionAttempts * (topic.stats.overallCorrectPercentage || 0) / 100);
+                    topicsWithData++;
+                }
+            });
+
+            const overallCorrectPct = totalAttempts > 0
+                ? Math.round((totalCorrect / totalAttempts) * 100)
+                : null;
+
+            const pctClass = overallCorrectPct === null ? '' :
+                (overallCorrectPct >= 70 ? 'success' : (overallCorrectPct >= 50 ? 'warning' : 'danger'));
+
+            document.getElementById('summary-stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${topics.length}</div>
+                    <div class="stat-label">Total Topics</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalAttempts.toLocaleString()}</div>
+                    <div class="stat-label">Total Question Attempts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value ${pctClass}">${overallCorrectPct !== null ? overallCorrectPct + '%' : 'N/A'}</div>
+                    <div class="stat-label">Overall Correct Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${topicsWithData}</div>
+                    <div class="stat-label">Topics with Data</div>
+                </div>
+            `;
+        }
+
+        function renderTopics() {
+            const { topics } = topicsData;
+            const container = document.getElementById('topics-container');
+
+            if (topics.length === 0) {
+                container.innerHTML = '<div class="no-data">No topics found.</div>';
+                return;
+            }
+
+            container.innerHTML = topics.map(topic => {
+                const pct = topic.stats.overallCorrectPercentage;
+                const pctClass = pct === null ? '' : (pct >= 70 ? 'high' : (pct >= 50 ? 'medium' : 'low'));
+                const avgTime = topic.stats.avgTimePerQuestionMs
+                    ? formatTime(topic.stats.avgTimePerQuestionMs)
+                    : 'N/A';
+
+                return `
+                    <div class="topic-card">
+                        <div class="topic-header" onclick="toggleTopic('${topic.id}')">
+                            <h3>${topic.name}</h3>
+                            <div class="topic-meta">
+                                <span>${topic.questionCount} questions</span>
+                                <span>${topic.stats.totalQuestionAttempts} attempts</span>
+                                <span class="percentage ${pctClass}">${pct !== null ? pct + '% correct' : 'No data'}</span>
+                                <span>Avg: ${avgTime}</span>
+                                <svg class="expand-icon" id="icon-${topic.id}" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="topic-body" id="body-${topic.id}">
+                            <div class="loading-state">Loading questions...</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function toggleTopic(topicId) {
+            const body = document.getElementById(`body-${topicId}`);
+            const icon = document.getElementById(`icon-${topicId}`);
+
+            if (body.classList.contains('open')) {
+                body.classList.remove('open');
+                icon.classList.remove('open');
+            } else {
+                body.classList.add('open');
+                icon.classList.add('open');
+
+                // Load question stats if not already loaded
+                if (!loadedTopicStats[topicId]) {
+                    await loadTopicQuestionStats(topicId);
+                }
+            }
+        }
+
+        async function loadTopicQuestionStats(topicId) {
+            try {
+                const response = await fetch(`${apiBase}/topics/${topicId}/question-stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load question stats');
+                }
+
+                const data = await response.json();
+                loadedTopicStats[topicId] = data;
+                renderTopicQuestions(topicId, data);
+
+            } catch (error) {
+                console.error('Error loading question stats:', error);
+                document.getElementById(`body-${topicId}`).innerHTML = `
+                    <div class="no-data">Error loading question statistics.</div>
+                `;
+            }
+        }
+
+        function renderTopicQuestions(topicId, data) {
+            const body = document.getElementById(`body-${topicId}`);
+            const { questions } = data;
+
+            if (!questions || questions.length === 0) {
+                body.innerHTML = '<div class="no-data">No questions in this topic.</div>';
+                return;
+            }
+
+            body.innerHTML = questions.map((q, i) => {
+                const stats = q.stats;
+                const correctPct = stats.correctPercentage;
+                const pctClass = correctPct === null ? '' : (correctPct >= 70 ? 'high' : (correctPct >= 50 ? 'medium' : 'low'));
+                const avgTime = stats.avgTimeMs ? formatTime(stats.avgTimeMs) : 'N/A';
+
+                return `
+                    <div class="question-item ${q.deactivated ? 'deactivated' : ''}">
+                        <div class="question-header">
+                            <div class="question-text">
+                                ${i + 1}. ${q.text}
+                                ${q.deactivated ? '<span class="deactivated-badge">Deactivated</span>' : ''}
+                            </div>
+                            <div class="question-stats">
+                                <div class="stat">
+                                    <div class="stat-num">${stats.totalAttempts}</div>
+                                    <div class="stat-lbl">Attempts</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-num ${pctClass}">${correctPct !== null ? correctPct + '%' : 'N/A'}</div>
+                                    <div class="stat-lbl">Correct</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-num">${avgTime}</div>
+                                    <div class="stat-lbl">Avg Time</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="options-breakdown">
+                            <h4>Answer Distribution</h4>
+                            ${stats.optionStats.map(opt => {
+                                const isPopularWrong = !opt.isCorrect && opt.selectionPercentage > 30;
+                                const barClass = opt.isCorrect ? 'correct' : (isPopularWrong ? 'incorrect-popular' : '');
+
+                                return `
+                                    <div class="option-bar">
+                                        <span class="option-text ${opt.isCorrect ? 'correct' : ''}">${opt.text}</span>
+                                        <div class="option-bar-container">
+                                            <div class="option-bar-fill ${barClass}" style="width: ${opt.selectionPercentage}%"></div>
+                                        </div>
+                                        <span class="option-percentage">${opt.selectionPercentage}%</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatTime(ms) {
+            if (!ms || ms === 0) return '0s';
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+
+            if (minutes > 0) {
+                return `${minutes}m ${remainingSeconds}s`;
+            }
+            return `${seconds}s`;
+        }
+
+        // Load data
+        loadSummary();
+    </script>
+</body>
+</html>

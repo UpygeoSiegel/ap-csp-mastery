@@ -74,18 +74,20 @@ router.post('/student-signup', async (req, res) => {
     const classData = classDoc.data();
     const classId = classDoc.id;
 
-    // Check if username is already taken in this class
+    // Check if username is already taken (globally unique)
     const existingUserQuery = await db.collection('users')
       .where('username', '==', username)
-      .where('classIds', 'array-contains', classId)
+      .limit(1)
       .get();
 
     if (!existingUserQuery.empty) {
-      return res.status(400).json({ error: 'Username already taken in this class' });
+      return res.status(400).json({ error: 'Username already taken. Please choose a different username.' });
     }
 
     // Generate email for Firebase Auth
-    const generatedEmail = `${username}_${classCode}@${process.env.APP_DOMAIN || 'cspready.app'}`;
+    // Sanitize username: lowercase, replace spaces with dots, remove invalid characters
+    const sanitizedUsername = username.toLowerCase().replace(/\s+/g, '.').replace(/[^a-z0-9._-]/g, '');
+    const generatedEmail = `${sanitizedUsername}_${classCode.toUpperCase()}@${process.env.APP_DOMAIN || 'cspready.app'}`;
 
     // Create Firebase Auth user
     const userRecord = await auth.createUser({
@@ -131,38 +133,111 @@ router.post('/student-signup', async (req, res) => {
   }
 });
 
+// Verify login - called after Firebase client-side auth
+router.post('/verify-login', async (req, res) => {
+  try {
+    const { isTeacher, isAdmin } = req.body;
+
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const token = authHeader.split('Bearer ')[1];
+
+    // Verify the Firebase token
+    const decodedToken = await auth.verifyIdToken(token);
+    const uid = decodedToken.uid;
+
+    // Get user data from Firestore
+    const userDoc = await db.collection('users').doc(uid).get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userData = userDoc.data();
+
+    // Verify role matches login type
+    if (isAdmin && userData.role !== 'admin') {
+      return res.status(403).json({ error: 'Not an admin account' });
+    }
+    if (isTeacher && userData.role !== 'teacher') {
+      return res.status(403).json({ error: 'Not a teacher account' });
+    }
+    if (!isTeacher && !isAdmin && userData.role !== 'student') {
+      return res.status(403).json({ error: 'Not a student account' });
+    }
+
+    // Get all classes for students
+    let classes = [];
+    if (userData.role === 'student' && userData.classIds && userData.classIds.length > 0) {
+      for (const classId of userData.classIds) {
+        const classDoc = await db.collection('classes').doc(classId).get();
+        if (classDoc.exists) {
+          const classData = classDoc.data();
+          classes.push({
+            id: classId,
+            name: classData.name,
+            code: classData.code,
+            teacherName: classData.teacherName
+          });
+        }
+      }
+    }
+
+    res.json({
+      message: 'Login verified',
+      user: {
+        uid,
+        email: userData.email,
+        role: userData.role,
+        displayName: userData.displayName,
+        username: userData.username,
+        classes,
+        classIds: userData.classIds
+      }
+    });
+
+  } catch (error) {
+    console.error('Verify login error:', error);
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
 // Login endpoint - works for both teachers and students
 router.post('/login', async (req, res) => {
   try {
-    const { email, password, classCode, username, isTeacher } = req.body;
+    const { email, password, username, isTeacher } = req.body;
 
     let loginEmail = email;
 
-    // For students, construct email from username and class code
+    // For students, look up email by username
     if (!isTeacher) {
-      if (!classCode || !username) {
-        return res.status(400).json({ error: 'Username and class code are required for students' });
+      if (!username) {
+        return res.status(400).json({ error: 'Username is required for students' });
       }
 
-      // Verify class code exists
-      const classQuery = await db.collection('classes')
-        .where('code', '==', classCode.toUpperCase())
+      // Find user by username
+      const userQuery = await db.collection('users')
+        .where('username', '==', username)
+        .where('role', '==', 'student')
+        .limit(1)
         .get();
 
-      if (classQuery.empty) {
-        return res.status(400).json({ error: 'Invalid class code' });
+      if (userQuery.empty) {
+        return res.status(401).json({ error: 'Invalid credentials' });
       }
 
-      loginEmail = `${username}_${classCode}@${process.env.APP_DOMAIN || 'cspready.app'}`;
+      const userData = userQuery.docs[0].data();
+      loginEmail = userData.email;
     }
 
     if (!loginEmail || !password) {
       return res.status(400).json({ error: 'Email/username and password are required' });
     }
 
-    // Note: Firebase Auth verification happens on the client side
-    // This endpoint is mainly for validation and returning user info
-    
     // Get user by email to verify account exists
     let userRecord;
     try {
@@ -173,7 +248,7 @@ router.post('/login', async (req, res) => {
 
     // Get user data from Firestore
     const userDoc = await db.collection('users').doc(userRecord.uid).get();
-    
+
     if (!userDoc.exists) {
       return res.status(404).json({ error: 'User data not found' });
     }
@@ -188,7 +263,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid student credentials' });
     }
 
-    res.json({ 
+    res.json({
       message: 'Login validation successful',
       userId: userRecord.uid,
       email: loginEmail,
@@ -233,30 +308,19 @@ router.post('/validate-class-code', async (req, res) => {
   }
 });
 
-// Check username availability in a class
+// Check username availability (globally unique)
 router.post('/check-username', async (req, res) => {
   try {
-    const { username, classCode } = req.body;
+    const { username } = req.body;
 
-    if (!username || !classCode) {
-      return res.status(400).json({ error: 'Username and class code are required' });
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required' });
     }
 
-    // Find class by code
-    const classQuery = await db.collection('classes')
-      .where('code', '==', classCode.toUpperCase())
-      .get();
-
-    if (classQuery.empty) {
-      return res.status(400).json({ error: 'Invalid class code' });
-    }
-
-    const classId = classQuery.docs[0].id;
-
-    // Check if username exists in this class
+    // Check if username exists globally
     const existingUserQuery = await db.collection('users')
       .where('username', '==', username)
-      .where('classIds', 'array-contains', classId)
+      .limit(1)
       .get();
 
     res.json({

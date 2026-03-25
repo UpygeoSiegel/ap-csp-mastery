@@ -10,15 +10,20 @@ router.use(verifyToken, verifyStudent);
 // Start a quiz for a topic
 router.post('/start', async (req, res) => {
   try {
-    const { topicId } = req.body;
+    const { topicId, classId } = req.body;
     const studentId = req.user.uid;
 
     if (!topicId) {
       return res.status(400).json({ error: 'Topic ID is required' });
     }
 
-    // Get student's class
-    const studentClassId = req.user.classIds[0]; // Students belong to one class
+    // Get student's class - use provided classId or default to first class
+    const studentClassId = classId || req.user.classIds[0];
+
+    // Verify student is in this class
+    if (!req.user.classIds.includes(studentClassId)) {
+      return res.status(403).json({ error: 'You are not enrolled in this class' });
+    }
 
     // Get topic
     const topicDoc = await db.collection('topics').doc(topicId).get();
@@ -28,11 +33,30 @@ router.post('/start', async (req, res) => {
 
     const topic = topicDoc.data();
 
+    // Get Big Idea for breadcrumb
+    let bigIdeaName = '';
+    if (topic.bigIdeaId) {
+      const bigIdeaDoc = await db.collection('bigIdeas').doc(topic.bigIdeaId).get();
+      if (bigIdeaDoc.exists) {
+        const bigIdea = bigIdeaDoc.data();
+        bigIdeaName = bigIdea.shortName || bigIdea.name;
+      }
+    }
+
     // Check if topic is available to student
     const isTopicAvailable = await checkTopicAvailability(studentId, topicId, studentClassId);
-    
+
     if (!isTopicAvailable.available) {
-      return res.status(403).json({ error: isTopicAvailable.reason });
+      const errorResponse = { error: isTopicAvailable.reason };
+
+      // Include wait time info if applicable
+      if (isTopicAvailable.waitRequired) {
+        errorResponse.waitRequired = true;
+        errorResponse.waitUntil = isTopicAvailable.waitUntil;
+        errorResponse.remainingMinutes = isTopicAvailable.remainingMinutes;
+      }
+
+      return res.status(403).json(errorResponse);
     }
 
     // Get student's previous attempts to avoid repeating failed questions
@@ -46,24 +70,27 @@ router.post('/start', async (req, res) => {
     let usedQuestionIds = [];
     if (!progressDoc.empty) {
       const progress = progressDoc.docs[0].data();
-      
-      // If already passed, don't allow retaking
-      if (progress.status === 'passed') {
-        return res.status(403).json({ error: 'Topic already completed' });
-      }
 
-      // Collect question IDs from failed attempts
+      // Collect question IDs from previous attempts (prioritize new questions)
       if (progress.attempts) {
-        progress.attempts
-          .filter(attempt => !attempt.passed)
-          .forEach(attempt => {
-            usedQuestionIds = usedQuestionIds.concat(attempt.questionIds);
-          });
+        progress.attempts.forEach(attempt => {
+          usedQuestionIds = usedQuestionIds.concat(attempt.questionIds || []);
+        });
       }
     }
 
+    // Get questions from questions collection
+    const questionsSnapshot = await db.collection('questions')
+      .where('topicId', '==', topicId)
+      .get();
+
+    const allQuestions = questionsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
     // Get active questions (not deactivated by teachers)
-    const activeQuestions = topic.questions.filter(q => !q.deactivated);
+    const activeQuestions = allQuestions.filter(q => !q.deactivated);
 
     if (activeQuestions.length < 5) {
       return res.status(400).json({ error: 'Not enough active questions for this topic' });
@@ -87,6 +114,7 @@ router.post('/start', async (req, res) => {
       attemptId,
       topicId,
       topicName: topic.name,
+      bigIdeaName,
       questions: quizQuestions,
       questionIds: selectedQuestions.map(q => q.id)
     });
@@ -100,16 +128,22 @@ router.post('/start', async (req, res) => {
 // Submit quiz answers
 router.post('/submit', async (req, res) => {
   try {
-    const { attemptId, topicId, answers } = req.body;
+    const { attemptId, topicId, classId, answers } = req.body;
     const studentId = req.user.uid;
 
     if (!attemptId || !topicId || !answers) {
       return res.status(400).json({ error: 'Attempt ID, topic ID, and answers are required' });
     }
 
-    const studentClassId = req.user.classIds[0];
+    // Get student's class - use provided classId or default to first class
+    const studentClassId = classId || req.user.classIds[0];
 
-    // Get topic with correct answers
+    // Verify student is in this class
+    if (!req.user.classIds.includes(studentClassId)) {
+      return res.status(403).json({ error: 'You are not enrolled in this class' });
+    }
+
+    // Get topic
     const topicDoc = await db.collection('topics').doc(topicId).get();
     if (!topicDoc.exists) {
       return res.status(404).json({ error: 'Topic not found' });
@@ -117,17 +151,31 @@ router.post('/submit', async (req, res) => {
 
     const topic = topicDoc.data();
 
+    // Get questions from questions collection
+    const questionsSnapshot = await db.collection('questions')
+      .where('topicId', '==', topicId)
+      .get();
+
+    const questions = questionsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
     // Validate and score answers
-    const { score, results, questionIds } = scoreQuizAnswers(topic, answers);
+    const { score, results, questionIds } = scoreQuizAnswers(questions, answers);
     const passed = score >= 4; // 4 out of 5 to pass
 
-    // Prepare attempt data
+    // Calculate total time spent
+    const totalTimeMs = results.reduce((sum, r) => sum + (r.timeSpentMs || 0), 0);
+
+    // Prepare attempt data with full question details for review
     const attempt = {
       attemptId,
       timestamp: new Date(),
       score,
       passed,
       questionIds,
+      totalTimeMs,
       answers: results
     };
 
@@ -176,9 +224,12 @@ router.post('/submit', async (req, res) => {
       await unlockNextTopic(studentId, topicId, studentClassId);
     }
 
+    // Update question statistics for item analysis
+    await updateQuestionStats(topicId, results);
+
     // Prepare detailed results with explanations
     const detailedResults = results.map(result => {
-      const question = topic.questions.find(q => q.id === result.questionId);
+      const question = questions.find(q => q.id === result.questionId);
       return {
         ...result,
         question: {
@@ -207,8 +258,20 @@ router.post('/submit', async (req, res) => {
 });
 
 // Helper function to check if a topic is available to a student
-async function checkTopicAvailability(studentId, topicId, classId) {
+async function checkTopicAvailability(studentId, topicId, classId, classData = null) {
   try {
+    // Get class data if not provided
+    if (!classData) {
+      const classDoc = await db.collection('classes').doc(classId).get();
+      if (!classDoc.exists) {
+        return { available: false, reason: 'Class not found' };
+      }
+      classData = classDoc.data();
+    }
+
+    const progressionMode = classData.progressionMode || 'linear';
+    const retakeWaitMinutes = classData.retakeWaitMinutes || 0;
+
     // Get topic
     const topicDoc = await db.collection('topics').doc(topicId).get();
     if (!topicDoc.exists) {
@@ -217,7 +280,7 @@ async function checkTopicAvailability(studentId, topicId, classId) {
 
     const topic = topicDoc.data();
 
-    // Check if already passed
+    // Check if student has progress for this topic
     const progressDoc = await db.collection('studentProgress')
       .where('studentId', '==', studentId)
       .where('topicId', '==', topicId)
@@ -225,13 +288,42 @@ async function checkTopicAvailability(studentId, topicId, classId) {
       .limit(1)
       .get();
 
+    // Check wait time for retakes
     if (!progressDoc.empty) {
       const progress = progressDoc.docs[0].data();
-      if (progress.status === 'passed') {
-        return { available: false, reason: 'Topic already completed' };
+
+      // Check if there's a retake wait time requirement
+      if (retakeWaitMinutes > 0 && progress.attempts && progress.attempts.length > 0) {
+        const lastAttempt = progress.attempts[progress.attempts.length - 1];
+        const lastAttemptTime = lastAttempt.timestamp.toDate ? lastAttempt.timestamp.toDate() : new Date(lastAttempt.timestamp);
+        const waitUntil = new Date(lastAttemptTime.getTime() + retakeWaitMinutes * 60 * 1000);
+        const now = new Date();
+
+        if (now < waitUntil) {
+          const remainingMs = waitUntil.getTime() - now.getTime();
+          const remainingMinutes = Math.ceil(remainingMs / (60 * 1000));
+          return {
+            available: false,
+            reason: `Please wait before retaking this quiz`,
+            waitRequired: true,
+            waitUntil: waitUntil.toISOString(),
+            remainingMinutes
+          };
+        }
+      }
+
+      // Allow retaking if passed or available (and wait time passed)
+      if (progress.status === 'passed' || progress.status === 'available') {
+        return { available: true };
       }
     }
 
+    // If progression mode is 'unlocked', all topics are available
+    if (progressionMode === 'unlocked') {
+      return { available: true };
+    }
+
+    // Linear progression mode - check prerequisites
     // For first topic (order 1), it's always available
     if (topic.order === 1) {
       return { available: true };
@@ -239,6 +331,7 @@ async function checkTopicAvailability(studentId, topicId, classId) {
 
     // Check if previous topic is completed
     const previousTopicSnapshot = await db.collection('topics')
+      .where('bigIdeaId', '==', topic.bigIdeaId)
       .where('order', '==', topic.order - 1)
       .limit(1)
       .get();
@@ -306,13 +399,13 @@ function selectQuizQuestions(allQuestions, usedQuestionIds, count) {
 }
 
 // Helper function to score quiz answers
-function scoreQuizAnswers(topic, submittedAnswers) {
+function scoreQuizAnswers(questions, submittedAnswers) {
   const results = [];
   let score = 0;
   const questionIds = [];
 
   submittedAnswers.forEach(answer => {
-    const question = topic.questions.find(q => q.id === answer.questionId);
+    const question = questions.find(q => q.id === answer.questionId);
     if (!question) return;
 
     questionIds.push(answer.questionId);
@@ -324,11 +417,30 @@ function scoreQuizAnswers(topic, submittedAnswers) {
 
     if (isCorrect) score++;
 
+    // Get selected answer texts
+    const selectedAnswerTexts = answer.selectedAnswerIds.map(id => {
+      const option = question.options.find(o => o.id === id);
+      return option ? option.text : 'Unknown';
+    });
+
+    // Get correct answer texts
+    const correctAnswerTexts = question.correctAnswers.map(id => {
+      const option = question.options.find(o => o.id === id);
+      return option ? option.text : 'Unknown';
+    });
+
     results.push({
       questionId: answer.questionId,
+      questionText: question.text,
+      questionType: question.type,
+      options: question.options,
       selectedAnswerIds: answer.selectedAnswerIds,
+      selectedAnswerTexts,
       correctAnswerIds: question.correctAnswers,
-      correct: isCorrect
+      correctAnswerTexts,
+      correct: isCorrect,
+      timeSpentMs: answer.timeSpentMs || 0,
+      explanation: question.explanation
     });
   });
 
@@ -347,15 +459,16 @@ function arraysEqual(a, b) {
 // Helper function to unlock next topic
 async function unlockNextTopic(studentId, currentTopicId, classId) {
   try {
-    // Get current topic to find its order
+    // Get current topic to find its order and bigIdeaId
     const currentTopicDoc = await db.collection('topics').doc(currentTopicId).get();
     if (!currentTopicDoc.exists) return;
 
     const currentTopic = currentTopicDoc.data();
     const nextOrder = currentTopic.order + 1;
 
-    // Find next topic
+    // Find next topic within the same Big Idea
     const nextTopicSnapshot = await db.collection('topics')
+      .where('bigIdeaId', '==', currentTopic.bigIdeaId)
       .where('order', '==', nextOrder)
       .limit(1)
       .get();
@@ -395,6 +508,64 @@ async function unlockNextTopic(studentId, currentTopicId, classId) {
     }
   } catch (error) {
     console.error('Unlock next topic error:', error);
+  }
+}
+
+// Helper function to update question statistics for item analysis
+async function updateQuestionStats(topicId, results) {
+  try {
+    for (const result of results) {
+      const questionId = result.questionId;
+      const statsRef = db.collection('questionStats').doc(questionId);
+
+      // Get existing stats or create new
+      const statsDoc = await statsRef.get();
+
+      if (statsDoc.exists) {
+        const stats = statsDoc.data();
+
+        // Update option selections
+        const optionSelections = stats.optionSelections || {};
+        result.selectedAnswerIds.forEach(optionId => {
+          optionSelections[optionId] = (optionSelections[optionId] || 0) + 1;
+        });
+
+        // Update stats
+        await statsRef.update({
+          totalAttempts: (stats.totalAttempts || 0) + 1,
+          correctCount: (stats.correctCount || 0) + (result.correct ? 1 : 0),
+          incorrectCount: (stats.incorrectCount || 0) + (result.correct ? 0 : 1),
+          optionSelections,
+          totalTimeSpentMs: (stats.totalTimeSpentMs || 0) + (result.timeSpentMs || 0),
+          lastUpdated: new Date()
+        });
+      } else {
+        // Create new stats document
+        const optionSelections = {};
+        result.selectedAnswerIds.forEach(optionId => {
+          optionSelections[optionId] = 1;
+        });
+
+        await statsRef.set({
+          questionId,
+          topicId,
+          questionText: result.questionText,
+          questionType: result.questionType,
+          options: result.options,
+          correctAnswerIds: result.correctAnswerIds,
+          totalAttempts: 1,
+          correctCount: result.correct ? 1 : 0,
+          incorrectCount: result.correct ? 0 : 1,
+          optionSelections,
+          totalTimeSpentMs: result.timeSpentMs || 0,
+          createdAt: new Date(),
+          lastUpdated: new Date()
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Update question stats error:', error);
+    // Don't throw - this is non-critical analytics
   }
 }
 

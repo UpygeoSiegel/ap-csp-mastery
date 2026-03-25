@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - CSP Ready</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .dashboard-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-secondary {
+            padding: 0.5rem 1rem;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+        .progress-overview {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .progress-overview h3 {
+            margin-bottom: 1rem;
+        }
+        .overall-progress {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .overall-progress .progress-bar {
+            flex: 1;
+            height: 12px;
+        }
+        .progress-percentage {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            min-width: 60px;
+        }
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .topic-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .topic-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .topic-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .topic-card.locked {
+            opacity: 0.6;
+        }
+        .topic-card h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: var(--gray-900);
+        }
+        .topic-card p {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        .topic-progress {
+            margin-top: 1rem;
+        }
+        .topic-progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .topic-progress-text span:first-child {
+            color: var(--gray-600);
+        }
+        .topic-progress-text span:last-child {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        .btn-start {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 1rem;
+        }
+        .btn-start:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+        }
+        .class-info {
+            background: var(--gray-100);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        .class-selector {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .class-selector h3 {
+            margin-bottom: 1rem;
+        }
+        .class-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .class-tab {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gray-200);
+            background: var(--white);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .class-tab:hover {
+            border-color: var(--primary-blue);
+        }
+        .class-tab.active {
+            border-color: var(--primary-blue);
+            background: var(--primary-blue);
+            color: white;
+        }
+        .class-tab .class-code {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-left: 0.5rem;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .breadcrumb-item {
+            color: var(--gray-500);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .breadcrumb-item:hover {
+            color: var(--primary-blue);
+        }
+        .breadcrumb-item.active {
+            color: var(--gray-900);
+            font-weight: 500;
+        }
+        .breadcrumb-separator {
+            color: var(--gray-400);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="dashboard-header">
+                <div class="logo">
+                    <h1>CSP Ready</h1>
+                    <span>Student Dashboard</span>
+                </div>
+                <div class="user-info">
+                    <span class="class-info" id="class-info">Loading...</span>
+                    <span id="user-name">Loading...</span>
+                    <button id="logout-btn" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <nav class="breadcrumb">
+                <span class="breadcrumb-item active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    Big Ideas
+                </span>
+            </nav>
+
+            <div id="class-selector-container" class="class-selector" style="display: none;">
+                <h3>Your Classes</h3>
+                <div id="class-tabs" class="class-tabs">
+                    <!-- Class tabs will be loaded here -->
+                </div>
+            </div>
+
+            <div class="progress-overview">
+                <h3>Your Progress</h3>
+                <div class="overall-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="overall-progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-percentage" id="overall-percentage">0%</div>
+                </div>
+                <p style="color: var(--gray-500); font-size: 0.875rem;">
+                    Complete topics in order to unlock new content. Master each topic before moving on.
+                </p>
+            </div>
+
+            <h2 style="margin-bottom: 1.5rem;">Topics</h2>
+
+            <div id="topics-container" class="topics-grid">
+                <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                    Loading...
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 CSP Ready. Built for AP Computer Science Principles educators.</p>
+        </footer>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        const apiBase = window.location.origin + '/api';
+
+        // Check if user is logged in
+        const token = localStorage.getItem('authToken');
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Current selected class
+        let currentClassId = null;
+        const userClasses = userData.classes || [];
+
+        // Display user info
+        document.getElementById('user-name').textContent = userData.displayName || userData.username || 'Student';
+
+        // Render class selector if user has multiple classes
+        function renderClassSelector() {
+            const container = document.getElementById('class-selector-container');
+            const tabsContainer = document.getElementById('class-tabs');
+            const classInfoEl = document.getElementById('class-info');
+
+            if (userClasses.length === 0) {
+                classInfoEl.textContent = 'No classes';
+                return;
+            }
+
+            if (userClasses.length === 1) {
+                // Single class - just show the name
+                currentClassId = userClasses[0].id;
+                classInfoEl.textContent = userClasses[0].name;
+                return;
+            }
+
+            // Multiple classes - show selector
+            container.style.display = 'block';
+            classInfoEl.style.display = 'none';
+
+            // Set default to first class
+            currentClassId = userClasses[0].id;
+
+            tabsContainer.innerHTML = userClasses.map(cls => `
+                <button class="class-tab ${cls.id === currentClassId ? 'active' : ''}"
+                        onclick="selectClass('${cls.id}')">
+                    ${cls.name}
+                    <span class="class-code">${cls.code}</span>
+                </button>
+            `).join('');
+        }
+
+        function selectClass(classId) {
+            currentClassId = classId;
+
+            // Update active tab
+            document.querySelectorAll('.class-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.class-tab').classList.add('active');
+
+            // Reload progress for selected class
+            loadProgress();
+        }
+
+        // Logout handler
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/';
+        });
+
+        // Load Big Ideas and overall progress
+        async function loadProgress() {
+            try {
+                // Load Big Ideas
+                const bigIdeasResponse = await fetch(`${apiBase}/topics/big-ideas`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const bigIdeasData = await bigIdeasResponse.json();
+
+                if (bigIdeasResponse.ok && bigIdeasData.bigIdeas && bigIdeasData.bigIdeas.length > 0) {
+                    renderBigIdeas(bigIdeasData.bigIdeas);
+                } else {
+                    renderDefaultBigIdeas();
+                }
+
+                // Load overall progress if we have a class selected
+                if (currentClassId) {
+                    const progressResponse = await fetch(`${apiBase}/progress/${userData.uid}?classId=${currentClassId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (progressResponse.ok) {
+                        const progressData = await progressResponse.json();
+                        const stats = progressData.statistics || {};
+                        const overallProgress = stats.completionPercentage || 0;
+                        document.getElementById('overall-progress-fill').style.width = `${overallProgress}%`;
+                        document.getElementById('overall-percentage').textContent = `${Math.round(overallProgress)}%`;
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load:', error);
+                renderDefaultBigIdeas();
+            }
+        }
+
+        function renderBigIdeas(bigIdeas) {
+            const container = document.getElementById('topics-container');
+            container.innerHTML = bigIdeas.map(bigIdea => `
+                <a href="/student/big-idea.html?id=${bigIdea.id}&classId=${currentClassId || ''}" class="topic-card-link">
+                    <div class="topic-card" style="border-left: 4px solid ${bigIdea.color || '#3B82F6'}">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <h4>${bigIdea.name}</h4>
+                        </div>
+                        <p>${bigIdea.description || ''}</p>
+                        <button class="btn-primary btn-start">
+                            View Topics
+                        </button>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        function renderDefaultBigIdeas() {
+            const defaultBigIdeas = [
+                { id: 'big-idea-1', name: 'Big Idea 1: Creative Development', description: 'Computing is a creative discipline that enables innovation through collaboration and iterative design.', color: '#3B82F6' },
+                { id: 'big-idea-2', name: 'Big Idea 2: Data', description: 'Data is central to computing and understanding how to work with it is essential.', color: '#10B981' },
+                { id: 'big-idea-3', name: 'Big Idea 3: Algorithms and Programming', description: 'Algorithms are the foundation of programming and computational thinking.', color: '#F59E0B' },
+                { id: 'big-idea-4', name: 'Big Idea 4: Computing Systems and Networks', description: 'Computer systems and networks enable problem solving and communication.', color: '#8B5CF6' },
+                { id: 'big-idea-5', name: 'Big Idea 5: Impact of Computing', description: 'Computing has both beneficial and harmful effects on society.', color: '#EF4444' }
+            ];
+            renderBigIdeas(defaultBigIdeas);
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Initial load
+        renderClassSelector();
+        loadProgress();
+    </script>
+</body>
+</html>
