@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz - CSP Ready</title>
+    <title>Quiz - APproval</title>
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -194,13 +194,91 @@
             padding: 3rem;
             color: var(--danger-red);
         }
+        .study-resources {
+            background: rgba(26, 86, 219, 0.05);
+            border: 1px solid rgba(26, 86, 219, 0.2);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        .study-resources h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .resource-category {
+            margin-bottom: 1.5rem;
+        }
+        .resource-category h4 {
+            margin-bottom: 0.75rem;
+            color: var(--gray-700);
+            font-size: 1rem;
+        }
+        .resource-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .resource-item {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+        .resource-item:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(26, 86, 219, 0.1);
+        }
+        .resource-title {
+            font-weight: 500;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+        .resource-title a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+        .resource-title a:hover {
+            text-decoration: underline;
+        }
+        .resource-type {
+            display: inline-block;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+        .resource-type.article {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success-green);
+        }
+        .resource-type.video {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+        }
+        .resource-type.exercise {
+            background: rgba(168, 85, 247, 0.1);
+            color: #8b5cf6;
+        }
+        .resource-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
             <div class="logo">
-                <h1>CSP Ready</h1>
+                <h1>APproval</h1>
                 <span>Quiz</span>
             </div>
         </header>
@@ -229,7 +307,7 @@
         </main>
 
         <footer class="footer">
-            <p>&copy; 2024 CSP Ready. Built for AP Computer Science Principles educators.</p>
+            <p>&copy; 2024 APproval. Built for AP Computer Science Principles educators.</p>
         </footer>
     </div>
 
@@ -465,6 +543,7 @@
                     return;
                 }
 
+                console.log('Quiz submission response:', data);
                 renderResults(data);
 
             } catch (error) {
@@ -494,6 +573,8 @@
                         ` : ''}
                     </div>
 
+                    ${renderStudyResources(results)}
+
                     <div class="results-details">
                         <h3>Review Your Answers</h3>
                         ${results.results.map((result, index) => `
@@ -513,6 +594,102 @@
                     </div>
                 </div>
             `;
+        }
+
+        function renderStudyResources(results) {
+            console.log('renderStudyResources called with:', results);
+            console.log('results.passed:', results.passed);
+            console.log('results.studyResources:', results.studyResources);
+            
+            // Only show resources if the student failed and resources are provided
+            if (results.passed || !results.studyResources) {
+                console.log('No resources to display - either passed or no resources provided');
+                return '';
+            }
+
+            const resources = results.studyResources;
+            let resourcesHtml = `
+                <div class="study-resources">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                        </svg>
+                        ${results.resourcesMessage || 'Study Resources'}
+                    </h3>
+                    <p style="margin-bottom: 1.5rem; color: var(--gray-600);">
+                        Review these materials to strengthen your understanding of this topic:
+                    </p>
+            `;
+
+            // Khan Academy Resources
+            if (resources.khanAcademy && resources.khanAcademy.length > 0) {
+                resourcesHtml += `
+                    <div class="resource-category">
+                        <h4>📚 Khan Academy Resources</h4>
+                        <div class="resource-list">
+                            ${resources.khanAcademy.map(resource => `
+                                <div class="resource-item">
+                                    <div class="resource-title">
+                                        <span class="resource-type ${resource.type}">${resource.type}</span>
+                                        <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
+                                            ${resource.title}
+                                        </a>
+                                    </div>
+                                    <div class="resource-description">${resource.description}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Additional Resources
+            if (resources.additional && resources.additional.length > 0) {
+                resourcesHtml += `
+                    <div class="resource-category">
+                        <h4>🌐 Additional Resources</h4>
+                        <div class="resource-list">
+                            ${resources.additional.map(resource => `
+                                <div class="resource-item">
+                                    <div class="resource-title">
+                                        <span class="resource-type ${resource.type}">${resource.type}</span>
+                                        <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
+                                            ${resource.title}
+                                        </a>
+                                    </div>
+                                    <div class="resource-description">${resource.description}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Custom Teacher Resources
+            if (resources.customTeacherResources && resources.customTeacherResources.length > 0) {
+                resourcesHtml += `
+                    <div class="resource-category">
+                        <h4>👩‍🏫 Teacher Recommended</h4>
+                        <div class="resource-list">
+                            ${resources.customTeacherResources.map(resource => `
+                                <div class="resource-item">
+                                    <div class="resource-title">
+                                        <span class="resource-type ${resource.type}">${resource.type}</span>
+                                        <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
+                                            ${resource.title}
+                                        </a>
+                                    </div>
+                                    <div class="resource-description">${resource.description}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            resourcesHtml += `</div>`;
+            return resourcesHtml;
         }
 
         function getOptionTexts(options, ids) {

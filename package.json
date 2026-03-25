@@ -1,7 +1,7 @@
 {
-  "name": "csp-ready",
+  "name": "approval",
   "version": "1.0.0",
-  "description": "A mastery-based quiz platform for AP Computer Science Principles",
+  "description": "APproval - A mastery-based quiz platform for AP Computer Science Principles",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
@@ -26,8 +26,9 @@
     "ap-computer-science",
     "quiz",
     "mastery-learning",
-    "firebase"
+    "firebase",
+    "approval"
   ],
-  "author": "CSP Ready Team",
+  "author": "APproval Team",
   "license": "MIT"
 }

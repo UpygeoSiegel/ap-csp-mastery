@@ -1,7 +1,7 @@
-// Authentication JavaScript for CSP Ready
+// Authentication JavaScript for APproval
 // This file handles the frontend authentication logic
 
-class CSPReady {
+class APproval {
     constructor() {
         this.apiBase = window.location.origin + '/api';
         this.initializeEventListeners();
@@ -367,10 +367,10 @@ class CSPReady {
 
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.cspReady = new CSPReady();
+    window.approval = new APproval();
 });
 
 // Export for module use (if needed)
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = CSPReady;
+    module.exports = APproval;
 }

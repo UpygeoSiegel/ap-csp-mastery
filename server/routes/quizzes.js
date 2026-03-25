@@ -242,13 +242,22 @@ router.post('/submit', async (req, res) => {
       };
     });
 
+    // Get resources for failed quiz
+    let studyResources = null;
+    if (!passed) {
+      studyResources = topic.resources || null;
+      console.log('Student failed quiz, including resources:', studyResources);
+    }
+
     res.json({
       success: true,
       score,
       passed,
       totalQuestions: 5,
       results: detailedResults,
-      message: passed ? 'Congratulations! You passed this topic!' : 'Keep practicing! You can retake this quiz.'
+      studyResources,
+      message: passed ? 'Congratulations! You passed this topic!' : 'Keep practicing! You can retake this quiz.',
+      resourcesMessage: !passed ? 'Here are some resources to help you study:' : null
     });
 
   } catch (error) {

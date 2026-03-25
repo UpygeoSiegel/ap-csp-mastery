@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Idea - CSP Ready</title>
+    <title>Big Idea - APproval</title>
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -203,6 +203,114 @@
         .btn-secondary:hover {
             background: var(--gray-300);
         }
+        .topic-resources {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .resources-toggle {
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+        }
+        .resources-toggle:hover {
+            color: var(--primary-blue);
+            text-decoration: underline;
+        }
+        .resources-toggle svg {
+            transition: transform 0.2s;
+        }
+        .resources-toggle.expanded svg {
+            transform: rotate(180deg);
+        }
+        .resources-content {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(26, 86, 219, 0.05);
+            border-radius: var(--border-radius);
+        }
+        .resources-content.expanded {
+            display: block;
+        }
+        .resources-loading {
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+            padding: 1rem;
+        }
+        .resource-category {
+            margin-bottom: 1rem;
+        }
+        .resource-category h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+        .resource-list-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .resource-item-compact {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-200);
+        }
+        .resource-item-compact:hover {
+            border-color: var(--primary-blue);
+        }
+        .resource-type-compact {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        .resource-type-compact.article {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success-green);
+        }
+        .resource-type-compact.video {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+        }
+        .resource-type-compact.exercise {
+            background: rgba(168, 85, 247, 0.1);
+            color: #8b5cf6;
+        }
+        .resource-details {
+            flex: 1;
+        }
+        .resource-title-compact {
+            margin: 0 0 0.25rem 0;
+            font-size: 0.875rem;
+        }
+        .resource-title-compact a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+        .resource-title-compact a:hover {
+            text-decoration: underline;
+        }
+        .resource-description-compact {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -210,7 +318,7 @@
         <header class="header">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                 <div class="logo">
-                    <h1>CSP Ready</h1>
+                    <h1>APproval</h1>
                     <span>Student Dashboard</span>
                 </div>
                 <div class="user-info">
@@ -242,7 +350,7 @@
         </main>
 
         <footer class="footer">
-            <p>&copy; 2024 CSP Ready. Built for AP Computer Science Principles educators.</p>
+            <p>&copy; 2024 APproval. Built for AP Computer Science Principles educators.</p>
         </footer>
     </div>
 
@@ -311,7 +419,7 @@
             const passedCount = topics.filter(t => t.status === 'passed').length;
             const progressPercent = topics.length > 0 ? Math.round((passedCount / topics.length) * 100) : 0;
 
-            document.title = `${bigIdea.shortName || bigIdea.name} - CSP Ready`;
+            document.title = `${bigIdea.shortName || bigIdea.name} - APproval`;
 
             // Update breadcrumb
             document.getElementById('breadcrumb-current').textContent = bigIdea.shortName || bigIdea.name;
@@ -362,14 +470,25 @@
             return `
                 <div class="topic-card ${statusClass}">
                     <div class="topic-number">${isPassed ? '&#10003;' : index + 1}</div>
-                    <div class="topic-info">
+                    <div class="topic-info" style="flex: 1;">
                         <h3>${topic.name}</h3>
-                        <p>${topic.description}</p>
+                        ${topic.description ? `<p>${topic.description}</p>` : ''}
                         ${topic.attemptCount > 0 ? `
                         <div class="topic-meta">
                             <span>${topic.attemptCount} attempt${topic.attemptCount > 1 ? 's' : ''}</span>
                         </div>
                         ` : ''}
+                        <div class="topic-resources">
+                            <button class="resources-toggle" onclick="toggleResources('${topic.id}')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                                Study Resources
+                            </button>
+                            <div class="resources-content" id="resources-${topic.id}">
+                                <div class="resources-loading">Loading resources...</div>
+                            </div>
+                        </div>
                     </div>
                     <div class="topic-actions">
                         ${topic.bestScore !== null ? `
@@ -408,6 +527,140 @@
             toast.textContent = message;
             document.getElementById('toast-container').appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
+        }
+
+        async function toggleResources(topicId) {
+            const toggle = document.querySelector(`button[onclick="toggleResources('${topicId}')"]`);
+            const content = document.getElementById(`resources-${topicId}`);
+            
+            if (content.classList.contains('expanded')) {
+                // Collapse
+                content.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+            } else {
+                // Expand and load resources if not already loaded
+                content.classList.add('expanded');
+                toggle.classList.add('expanded');
+                
+                // Check if already loaded
+                if (!content.dataset.loaded) {
+                    await loadTopicResources(topicId);
+                }
+            }
+        }
+
+        async function loadTopicResources(topicId) {
+            const content = document.getElementById(`resources-${topicId}`);
+            
+            try {
+                const response = await fetch(`${apiBase}/topics/${topicId}/resources`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load resources');
+                }
+
+                const data = await response.json();
+                content.innerHTML = renderTopicResources(data.resources);
+                content.dataset.loaded = 'true';
+
+            } catch (error) {
+                console.error('Error loading resources:', error);
+                content.innerHTML = `
+                    <div style="text-align: center; color: var(--danger-red); padding: 1rem;">
+                        Failed to load resources. Please try again.
+                    </div>
+                `;
+            }
+        }
+
+        function renderTopicResources(resources) {
+            if (!resources || (!resources.khanAcademy?.length && !resources.additional?.length && !resources.customTeacherResources?.length)) {
+                return `
+                    <div style="text-align: center; color: var(--gray-500); padding: 1rem;">
+                        No study resources available for this topic yet.
+                    </div>
+                `;
+            }
+
+            let html = '';
+
+            // Khan Academy Resources
+            if (resources.khanAcademy && resources.khanAcademy.length > 0) {
+                html += `
+                    <div class="resource-category">
+                        <h5>📚 Khan Academy Resources</h5>
+                        <div class="resource-list-compact">
+                            ${resources.khanAcademy.map(resource => `
+                                <div class="resource-item-compact">
+                                    <span class="resource-type-compact ${resource.type}">${resource.type}</span>
+                                    <div class="resource-details">
+                                        <h6 class="resource-title-compact">
+                                            <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
+                                                ${resource.title}
+                                            </a>
+                                        </h6>
+                                        <p class="resource-description-compact">${resource.description}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Additional Resources
+            if (resources.additional && resources.additional.length > 0) {
+                html += `
+                    <div class="resource-category">
+                        <h5>🌐 Additional Resources</h5>
+                        <div class="resource-list-compact">
+                            ${resources.additional.map(resource => `
+                                <div class="resource-item-compact">
+                                    <span class="resource-type-compact ${resource.type}">${resource.type}</span>
+                                    <div class="resource-details">
+                                        <h6 class="resource-title-compact">
+                                            <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
+                                                ${resource.title}
+                                            </a>
+                                        </h6>
+                                        <p class="resource-description-compact">${resource.description}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Custom Teacher Resources
+            if (resources.customTeacherResources && resources.customTeacherResources.length > 0) {
+                html += `
+                    <div class="resource-category">
+                        <h5>👩‍🏫 Teacher Recommended</h5>
+                        <div class="resource-list-compact">
+                            ${resources.customTeacherResources.map(resource => `
+                                <div class="resource-item-compact">
+                                    <span class="resource-type-compact ${resource.type}">${resource.type}</span>
+                                    <div class="resource-details">
+                                        <h6 class="resource-title-compact">
+                                            <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
+                                                ${resource.title}
+                                            </a>
+                                        </h6>
+                                        <p class="resource-description-compact">${resource.description}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return html;
         }
 
         loadBigIdea();

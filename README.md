@@ -1,4 +1,4 @@
-# CSP Ready - AP Computer Science Principles Mastery Platform
+# APproval - AP Computer Science Principles Mastery Platform
 
 A comprehensive mastery-based quiz platform designed specifically for AP Computer Science Principles teachers and students. Features sequential topic unlocking, detailed progress tracking, and a complete question bank covering all AP CSP curriculum topics.
 
@@ -82,7 +82,7 @@ npm install
    
    PORT=3000
    NODE_ENV=development
-   APP_DOMAIN=cspready.app
+   APP_DOMAIN=approval.app
    ```
 
 ### Step 3: Initialize Database
@@ -99,7 +99,7 @@ npm start
 npm run dev
 ```
 
-The application will be available at `http://localhost:3000`
+The applicatiP_{"}\\]=[-PCX Zon will be available at `http://localhost:3000`
 
 ## 🎯 Usage Guide
 
@@ -334,7 +334,7 @@ PORT=3000
 
 #### Heroku
 1. Install Heroku CLI
-2. Create Heroku app: `heroku create csp-ready`
+2. Create Heroku app: `heroku create approval-app`
 3. Set config vars: `heroku config:set FIREBASE_PROJECT_ID=...`
 4. Deploy: `git push heroku main`
 
@@ -370,7 +370,7 @@ PORT=3000
 
 ### Project Structure
 ```
-csp-ready/
+approval/
 ├── server/
 │   ├── index.js              # Express app entry point
 │   ├── firebase.js           # Firebase configuration

@@ -58,7 +58,7 @@ app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    service: 'CSP Ready API'
+    service: 'APproval API'
   });
 });
 
@@ -77,7 +77,7 @@ app.use('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`CSP Ready server running on port ${PORT}`);
+  console.log(`APproval server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Access the application at: http://localhost:${PORT}`);
 });

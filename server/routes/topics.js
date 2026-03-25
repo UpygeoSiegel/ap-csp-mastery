@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../firebase');
 const { verifyToken } = require('../middleware/verifyToken');
+const crypto = require('crypto');
 const router = express.Router();
 
 // All routes require authentication
@@ -445,6 +446,228 @@ router.get('/stats/summary', async (req, res) => {
   } catch (error) {
     console.error('Get stats summary error:', error);
     res.status(500).json({ error: 'Failed to fetch statistics summary' });
+  }
+});
+
+// Add custom resource to a topic (teachers only)
+router.post('/:topicId/resources', async (req, res) => {
+  try {
+    // Only teachers can add resources
+    if (req.user.role !== 'teacher') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const { topicId } = req.params;
+    const { title, url, type, description } = req.body;
+
+    if (!title || !url || !type || !description) {
+      return res.status(400).json({ 
+        error: 'Title, URL, type, and description are required' 
+      });
+    }
+
+    // Validate URL format
+    try {
+      new URL(url);
+    } catch {
+      return res.status(400).json({ error: 'Invalid URL format' });
+    }
+
+    // Validate resource type
+    const validTypes = ['article', 'video', 'exercise', 'external', 'tutorial', 'document'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ 
+        error: 'Type must be one of: ' + validTypes.join(', ') 
+      });
+    }
+
+    // Get topic
+    const topicDoc = await db.collection('topics').doc(topicId).get();
+    if (!topicDoc.exists) {
+      return res.status(404).json({ error: 'Topic not found' });
+    }
+
+    const topic = topicDoc.data();
+    const currentResources = topic.resources || { khanAcademy: [], additional: [], customTeacherResources: [] };
+
+    // Create new resource object
+    const newResource = {
+      id: crypto.randomUUID(),
+      title: title.trim(),
+      url: url.trim(),
+      type,
+      description: description.trim(),
+      addedBy: req.user.uid,
+      addedAt: new Date()
+    };
+
+    // Add to custom teacher resources
+    currentResources.customTeacherResources = currentResources.customTeacherResources || [];
+    currentResources.customTeacherResources.push(newResource);
+
+    // Update topic document
+    await db.collection('topics').doc(topicId).update({
+      resources: currentResources,
+      updatedAt: new Date()
+    });
+
+    res.json({
+      success: true,
+      message: 'Resource added successfully',
+      resource: newResource
+    });
+
+  } catch (error) {
+    console.error('Add resource error:', error);
+    res.status(500).json({ error: 'Failed to add resource' });
+  }
+});
+
+// Update a custom resource (teachers only)
+router.put('/:topicId/resources/:resourceId', async (req, res) => {
+  try {
+    // Only teachers can update resources
+    if (req.user.role !== 'teacher') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const { topicId, resourceId } = req.params;
+    const { title, url, type, description } = req.body;
+
+    if (!title || !url || !type || !description) {
+      return res.status(400).json({ 
+        error: 'Title, URL, type, and description are required' 
+      });
+    }
+
+    // Validate URL format
+    try {
+      new URL(url);
+    } catch {
+      return res.status(400).json({ error: 'Invalid URL format' });
+    }
+
+    // Validate resource type
+    const validTypes = ['article', 'video', 'exercise', 'external', 'tutorial', 'document'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ 
+        error: 'Type must be one of: ' + validTypes.join(', ') 
+      });
+    }
+
+    // Get topic
+    const topicDoc = await db.collection('topics').doc(topicId).get();
+    if (!topicDoc.exists) {
+      return res.status(404).json({ error: 'Topic not found' });
+    }
+
+    const topic = topicDoc.data();
+    const currentResources = topic.resources || { khanAcademy: [], additional: [], customTeacherResources: [] };
+
+    // Find and update the resource
+    const resourceIndex = currentResources.customTeacherResources.findIndex(r => r.id === resourceId);
+    
+    if (resourceIndex === -1) {
+      return res.status(404).json({ error: 'Resource not found' });
+    }
+
+    // Update the resource
+    currentResources.customTeacherResources[resourceIndex] = {
+      ...currentResources.customTeacherResources[resourceIndex],
+      title: title.trim(),
+      url: url.trim(),
+      type,
+      description: description.trim(),
+      updatedAt: new Date()
+    };
+
+    // Update topic document
+    await db.collection('topics').doc(topicId).update({
+      resources: currentResources,
+      updatedAt: new Date()
+    });
+
+    res.json({
+      success: true,
+      message: 'Resource updated successfully',
+      resource: currentResources.customTeacherResources[resourceIndex]
+    });
+
+  } catch (error) {
+    console.error('Update resource error:', error);
+    res.status(500).json({ error: 'Failed to update resource' });
+  }
+});
+
+// Delete a custom resource (teachers only)
+router.delete('/:topicId/resources/:resourceId', async (req, res) => {
+  try {
+    // Only teachers can delete resources
+    if (req.user.role !== 'teacher') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const { topicId, resourceId } = req.params;
+
+    // Get topic
+    const topicDoc = await db.collection('topics').doc(topicId).get();
+    if (!topicDoc.exists) {
+      return res.status(404).json({ error: 'Topic not found' });
+    }
+
+    const topic = topicDoc.data();
+    const currentResources = topic.resources || { khanAcademy: [], additional: [], customTeacherResources: [] };
+
+    // Find and remove the resource
+    const resourceIndex = currentResources.customTeacherResources.findIndex(r => r.id === resourceId);
+    
+    if (resourceIndex === -1) {
+      return res.status(404).json({ error: 'Resource not found' });
+    }
+
+    // Remove the resource
+    currentResources.customTeacherResources.splice(resourceIndex, 1);
+
+    // Update topic document
+    await db.collection('topics').doc(topicId).update({
+      resources: currentResources,
+      updatedAt: new Date()
+    });
+
+    res.json({
+      success: true,
+      message: 'Resource deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Delete resource error:', error);
+    res.status(500).json({ error: 'Failed to delete resource' });
+  }
+});
+
+// Get all resources for a topic (accessible to all authenticated users)
+router.get('/:topicId/resources', async (req, res) => {
+  try {
+    const { topicId } = req.params;
+
+    // Get topic
+    const topicDoc = await db.collection('topics').doc(topicId).get();
+    if (!topicDoc.exists) {
+      return res.status(404).json({ error: 'Topic not found' });
+    }
+
+    const topic = topicDoc.data();
+    const resources = topic.resources || { khanAcademy: [], additional: [], customTeacherResources: [] };
+
+    res.json({
+      topicId,
+      topicName: topic.name,
+      resources
+    });
+
+  } catch (error) {
+    console.error('Get resources error:', error);
+    res.status(500).json({ error: 'Failed to fetch resources' });
   }
 });
 

@@ -1,7 +1,7 @@
 const { spawn } = require('child_process');
 require('dotenv').config();
 
-console.log('🔧 CSP Ready Setup Verification\n');
+console.log('🔧 APproval Setup Verification\n');
 
 // Check Node.js version
 console.log('✅ Node.js version:', process.version);
@@ -102,7 +102,7 @@ console.log('2. Run: npm run seed (to populate database)');
 console.log('3. Run: npm start (to start the server)');
 console.log('4. Open: http://localhost:3000');
 
-console.log('\n✨ CSP Ready is ready to launch!');
+console.log('\n✨ APproval is ready to launch!');
 
 // Test server start (optional)
 if (process.argv.includes('--test-server')) {
