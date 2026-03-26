@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -361,8 +362,38 @@
             justify-content: center;
             padding: 2rem;
         }
+        /* Pseudocode Styling */
+        .pseudocode-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 0.75rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            color: #212529;
+            line-height: 1.5;
+            position: relative;
+            font-size: 0.9rem;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .pseudocode-block::before {
+            content: "PSEUDOCODE";
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.6rem;
+            font-family: var(--font-family);
+            background: #e9ecef;
+            color: #6c757d;
+            border-bottom-left-radius: 4px;
+            font-weight: 600;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header class="header">
@@ -377,7 +408,6 @@
                 </div>
             </div>
         </header>
-
         <main class="main">
             <div class="admin-layout">
                 <aside class="sidebar">
@@ -388,7 +418,6 @@
                         </div>
                     </div>
                 </aside>
-
                 <section class="main-content">
                     <div id="main-content">
                         <div class="empty-state">
@@ -399,14 +428,11 @@
                 </section>
             </div>
         </main>
-
         <footer class="footer">
             <p>&copy; 2024 APproval. Admin Portal.</p>
         </footer>
     </div>
-
     <div id="toast-container" class="toast-container"></div>
-
     <!-- Question Modal -->
     <div id="question-modal" class="modal-overlay">
         <div class="modal">
@@ -423,12 +449,10 @@
                 <div class="modal-body">
                     <input type="hidden" id="question-id">
                     <input type="hidden" id="question-topic-id">
-
                     <div class="form-group">
                         <label for="question-text">Question Text *</label>
                         <textarea id="question-text" required placeholder="Enter the question text..."></textarea>
                     </div>
-
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
                             <label for="question-type">Question Type *</label>
@@ -446,7 +470,6 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label>Answer Options * <span style="font-weight: normal; color: var(--gray-500);">(Check correct answers)</span></label>
                         <div id="options-container" class="options-container">
@@ -456,7 +479,6 @@
                             + Add Option
                         </button>
                     </div>
-
                     <div class="form-group">
                         <label for="question-explanation">Explanation (shown after answering)</label>
                         <textarea id="question-explanation" placeholder="Explain why the correct answer is correct..."></textarea>
@@ -469,7 +491,6 @@
             </form>
         </div>
     </div>
-
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="modal-overlay">
         <div class="modal" style="max-width: 400px;">
@@ -486,65 +507,64 @@
             </div>
         </div>
     </div>
-
     <script>
-        const apiBase = window.location.origin + '/api';
-        const token = localStorage.getItem('authToken');
-        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const apiBase = window.location.origin + '/api';
+    const token = localStorage.getItem('authToken');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-        if (!token || userData.role !== 'admin') {
-            window.location.href = '/admin/login.html';
-        }
+    if (!token || userData.role !== 'admin') {
+        window.location.href = '/admin/login.html';
+    }
 
-        // State
-        let bigIdeas = [];
-        let currentTopicId = null;
-        let currentQuestions = [];
-        let expandedBigIdeas = {};
+    // State
+    let bigIdeas = [];
+    let currentTopicId = null;
+    let currentQuestions = [];
+    let expandedBigIdeas = {};
 
-        // Display user name
-        document.getElementById('user-name').textContent = userData.displayName || 'Admin';
+    // Display user name
+    document.getElementById('user-name').textContent = userData.displayName || 'Admin';
 
-        // Logout handler
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userData');
-            window.location.href = '/';
-        });
+    // Logout handler
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+        window.location.href = '/';
+    });
 
-        // Load big ideas and topics
-        async function loadSidebar() {
-            try {
-                const response = await fetch(`${apiBase}/admin/big-ideas`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+    // Load big ideas and topics
+    async function loadSidebar() {
+        try {
+            const response = await fetch(`${apiBase}/admin/big-ideas`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
 
-                if (!response.ok) {
-                    if (response.status === 403) {
-                        window.location.href = '/admin/login.html';
-                        return;
-                    }
-                    throw new Error('Failed to load');
+            if (!response.ok) {
+                if (response.status === 403) {
+                    window.location.href = '/admin/login.html';
+                    return;
                 }
+                throw new Error('Failed to load');
+            }
 
-                const data = await response.json();
-                bigIdeas = data.bigIdeas;
-                renderSidebar();
+            const data = await response.json();
+            bigIdeas = data.bigIdeas;
+            renderSidebar();
 
-            } catch (error) {
-                console.error('Error loading sidebar:', error);
-                document.getElementById('sidebar-content').innerHTML = `
+        } catch (error) {
+            console.error('Error loading sidebar:', error);
+            document.getElementById('sidebar-content').innerHTML = `
                     <div class="empty-state">
                         <p>Error loading content</p>
                     </div>
                 `;
-            }
         }
+    }
 
-        function renderSidebar() {
-            const container = document.getElementById('sidebar-content');
+    function renderSidebar() {
+        const container = document.getElementById('sidebar-content');
 
-            container.innerHTML = bigIdeas.map(bi => `
+        container.innerHTML = bigIdeas.map(bi => `
                 <div class="big-idea-section">
                     <div class="sidebar-item" onclick="toggleBigIdea('${bi.id}')" style="border-left: 3px solid ${bi.color || '#3B82F6'}">
                         <span>${bi.shortName || bi.name}</span>
@@ -555,26 +575,26 @@
                     </div>
                 </div>
             `).join('');
-        }
+    }
 
-        async function toggleBigIdea(bigIdeaId) {
-            expandedBigIdeas[bigIdeaId] = !expandedBigIdeas[bigIdeaId];
-            const topicsContainer = document.getElementById(`topics-${bigIdeaId}`);
+    async function toggleBigIdea(bigIdeaId) {
+        expandedBigIdeas[bigIdeaId] = !expandedBigIdeas[bigIdeaId];
+        const topicsContainer = document.getElementById(`topics-${bigIdeaId}`);
 
-            if (expandedBigIdeas[bigIdeaId]) {
-                topicsContainer.style.display = 'block';
+        if (expandedBigIdeas[bigIdeaId]) {
+            topicsContainer.style.display = 'block';
 
-                // Load topics if not already loaded
-                if (!topicsContainer.dataset.loaded) {
-                    topicsContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+            // Load topics if not already loaded
+            if (!topicsContainer.dataset.loaded) {
+                topicsContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
 
-                    try {
-                        const response = await fetch(`${apiBase}/admin/big-ideas/${bigIdeaId}/topics`, {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        const data = await response.json();
+                try {
+                    const response = await fetch(`${apiBase}/admin/big-ideas/${bigIdeaId}/topics`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
 
-                        topicsContainer.innerHTML = data.topics.map(topic => `
+                    topicsContainer.innerHTML = data.topics.map(topic => `
                             <div class="sidebar-item topic-item ${currentTopicId === topic.id ? 'active' : ''}"
                                  onclick="loadTopic('${topic.id}', '${escapeHtml(topic.name)}')">
                                 <span>${topic.name}</span>
@@ -582,52 +602,52 @@
                             </div>
                         `).join('');
 
-                        topicsContainer.dataset.loaded = 'true';
-                    } catch (error) {
-                        topicsContainer.innerHTML = '<p style="padding: 0.5rem; color: var(--gray-500);">Error loading topics</p>';
-                    }
+                    topicsContainer.dataset.loaded = 'true';
+                } catch (error) {
+                    topicsContainer.innerHTML = '<p style="padding: 0.5rem; color: var(--gray-500);">Error loading topics</p>';
                 }
-            } else {
-                topicsContainer.style.display = 'none';
             }
+        } else {
+            topicsContainer.style.display = 'none';
         }
+    }
 
-        async function loadTopic(topicId, topicName) {
-            currentTopicId = topicId;
+    async function loadTopic(topicId, topicName) {
+        currentTopicId = topicId;
 
-            // Update sidebar active state
-            document.querySelectorAll('.topic-item').forEach(item => {
-                item.classList.remove('active');
+        // Update sidebar active state
+        document.querySelectorAll('.topic-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        event.target.closest('.topic-item').classList.add('active');
+
+        const mainContent = document.getElementById('main-content');
+        mainContent.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+        try {
+            const response = await fetch(`${apiBase}/admin/topics/${topicId}/questions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-            event.target.closest('.topic-item').classList.add('active');
+            const data = await response.json();
 
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+            currentQuestions = data.questions;
+            renderQuestions(data.topic, data.questions);
 
-            try {
-                const response = await fetch(`${apiBase}/admin/topics/${topicId}/questions`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await response.json();
-
-                currentQuestions = data.questions;
-                renderQuestions(data.topic, data.questions);
-
-            } catch (error) {
-                console.error('Error loading topic:', error);
-                mainContent.innerHTML = `
+        } catch (error) {
+            console.error('Error loading topic:', error);
+            mainContent.innerHTML = `
                     <div class="empty-state">
                         <h3>Error loading questions</h3>
                         <p>Please try again later.</p>
                     </div>
                 `;
-            }
         }
+    }
 
-        function renderQuestions(topic, questions) {
-            const mainContent = document.getElementById('main-content');
+    function renderQuestions(topic, questions) {
+        const mainContent = document.getElementById('main-content');
 
-            mainContent.innerHTML = `
+        mainContent.innerHTML = `
                 <div class="content-header">
                     <div>
                         <h2>${topic.name}</h2>
@@ -669,22 +689,24 @@
                     ${renderQuestionsList(questions)}
                 </div>
             `;
-        }
+    }
 
-        function renderQuestionsList(questions) {
-            if (questions.length === 0) {
-                return `
+    function renderQuestionsList(questions) {
+        if (questions.length === 0) {
+            return `
                     <div class="empty-state">
                         <h3>No questions found</h3>
                         <p>Add some questions to this topic.</p>
                     </div>
                 `;
-            }
+        }
 
-            return questions.map((q, index) => `
+        return questions.map((q, index) => {
+            const questionText = q.text || q.question || '';
+            return `
                 <div class="question-card ${q.deactivated ? 'deactivated' : ''}" data-question-id="${q.id}">
                     <div class="question-header">
-                        <div class="question-text">${index + 1}. ${escapeHtml(q.text)}</div>
+                        <div class="question-text">${index + 1}. ${escapeHtml(questionText)}</div>
                         <div class="question-badges">
                             <span class="badge type-${q.type === 'multiple_choice' ? 'mc' : 'ms'}">
                                 ${q.type === 'multiple_choice' ? 'MC' : 'MS'}
@@ -697,12 +719,17 @@
                     </div>
 
                     <div class="question-options">
-                        ${q.options.map(opt => `
-                            <div class="question-option ${q.correctAnswers.includes(opt.id) ? 'correct' : ''}">
-                                ${q.correctAnswers.includes(opt.id) ? '<span class="check">&#10003;</span>' : '<span>&bull;</span>'}
-                                ${escapeHtml(opt.text)}
-                            </div>
-                        `).join('')}
+                        ${q.options.map((opt, optIndex) => {
+                            // Support both correctAnswers array AND correctIndex number
+                            const isCorrect = (q.correctAnswers && q.correctAnswers.includes(opt.id)) || 
+                                            (q.correctIndex !== undefined && optIndex === q.correctIndex);
+                            return `
+                                <div class="question-option ${isCorrect ? 'correct' : ''}">
+                                    ${isCorrect ? '<span class="check">&#10003;</span>' : '<span>&bull;</span>'}
+                                    ${escapeHtml(opt.text || opt)}
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
 
                     ${q.explanation ? `<p style="font-size: 0.875rem; color: var(--gray-600); margin-top: 0.5rem;"><strong>Explanation:</strong> ${escapeHtml(q.explanation)}</p>` : ''}
@@ -720,87 +747,89 @@
                         <button class="btn-secondary btn-sm" style="color: var(--danger-red);" onclick="openDeleteModal('${q.id}')">Delete</button>
                     </div>
                 </div>
-            `).join('');
-        }
+            `;
+        }).join('');
+    }
 
-        function filterQuestions() {
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const difficultyFilter = document.getElementById('filter-difficulty').value;
-            const typeFilter = document.getElementById('filter-type').value;
-            const statusFilter = document.getElementById('filter-status').value;
+    function filterQuestions() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const difficultyFilter = document.getElementById('filter-difficulty').value;
+        const typeFilter = document.getElementById('filter-type').value;
+        const statusFilter = document.getElementById('filter-status').value;
 
-            const filtered = currentQuestions.filter(q => {
-                const matchesSearch = q.text.toLowerCase().includes(searchTerm) ||
-                    q.options.some(o => o.text.toLowerCase().includes(searchTerm));
-                const matchesDifficulty = !difficultyFilter || q.difficulty === difficultyFilter;
-                const matchesType = !typeFilter || q.type === typeFilter;
-                const matchesStatus = !statusFilter ||
-                    (statusFilter === 'active' && !q.deactivated) ||
-                    (statusFilter === 'deactivated' && q.deactivated);
+        const filtered = currentQuestions.filter(q => {
+            const questionText = (q.text || q.question || '').toLowerCase();
+            const matchesSearch = questionText.includes(searchTerm) ||
+                q.options.some(o => o.text.toLowerCase().includes(searchTerm));
+            const matchesDifficulty = !difficultyFilter || q.difficulty === difficultyFilter;
+            const matchesType = !typeFilter || q.type === typeFilter;
+            const matchesStatus = !statusFilter ||
+                (statusFilter === 'active' && !q.deactivated) ||
+                (statusFilter === 'deactivated' && q.deactivated);
 
-                return matchesSearch && matchesDifficulty && matchesType && matchesStatus;
-            });
+            return matchesSearch && matchesDifficulty && matchesType && matchesStatus;
+        });
 
-            document.getElementById('questions-list').innerHTML = renderQuestionsList(filtered);
-        }
+        document.getElementById('questions-list').innerHTML = renderQuestionsList(filtered);
+    }
 
-        // Question Modal Functions
-        let optionCount = 0;
+    // Question Modal Functions
+    let optionCount = 0;
 
-        function openAddQuestionModal() {
-            document.getElementById('modal-title').textContent = 'Add Question';
-            document.getElementById('question-id').value = '';
-            document.getElementById('question-topic-id').value = currentTopicId;
-            document.getElementById('question-text').value = '';
-            document.getElementById('question-type').value = 'multiple_choice';
-            document.getElementById('question-difficulty').value = 'medium';
-            document.getElementById('question-explanation').value = '';
+    function openAddQuestionModal() {
+        document.getElementById('modal-title').textContent = 'Add Question';
+        document.getElementById('question-id').value = '';
+        document.getElementById('question-topic-id').value = currentTopicId;
+        document.getElementById('question-text').value = '';
+        document.getElementById('question-type').value = 'multiple_choice';
+        document.getElementById('question-difficulty').value = 'medium';
+        document.getElementById('question-explanation').value = '';
 
-            // Reset options
-            optionCount = 0;
-            document.getElementById('options-container').innerHTML = '';
-            addOption();
-            addOption();
-            addOption();
-            addOption();
+        // Reset options
+        optionCount = 0;
+        document.getElementById('options-container').innerHTML = '';
+        addOption();
+        addOption();
+        addOption();
+        addOption();
 
-            document.getElementById('question-modal').classList.add('active');
-        }
+        document.getElementById('question-modal').classList.add('active');
+    }
 
-        function openEditQuestionModal(questionId) {
-            const question = currentQuestions.find(q => q.id === questionId);
-            if (!question) return;
+    function openEditQuestionModal(questionId) {
+        const question = currentQuestions.find(q => q.id === questionId);
+        if (!question) return;
 
-            document.getElementById('modal-title').textContent = 'Edit Question';
-            document.getElementById('question-id').value = question.id;
-            document.getElementById('question-topic-id').value = question.topicId;
-            document.getElementById('question-text').value = question.text;
-            document.getElementById('question-type').value = question.type;
-            document.getElementById('question-difficulty').value = question.difficulty || 'medium';
-            document.getElementById('question-explanation').value = question.explanation || '';
+        document.getElementById('modal-title').textContent = 'Edit Question';
+        document.getElementById('question-id').value = question.id;
+        document.getElementById('question-topic-id').value = question.topicId;
+        document.getElementById('question-text').value = question.text || question.question || '';
+        document.getElementById('question-type').value = question.type;
+        document.getElementById('question-difficulty').value = question.difficulty || 'medium';
+        document.getElementById('question-explanation').value = question.explanation || '';
 
-            // Set options
-            optionCount = 0;
-            document.getElementById('options-container').innerHTML = '';
-            question.options.forEach(opt => {
-                addOption(opt.text, opt.id, question.correctAnswers.includes(opt.id));
-            });
+        // Set options
+        optionCount = 0;
+        document.getElementById('options-container').innerHTML = '';
+        question.options.forEach(opt => {
+            addOption(opt.text, opt.id, question.correctAnswers.includes(opt.id));
+        });
 
-            document.getElementById('question-modal').classList.add('active');
-        }
+        document.getElementById('question-modal').classList.add('active');
+    }
 
-        function closeQuestionModal() {
-            document.getElementById('question-modal').classList.remove('active');
-        }
+    function closeQuestionModal() {
+        document.getElementById('question-modal').classList.remove('active');
+    }
 
-        function addOption(text = '', id = '', isCorrect = false) {
-            optionCount++;
-            const container = document.getElementById('options-container');
-            const optionId = id || `new-option-${optionCount}`;
+    function addOption(text = '', id = '', isCorrect = false) {
+        optionCount++;
+        const container = document.getElementById('options-container');
+        const optionId = id || `new-option-${optionCount}`;
 
-            const optionRow = document.createElement('div');
-            optionRow.className = 'option-row';
-            optionRow.innerHTML = `
+        const optionRow = document.createElement('div');
+        optionRow.className = 'option-row';
+        optionRow.innerHTML = `
                 <input type="checkbox" name="correct-answer" value="${optionId}" ${isCorrect ? 'checked' : ''}>
                 <input type="text" placeholder="Option ${optionCount}" value="${escapeHtml(text)}" data-option-id="${optionId}" required>
                 <button type="button" class="btn-icon danger" onclick="removeOption(this)">
@@ -810,190 +839,205 @@
                     </svg>
                 </button>
             `;
-            container.appendChild(optionRow);
+        container.appendChild(optionRow);
+    }
+
+    function removeOption(btn) {
+        const container = document.getElementById('options-container');
+        if (container.children.length > 2) {
+            btn.closest('.option-row').remove();
+        } else {
+            showToast('At least 2 options are required', 'warning');
         }
+    }
 
-        function removeOption(btn) {
-            const container = document.getElementById('options-container');
-            if (container.children.length > 2) {
-                btn.closest('.option-row').remove();
-            } else {
-                showToast('At least 2 options are required', 'warning');
-            }
-        }
+    // Form submission
+    document.getElementById('question-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-        // Form submission
-        document.getElementById('question-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        const questionId = document.getElementById('question-id').value;
+        const topicId = document.getElementById('question-topic-id').value;
+        const text = document.getElementById('question-text').value;
+        const type = document.getElementById('question-type').value;
+        const difficulty = document.getElementById('question-difficulty').value;
+        const explanation = document.getElementById('question-explanation').value;
 
-            const questionId = document.getElementById('question-id').value;
-            const topicId = document.getElementById('question-topic-id').value;
-            const text = document.getElementById('question-text').value;
-            const type = document.getElementById('question-type').value;
-            const difficulty = document.getElementById('question-difficulty').value;
-            const explanation = document.getElementById('question-explanation').value;
+        // Get options and correct answers
+        const optionRows = document.querySelectorAll('.option-row');
+        const options = [];
+        const correctAnswers = [];
 
-            // Get options and correct answers
-            const optionRows = document.querySelectorAll('.option-row');
-            const options = [];
-            const correctAnswers = [];
+        optionRows.forEach(row => {
+            const textInput = row.querySelector('input[type="text"]');
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            const optionId = textInput.dataset.optionId;
 
-            optionRows.forEach(row => {
-                const textInput = row.querySelector('input[type="text"]');
-                const checkbox = row.querySelector('input[type="checkbox"]');
-                const optionId = textInput.dataset.optionId;
-
-                options.push({
-                    id: optionId,
-                    text: textInput.value
-                });
-
-                if (checkbox.checked) {
-                    correctAnswers.push(optionId);
-                }
+            options.push({
+                id: optionId,
+                text: textInput.value
             });
 
-            if (correctAnswers.length === 0) {
-                showToast('Please select at least one correct answer', 'error');
-                return;
-            }
-
-            const questionData = {
-                topicId,
-                text,
-                type,
-                options,
-                correctAnswers,
-                explanation,
-                difficulty
-            };
-
-            try {
-                let response;
-                if (questionId) {
-                    // Update existing question
-                    response = await fetch(`${apiBase}/admin/questions/${questionId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify(questionData)
-                    });
-                } else {
-                    // Create new question
-                    response = await fetch(`${apiBase}/admin/questions`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify(questionData)
-                    });
-                }
-
-                if (response.ok) {
-                    showToast(questionId ? 'Question updated!' : 'Question created!', 'success');
-                    closeQuestionModal();
-                    loadTopic(currentTopicId, '');
-                    loadSidebar(); // Refresh counts
-                } else {
-                    const data = await response.json();
-                    showToast(data.error || 'Failed to save question', 'error');
-                }
-            } catch (error) {
-                console.error('Error saving question:', error);
-                showToast('Failed to save question', 'error');
+            if (checkbox.checked) {
+                correctAnswers.push(optionId);
             }
         });
 
-        async function toggleQuestion(questionId) {
-            try {
-                const response = await fetch(`${apiBase}/admin/questions/${questionId}/toggle`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+        if (correctAnswers.length === 0) {
+            showToast('Please select at least one correct answer', 'error');
+            return;
+        }
 
-                if (response.ok) {
-                    const data = await response.json();
-                    showToast(data.message, 'success');
-                    loadTopic(currentTopicId, '');
-                } else {
-                    showToast('Failed to toggle question', 'error');
-                }
-            } catch (error) {
+        const questionData = {
+            topicId,
+            text,
+            type,
+            options,
+            correctAnswers,
+            explanation,
+            difficulty
+        };
+
+        try {
+            let response;
+            if (questionId) {
+                // Update existing question
+                response = await fetch(`${apiBase}/admin/questions/${questionId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(questionData)
+                });
+            } else {
+                // Create new question
+                response = await fetch(`${apiBase}/admin/questions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(questionData)
+                });
+            }
+
+            if (response.ok) {
+                showToast(questionId ? 'Question updated!' : 'Question created!', 'success');
+                closeQuestionModal();
+                loadTopic(currentTopicId, '');
+                loadSidebar(); // Refresh counts
+            } else {
+                const data = await response.json();
+                showToast(data.error || 'Failed to save question', 'error');
+            }
+        } catch (error) {
+            console.error('Error saving question:', error);
+            showToast('Failed to save question', 'error');
+        }
+    });
+
+    async function toggleQuestion(questionId) {
+        try {
+            const response = await fetch(`${apiBase}/admin/questions/${questionId}/toggle`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                showToast(data.message, 'success');
+                loadTopic(currentTopicId, '');
+            } else {
                 showToast('Failed to toggle question', 'error');
             }
+        } catch (error) {
+            showToast('Failed to toggle question', 'error');
         }
+    }
 
-        // Delete Modal Functions
-        function openDeleteModal(questionId) {
-            document.getElementById('delete-question-id').value = questionId;
-            document.getElementById('delete-modal').classList.add('active');
-        }
+    // Delete Modal Functions
+    function openDeleteModal(questionId) {
+        document.getElementById('delete-question-id').value = questionId;
+        document.getElementById('delete-modal').classList.add('active');
+    }
 
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').classList.remove('active');
-        }
+    function closeDeleteModal() {
+        document.getElementById('delete-modal').classList.remove('active');
+    }
 
-        async function confirmDelete() {
-            const questionId = document.getElementById('delete-question-id').value;
+    async function confirmDelete() {
+        const questionId = document.getElementById('delete-question-id').value;
 
-            try {
-                const response = await fetch(`${apiBase}/admin/questions/${questionId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+        try {
+            const response = await fetch(`${apiBase}/admin/questions/${questionId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
 
-                if (response.ok) {
-                    showToast('Question deleted', 'success');
-                    closeDeleteModal();
-                    loadTopic(currentTopicId, '');
-                    loadSidebar(); // Refresh counts
-                } else {
-                    showToast('Failed to delete question', 'error');
-                }
-            } catch (error) {
+            if (response.ok) {
+                showToast('Question deleted', 'success');
+                closeDeleteModal();
+                loadTopic(currentTopicId, '');
+                loadSidebar(); // Refresh counts
+            } else {
                 showToast('Failed to delete question', 'error');
             }
+        } catch (error) {
+            showToast('Failed to delete question', 'error');
         }
+    }
 
-        // Utility functions
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
-
-        // Close modals on overlay click
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
-                    overlay.classList.remove('active');
-                }
-            });
+    // Utility functions
+    function formatQuestionText(text) {
+        if (!text) return '';
+        
+        // First escape HTML to prevent XSS
+        const div = document.createElement('div');
+        div.textContent = text;
+        let escaped = div.innerHTML;
+        
+        // Replace Markdown code blocks with styled div
+        // Matches ```code``` or ```language\ncode\n```
+        const codeBlockRegex = /```(?:[a-z]*\n)?([\s\S]*?)```/g;
+        
+        return escaped.replace(codeBlockRegex, (match, code) => {
+            return `<div class="pseudocode-block">${code.trim()}</div>`;
         });
+    }
 
-        // Close modals on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay').forEach(modal => {
-                    modal.classList.remove('active');
-                });
+    function escapeHtml(text) {
+        return formatQuestionText(text);
+    }
+
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        document.getElementById('toast-container').appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('active');
             }
         });
+    });
 
-        // Initial load
-        loadSidebar();
+    // Close modals on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+    });
+
+    // Initial load
+    loadSidebar();
     </script>
 </body>
+
 </html>

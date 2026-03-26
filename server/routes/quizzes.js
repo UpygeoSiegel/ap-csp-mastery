@@ -105,9 +105,12 @@ router.post('/start', async (req, res) => {
     // Prepare questions for quiz (without correct answers)
     const quizQuestions = selectedQuestions.map(q => ({
       id: q.id,
-      text: q.text,
+      text: q.text || q.question || '',
       type: q.type,
-      options: q.options
+      options: q.options.map((opt, idx) => ({
+        id: opt.id || idx.toString(),
+        text: typeof opt === 'string' ? opt : opt.text
+      }))
     }));
 
     res.json({
@@ -229,16 +232,14 @@ router.post('/submit', async (req, res) => {
 
     // Prepare detailed results with explanations
     const detailedResults = results.map(result => {
-      const question = questions.find(q => q.id === result.questionId);
       return {
         ...result,
         question: {
-          id: question.id,
-          text: question.text,
-          type: question.type,
-          options: question.options
-        },
-        explanation: question.explanation
+          id: result.questionId,
+          text: result.questionText,
+          type: result.questionType,
+          options: result.options
+        }
       };
     });
 
@@ -419,37 +420,52 @@ function scoreQuizAnswers(questions, submittedAnswers) {
 
     questionIds.push(answer.questionId);
 
+    // Normalize correct answers to an array of IDs
+    let correctAnswerIds = [];
+    if (Array.isArray(question.correctAnswers)) {
+      correctAnswerIds = [...question.correctAnswers];
+    } else if (question.correctIndex !== undefined) {
+      // If it's a legacy question with correctIndex, the ID is the string index
+      correctAnswerIds = [question.correctIndex.toString()];
+    }
+
     const isCorrect = arraysEqual(
-      answer.selectedAnswerIds.sort(),
-      question.correctAnswers.sort()
+      [...answer.selectedAnswerIds].sort(),
+      [...correctAnswerIds].sort()
     );
 
     if (isCorrect) score++;
 
+    // Standardize options for the response
+    const normalizedOptions = question.options.map((opt, idx) => ({
+      id: opt.id || idx.toString(),
+      text: typeof opt === 'string' ? opt : opt.text
+    }));
+
     // Get selected answer texts
     const selectedAnswerTexts = answer.selectedAnswerIds.map(id => {
-      const option = question.options.find(o => o.id === id);
+      const option = normalizedOptions.find(o => o.id === id);
       return option ? option.text : 'Unknown';
     });
 
     // Get correct answer texts
-    const correctAnswerTexts = question.correctAnswers.map(id => {
-      const option = question.options.find(o => o.id === id);
+    const correctAnswerTexts = correctAnswerIds.map(id => {
+      const option = normalizedOptions.find(o => o.id === id);
       return option ? option.text : 'Unknown';
     });
 
     results.push({
       questionId: answer.questionId,
-      questionText: question.text,
-      questionType: question.type,
-      options: question.options,
-      selectedAnswerIds: answer.selectedAnswerIds,
+      questionText: question.text || question.question || '',
+      questionType: question.type || 'multiple_choice',
+      options: normalizedOptions,
+      selectedAnswerIds: answer.selectedAnswerIds || [],
       selectedAnswerTexts,
-      correctAnswerIds: question.correctAnswers,
+      correctAnswerIds: correctAnswerIds,
       correctAnswerTexts,
       correct: isCorrect,
       timeSpentMs: answer.timeSpentMs || 0,
-      explanation: question.explanation
+      explanation: question.explanation || ''
     });
   });
 
