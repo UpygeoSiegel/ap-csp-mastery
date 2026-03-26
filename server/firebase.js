@@ -34,12 +34,14 @@ console.log('Initializing Firebase with project:', serviceAccount.project_id);
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    projectId: process.env.FIREBASE_PROJECT_ID
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`
   });
 }
 
 const db = admin.firestore();
 const auth = admin.auth();
+const bucket = admin.storage().bucket();
 
 // Helper function to generate unique class codes
 const generateClassCode = () => {
@@ -74,5 +76,6 @@ module.exports = {
   admin,
   db,
   auth,
+  bucket,
   generateUniqueClassCode
 };

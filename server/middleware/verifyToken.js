@@ -11,7 +11,19 @@ const verifyToken = async (req, res, next) => {
 
     const token = authHeader.split('Bearer ')[1];
     
-    // Verify the Firebase token
+    // For development: if token is 'test-token', create a mock teacher user
+    if (process.env.NODE_ENV === 'development' && token === 'test-token') {
+      req.user = {
+        uid: 'test-teacher-uid',
+        email: 'test@teacher.com',
+        role: 'teacher',
+        displayName: 'Test Teacher',
+        classIds: ['test-class-id']
+      };
+      return next();
+    }
+    
+    // Try to verify the Firebase token
     const decodedToken = await auth.verifyIdToken(token);
     const uid = decodedToken.uid;
 
@@ -31,6 +43,15 @@ const verifyToken = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Token verification error:', error);
+    
+    // More detailed error message for debugging
+    if (error.code === 'auth/argument-error') {
+      return res.status(401).json({ 
+        error: 'Invalid token format. Expected Firebase ID token.',
+        detail: 'Please ensure you are using a valid Firebase authentication token.'
+      });
+    }
+    
     return res.status(401).json({ error: 'Invalid token' });
   }
 };

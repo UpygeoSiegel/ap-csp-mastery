@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Management - APproval</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .question-management {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .topic-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .topic-selector select {
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            min-width: 250px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--gray-200);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .tab:hover {
+            color: var(--primary-blue);
+            background: var(--gray-50);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .questions-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .question-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .question-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-info {
+            flex: 1;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        .question-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--border-radius);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-system {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .badge-teacher {
+            background: var(--blue-100);
+            color: var(--blue-700);
+        }
+
+        .badge-difficulty-easy {
+            background: var(--green-100);
+            color: var(--green-700);
+        }
+
+        .badge-difficulty-medium {
+            background: var(--yellow-100);
+            color: var(--yellow-700);
+        }
+
+        .badge-difficulty-hard {
+            background: var(--red-100);
+            color: var(--red-700);
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            background: var(--white);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: var(--success-green);
+            color: var(--white);
+            border-color: var(--success-green);
+        }
+
+        .toggle-btn.inactive {
+            background: var(--gray-100);
+            color: var(--gray-500);
+            border-color: var(--gray-300);
+        }
+
+        .popularity-score {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .star {
+            color: var(--yellow-500);
+        }
+
+        .question-form {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .options-container {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .option-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .option-group input[type="checkbox"],
+        .option-group input[type="radio"] {
+            width: auto;
+        }
+
+        .option-group input[type="text"] {
+            flex: 1;
+        }
+
+        .remove-option-btn {
+            padding: 0.25rem 0.5rem;
+            background: var(--red-500);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .add-option-btn {
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .image-upload {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .image-upload:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .image-upload input {
+            display: none;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-outline {
+            padding: 0.75rem 1.5rem;
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .error-message {
+            background: var(--red-50);
+            color: var(--red-700);
+            padding: 1rem;
+            border: 1px solid var(--red-200);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            background: var(--green-50);
+            color: var(--green-700);
+            padding: 1rem;
+            border: 1px solid var(--green-200);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        @media (max-width: 768px) {
+            .question-management {
+                padding: 1rem;
+            }
+            
+            .header-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .topic-selector {
+                justify-content: center;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="question-management">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div>
+                <h1>Question Management</h1>
+                <div class="topic-selector">
+                    <label for="topicSelect">Select Topic:</label>
+                    <select id="topicSelect">
+                        <option value="">Choose a topic...</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <button class="btn-primary" onclick="showAddQuestionForm()">Add New Question</button>
+                <button class="btn-secondary" onclick="window.history.back()">Back to Dashboard</button>
+            </div>
+        </div>
+
+        <!-- Topic Stats -->
+        <div id="topicStats" class="stats-bar" style="display: none;">
+            <div class="stat-item">
+                <div id="totalQuestions" class="stat-value">0</div>
+                <div class="stat-label">Total Questions</div>
+            </div>
+            <div class="stat-item">
+                <div id="activeQuestions" class="stat-value">0</div>
+                <div class="stat-label">Active for You</div>
+            </div>
+            <div class="stat-item">
+                <div id="systemQuestions" class="stat-value">0</div>
+                <div class="stat-label">System Questions</div>
+            </div>
+            <div class="stat-item">
+                <div id="teacherQuestions" class="stat-value">0</div>
+                <div class="stat-label">Teacher-Made</div>
+            </div>
+            <div class="stat-item">
+                <div id="myQuestions" class="stat-value">0</div>
+                <div class="stat-label">My Questions</div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Question Form -->
+        <div id="questionForm" class="question-form" style="display: none;">
+            <h3 id="formTitle">Add New Question</h3>
+            
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="successMessage" class="success-message" style="display: none;"></div>
+
+            <form id="questionFormEl">
+                <div class="form-group">
+                    <label for="questionText">Question Text *</label>
+                    <textarea id="questionText" name="text" placeholder="Enter your question text here..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="questionType">Question Type *</label>
+                    <select id="questionType" name="type" required>
+                        <option value="multiple_choice">Multiple Choice (Single Answer)</option>
+                        <option value="multiple_select">Multiple Select (Multiple Answers)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="difficulty">Difficulty Level</label>
+                    <select id="difficulty" name="difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Answer Options *</label>
+                    <div id="optionsContainer" class="options-container">
+                        <!-- Options will be dynamically generated -->
+                    </div>
+                    <button type="button" class="add-option-btn" onclick="addOption()">Add Option</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="explanation">Explanation *</label>
+                    <textarea id="explanation" name="explanation" placeholder="Explain why the correct answer(s) are correct..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Question Image (Optional)</label>
+                    <div class="image-upload" onclick="document.getElementById('imageUpload').click()">
+                        <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(this)">
+                        <div id="uploadText">Click to upload an image or drag and drop</div>
+                        <img id="imagePreview" class="image-preview" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-outline" onclick="cancelForm()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Question</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Question Tabs -->
+        <div id="questionTabs" style="display: none;">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('system')">System Questions</button>
+                <button class="tab" onclick="showTab('community')">Community Questions</button>
+                <button class="tab" onclick="showTab('my')">My Questions</button>
+            </div>
+
+            <!-- System Questions Tab -->
+            <div id="systemTab" class="tab-content active">
+                <h3>System Questions</h3>
+                <p class="text-muted">These are the original questions provided by APproval. Toggle them on/off for your classes.</p>
+                <div id="systemQuestionsList" class="questions-grid">
+                    <!-- Questions will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Community Questions Tab -->
+            <div id="communityTab" class="tab-content">
+                <h3>Community Questions</h3>
+                <p class="text-muted">These are questions created by other teachers. Activate the ones you want to use.</p>
+                <div class="filters" style="margin-bottom: 1rem;">
+                    <select id="communitySort" onchange="loadCommunityQuestions()">
+                        <option value="popularity">Sort by Popularity</option>
+                        <option value="recent">Sort by Most Recent</option>
+                        <option value="difficulty">Sort by Difficulty</option>
+                    </select>
+                </div>
+                <div id="communityQuestionsList" class="questions-grid">
+                    <!-- Community questions will be loaded here -->
+                </div>
+            </div>
+
+            <!-- My Questions Tab -->
+            <div id="myTab" class="tab-content">
+                <h3>My Questions</h3>
+                <p class="text-muted">Questions you've created. Edit or delete them here.</p>
+                <div id="myQuestionsList" class="questions-grid">
+                    <!-- User's questions will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div id="loadingIndicator" style="text-align: center; padding: 2rem; display: none;">
+            <div>Loading...</div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script>
+        let currentTopic = null;
+        let editingQuestionId = null;
+        let uploadedImageUrl = null;
+        let optionCounter = 0;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Check authentication
+                let token = localStorage.getItem('authToken');
+                
+                // For development: use test token if no token exists
+                if (!token && window.location.hostname === 'localhost') {
+                    token = 'test-token';
+                    localStorage.setItem('authToken', token);
+                }
+                
+                if (!token) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                await loadTopics();
+                initializeForm();
+            } catch (error) {
+                console.error('Error initializing page:', error);
+                showError('Failed to load page. Please refresh and try again.');
+            }
+        });
+
+        // Load available topics
+        async function loadTopics() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    window.location.href = '/';
+                    return;
+                }
+
+                const response = await fetch('/api/topics', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Authentication failed, redirect to login
+                    localStorage.removeItem('authToken');
+                    window.location.href = '/';
+                    return;
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to load topics');
+                }
+
+                const data = await response.json();
+                const select = document.getElementById('topicSelect');
+                
+                data.bigIdeas.forEach(bigIdea => {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = bigIdea.name;
+                    
+                    bigIdea.topics.forEach(topic => {
+                        const option = document.createElement('option');
+                        option.value = topic.id;
+                        option.textContent = `${topic.topicCode} - ${topic.title}`;
+                        optgroup.appendChild(option);
+                    });
+                    
+                    select.appendChild(optgroup);
+                });
+
+                select.addEventListener('change', handleTopicChange);
+            } catch (error) {
+                console.error('Error loading topics:', error);
+                showError('Failed to load topics');
+            }
+        }
+
+        // Handle topic selection change
+        async function handleTopicChange() {
+            const topicId = document.getElementById('topicSelect').value;
+            
+            if (!topicId) {
+                document.getElementById('questionTabs').style.display = 'none';
+                document.getElementById('topicStats').style.display = 'none';
+                return;
+            }
+
+            currentTopic = topicId;
+            await loadTopicData();
+        }
+
+        // Load topic questions and stats
+        async function loadTopicData() {
+            if (!currentTopic) return;
+
+            showLoading();
+            
+            try {
+                const response = await fetch(`/api/questions/${currentTopic}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load questions');
+
+                const data = await response.json();
+                
+                // Update stats
+                updateTopicStats(data);
+                
+                // Load questions into tabs
+                loadSystemQuestions(data.systemQuestions);
+                loadMyQuestions(data.myQuestions);
+                await loadCommunityQuestions();
+                
+                // Show the interface
+                document.getElementById('questionTabs').style.display = 'block';
+                document.getElementById('topicStats').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error loading topic data:', error);
+                showError('Failed to load question data');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Update topic statistics
+        function updateTopicStats(data) {
+            document.getElementById('totalQuestions').textContent = 
+                (data.systemQuestions?.length || 0) + (data.teacherMadeQuestions?.length || 0);
+            document.getElementById('activeQuestions').textContent = data.activeQuestionsForTeacher || 0;
+            document.getElementById('systemQuestions').textContent = data.systemQuestions?.length || 0;
+            document.getElementById('teacherQuestions').textContent = data.teacherMadeQuestions?.length || 0;
+            document.getElementById('myQuestions').textContent = data.myQuestions?.length || 0;
+        }
+
+        // Load system questions
+        function loadSystemQuestions(questions) {
+            const container = document.getElementById('systemQuestionsList');
+            container.innerHTML = '';
+
+            if (!questions || questions.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted">No system questions available for this topic.</div>';
+                return;
+            }
+
+            questions.forEach(question => {
+                container.appendChild(createQuestionCard(question, 'system'));
+            });
+        }
+
+        // Load community questions
+        async function loadCommunityQuestions() {
+            if (!currentTopic) return;
+
+            const sortBy = document.getElementById('communitySort')?.value || 'popularity';
+            
+            try {
+                const response = await fetch(`/api/questions/${currentTopic}/community?sortBy=${sortBy}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load community questions');
+
+                const data = await response.json();
+                const container = document.getElementById('communityQuestionsList');
+                container.innerHTML = '';
+
+                if (!data.questions || data.questions.length === 0) {
+                    container.innerHTML = '<div class="text-center text-muted">No community questions available for this topic yet.</div>';
+                    return;
+                }
+
+                data.questions.forEach(question => {
+                    container.appendChild(createQuestionCard(question, 'community'));
+                });
+
+            } catch (error) {
+                console.error('Error loading community questions:', error);
+                showError('Failed to load community questions');
+            }
+        }
+
+        // Load user's questions
+        function loadMyQuestions(questions) {
+            const container = document.getElementById('myQuestionsList');
+            container.innerHTML = '';
+
+            if (!questions || questions.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted">You haven\'t created any questions for this topic yet. <button class="btn-primary" onclick="showAddQuestionForm()">Create your first question</button></div>';
+                return;
+            }
+
+            questions.forEach(question => {
+                container.appendChild(createQuestionCard(question, 'my'));
+            });
+        }
+
+        // Create question card element
+        function createQuestionCard(question, type) {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            
+            const difficultyClass = `badge-difficulty-${question.difficulty || 'medium'}`;
+            const typeClass = question.isTeacherMade ? 'badge-teacher' : 'badge-system';
+            
+            card.innerHTML = `
+                <div class="question-header">
+                    <div class="question-info">
+                        <div class="question-text">${escapeHtml(question.text.substring(0, 200))}${question.text.length > 200 ? '...' : ''}</div>
+                        <div class="question-meta">
+                            <span class="question-badge ${typeClass}">${question.isTeacherMade ? 'Teacher-Made' : 'System'}</span>
+                            <span class="question-badge ${difficultyClass}">${(question.difficulty || 'medium').toUpperCase()}</span>
+                            <span>${question.type === 'multiple_choice' ? 'Single Answer' : 'Multiple Answer'}</span>
+                            ${question.hasImage ? '<span>📷 Has Image</span>' : ''}
+                            ${question.activationCount ? `<span class="popularity-score"><span class="star">⭐</span> ${question.activationCount}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="question-actions">
+                        ${createActionButtons(question, type)}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Create action buttons for question card
+        function createActionButtons(question, type) {
+            let buttons = '';
+            
+            if (type === 'my') {
+                buttons += `
+                    <button class="btn-outline" onclick="editQuestion('${question.id}')">Edit</button>
+                    <button class="btn-outline" style="color: var(--red-600); border-color: var(--red-600);" onclick="deleteQuestion('${question.id}')">Delete</button>
+                `;
+            }
+            
+            // Toggle button for all questions
+            const isActive = question.isActiveForTeacher;
+            const toggleClass = isActive ? 'active' : 'inactive';
+            const toggleText = isActive ? 'Active' : 'Inactive';
+            
+            buttons += `
+                <button class="toggle-btn ${toggleClass}" onclick="toggleQuestion('${question.id}', ${!isActive})" title="${isActive ? 'Deactivate' : 'Activate'} this question">
+                    ${toggleText}
+                </button>
+            `;
+            
+            return buttons;
+        }
+
+        // Toggle question activation
+        async function toggleQuestion(questionId, activate) {
+            if (!currentTopic) return;
+
+            try {
+                const response = await fetch(`/api/questions/${currentTopic}/${questionId}/toggle`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to toggle question');
+                }
+
+                showSuccess(activate ? 'Question activated successfully' : 'Question deactivated successfully');
+                await loadTopicData(); // Reload data
+
+            } catch (error) {
+                console.error('Error toggling question:', error);
+                showError(error.message);
+            }
+        }
+
+        // Show add question form
+        function showAddQuestionForm() {
+            if (!currentTopic) {
+                showError('Please select a topic first');
+                return;
+            }
+            
+            editingQuestionId = null;
+            uploadedImageUrl = null;
+            document.getElementById('formTitle').textContent = 'Add New Question';
+            document.getElementById('questionFormEl').reset();
+            clearOptions();
+            addOption(); // Add first option
+            addOption(); // Add second option
+            document.getElementById('questionForm').style.display = 'block';
+            document.getElementById('questionForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Edit existing question
+        async function editQuestion(questionId) {
+            try {
+                const response = await fetch(`/api/questions/${currentTopic}/${questionId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load question');
+
+                const question = await response.json();
+                
+                editingQuestionId = questionId;
+                uploadedImageUrl = question.imageUrl;
+                
+                document.getElementById('formTitle').textContent = 'Edit Question';
+                document.getElementById('questionText').value = question.text;
+                document.getElementById('questionType').value = question.type;
+                document.getElementById('difficulty').value = question.difficulty || 'medium';
+                document.getElementById('explanation').value = question.explanation;
+                
+                // Load options
+                clearOptions();
+                question.options.forEach(option => {
+                    addOption(option.text, question.correctAnswers.includes(option.id));
+                });
+                
+                // Show image if exists
+                if (question.imageUrl) {
+                    document.getElementById('imagePreview').src = question.imageUrl;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('uploadText').textContent = 'Click to change image';
+                }
+                
+                document.getElementById('questionForm').style.display = 'block';
+                document.getElementById('questionForm').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error loading question:', error);
+                showError('Failed to load question for editing');
+            }
+        }
+
+        // Delete question
+        async function deleteQuestion(questionId) {
+            if (!confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/questions/${currentTopic}/${questionId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to delete question');
+                }
+
+                showSuccess('Question deleted successfully');
+                await loadTopicData(); // Reload data
+
+            } catch (error) {
+                console.error('Error deleting question:', error);
+                showError(error.message);
+            }
+        }
+
+        // Initialize form options
+        function initializeForm() {
+            clearOptions();
+            addOption(); // Add first option
+            addOption(); // Add second option
+        }
+
+        // Add option to form
+        function addOption(text = '', isCorrect = false) {
+            optionCounter++;
+            const container = document.getElementById('optionsContainer');
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'option-group';
+            optionDiv.dataset.optionId = optionCounter;
+            
+            const questionType = document.getElementById('questionType').value || 'multiple_choice';
+            const inputType = questionType === 'multiple_choice' ? 'radio' : 'checkbox';
+            const inputName = questionType === 'multiple_choice' ? 'correctAnswer' : `correctAnswer_${optionCounter}`;
+            
+            optionDiv.innerHTML = `
+                <input type="${inputType}" name="${inputName}" value="${optionCounter}" ${isCorrect ? 'checked' : ''}>
+                <input type="text" placeholder="Enter option text..." value="${escapeHtml(text)}" required>
+                ${container.children.length >= 2 ? '<button type="button" class="remove-option-btn" onclick="removeOption(this)">Remove</button>' : ''}
+            `;
+            
+            container.appendChild(optionDiv);
+        }
+
+        // Remove option from form
+        function removeOption(button) {
+            const container = document.getElementById('optionsContainer');
+            if (container.children.length > 2) {
+                button.parentElement.remove();
+            }
+        }
+
+        // Clear all options
+        function clearOptions() {
+            document.getElementById('optionsContainer').innerHTML = '';
+            optionCounter = 0;
+        }
+
+        // Update option input types when question type changes
+        document.getElementById('questionType').addEventListener('change', function() {
+            const container = document.getElementById('optionsContainer');
+            const questionType = this.value;
+            const inputType = questionType === 'multiple_choice' ? 'radio' : 'checkbox';
+            const inputName = questionType === 'multiple_choice' ? 'correctAnswer' : null;
+            
+            Array.from(container.children).forEach((optionDiv, index) => {
+                const checkbox = optionDiv.querySelector('input[type="checkbox"], input[type="radio"]');
+                const isChecked = checkbox.checked;
+                const optionId = optionDiv.dataset.optionId;
+                
+                checkbox.type = inputType;
+                checkbox.name = inputName || `correctAnswer_${optionId}`;
+                checkbox.checked = questionType === 'multiple_choice' && index === 0 ? true : isChecked;
+            });
+        });
+
+        // Handle image upload
+        async function handleImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                showError('Please select a valid image file');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showError('Image must be smaller than 5MB');
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                const response = await fetch(`/api/questions/${currentTopic}/upload-image`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    },
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Failed to upload image');
+                
+                const data = await response.json();
+                uploadedImageUrl = data.imageUrl;
+                
+                document.getElementById('imagePreview').src = data.imageUrl;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('uploadText').textContent = 'Click to change image';
+                
+                showSuccess('Image uploaded successfully');
+                
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                showError('Failed to upload image');
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('questionFormEl').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentTopic) {
+                showError('Please select a topic first');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            const container = document.getElementById('optionsContainer');
+            const questionType = formData.get('type');
+            
+            // Collect options and correct answers
+            const options = [];
+            const correctAnswers = [];
+            
+            Array.from(container.children).forEach((optionDiv, index) => {
+                const textInput = optionDiv.querySelector('input[type="text"]');
+                const checkInput = optionDiv.querySelector('input[type="checkbox"], input[type="radio"]');
+                const optionId = String.fromCharCode(65 + index); // A, B, C, D...
+                
+                if (textInput.value.trim()) {
+                    options.push({
+                        id: optionId,
+                        text: textInput.value.trim()
+                    });
+                    
+                    if (checkInput.checked) {
+                        correctAnswers.push(optionId);
+                    }
+                }
+            });
+            
+            // Validate
+            if (options.length < 2) {
+                showError('Please provide at least 2 options');
+                return;
+            }
+            
+            if (correctAnswers.length === 0) {
+                showError('Please select at least one correct answer');
+                return;
+            }
+            
+            if (questionType === 'multiple_choice' && correctAnswers.length > 1) {
+                showError('Multiple choice questions can only have one correct answer');
+                return;
+            }
+            
+            try {
+                const questionData = {
+                    text: formData.get('text'),
+                    type: questionType,
+                    difficulty: formData.get('difficulty'),
+                    options: options,
+                    correctAnswers: correctAnswers,
+                    explanation: formData.get('explanation'),
+                    hasImage: !!uploadedImageUrl,
+                    imageUrl: uploadedImageUrl
+                };
+                
+                const url = editingQuestionId 
+                    ? `/api/questions/${currentTopic}/${editingQuestionId}`
+                    : `/api/questions/${currentTopic}`;
+                
+                const method = editingQuestionId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(questionData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to save question');
+                }
+                
+                showSuccess(editingQuestionId ? 'Question updated successfully' : 'Question created successfully');
+                cancelForm();
+                await loadTopicData(); // Reload data
+                
+            } catch (error) {
+                console.error('Error saving question:', error);
+                showError(error.message);
+            }
+        });
+
+        // Cancel form
+        function cancelForm() {
+            document.getElementById('questionForm').style.display = 'none';
+            document.getElementById('questionFormEl').reset();
+            editingQuestionId = null;
+            uploadedImageUrl = null;
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('uploadText').textContent = 'Click to upload an image or drag and drop';
+            clearErrors();
+        }
+
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Show selected tab
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => successDiv.style.display = 'none', 3000);
+        }
+
+        function clearErrors() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

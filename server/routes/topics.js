@@ -7,6 +7,84 @@ const router = express.Router();
 // All routes require authentication
 router.use(verifyToken);
 
+// Get all topics organized by Big Ideas (for question management)
+router.get('/', async (req, res) => {
+  try {
+    // Get all Big Ideas
+    const bigIdeasSnapshot = await db.collection('bigIdeas')
+      .orderBy('order', 'asc')
+      .get();
+
+    // Get all topics
+    const topicsSnapshot = await db.collection('topics')
+      .orderBy('order', 'asc')
+      .get();
+
+    // Organize topics by Big Idea
+    const bigIdeasWithTopics = [];
+    
+    for (const bigIdeaDoc of bigIdeasSnapshot.docs) {
+      const bigIdea = { id: bigIdeaDoc.id, ...bigIdeaDoc.data() };
+      
+      // Get topics for this Big Idea
+      const bigIdeaTopics = topicsSnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(topic => topic.bigIdea === bigIdea.order)
+        .map(topic => ({
+          ...topic,
+          topicCode: topic.id.replace('topic-', ''), // Convert topic-3.1 to 3.1
+          title: getTopicTitle(topic.id) // Get proper title
+        }));
+
+      if (bigIdeaTopics.length > 0) {
+        bigIdeasWithTopics.push({
+          ...bigIdea,
+          name: bigIdea.name || `Big Idea ${bigIdea.order}`,
+          topics: bigIdeaTopics
+        });
+      }
+    }
+
+    res.json({ bigIdeas: bigIdeasWithTopics });
+
+  } catch (error) {
+    console.error('Get topics error:', error);
+    res.status(500).json({ error: 'Failed to fetch topics' });
+  }
+});
+
+// Helper function to get topic titles
+function getTopicTitle(topicId) {
+  const topicTitles = {
+    'topic-3.1': 'Variables and Assignment',
+    'topic-3.2': 'Data Abstraction',
+    'topic-3.3': 'Mathematical Expressions',
+    'topic-3.4': 'Strings',
+    'topic-3.5': 'Boolean Expressions',
+    'topic-3.6': 'Conditionals',
+    'topic-3.7': 'Nested Conditionals',
+    'topic-3.8': 'Iteration',
+    'topic-3.9': 'Developing Algorithms',
+    'topic-3.10': 'Lists',
+    'topic-3.11': 'Binary Search',
+    'topic-3.12': 'Calling Procedures',
+    'topic-3.13': 'Developing Procedures',
+    'topic-3.14': 'Libraries',
+    'topic-3.15': 'Random Values',
+    'topic-3.16': 'Simulations',
+    'topic-3.17': 'Algorithmic Efficiency',
+    'topic-3.18': 'Undecidable Problems',
+    'topic-5.1': 'Beneficial and Harmful Effects',
+    'topic-5.2': 'Digital Divide',
+    'topic-5.3': 'Computing Bias',
+    'topic-5.4': 'Crowdsourcing',
+    'topic-5.5': 'Legal and Ethical Concerns',
+    'topic-5.6': 'Safe Computing'
+  };
+  
+  return topicTitles[topicId] || topicId.replace('topic-', '').replace('-', '.');
+}
+
 // Get all Big Ideas
 router.get('/big-ideas', async (req, res) => {
   try {

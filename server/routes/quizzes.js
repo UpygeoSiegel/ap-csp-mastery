@@ -79,7 +79,16 @@ router.post('/start', async (req, res) => {
       }
     }
 
-    // Get questions from questions collection
+    // Get class information to find the teacher
+    const classDoc = await db.collection('classes').doc(studentClassId).get();
+    if (!classDoc.exists) {
+      return res.status(404).json({ error: 'Class not found' });
+    }
+    
+    const classInfo = classDoc.data();
+    const teacherId = classInfo.teacherId;
+
+    // Get all questions for this topic
     const questionsSnapshot = await db.collection('questions')
       .where('topicId', '==', topicId)
       .get();
@@ -89,8 +98,24 @@ router.post('/start', async (req, res) => {
       ...doc.data()
     }));
 
-    // Get active questions (not deactivated by teachers)
-    const activeQuestions = allQuestions.filter(q => !q.deactivated);
+    // Get teacher's question preferences
+    const teacherPrefsSnapshot = await db.collection('teacherQuestionPreferences')
+      .where('teacherId', '==', teacherId)
+      .where('topicId', '==', topicId)
+      .get();
+
+    const teacherPrefs = {};
+    teacherPrefsSnapshot.forEach(doc => {
+      const pref = doc.data();
+      teacherPrefs[pref.questionId] = pref;
+    });
+
+    // Filter to questions that are active for this teacher
+    const activeQuestions = allQuestions.filter(question => {
+      const teacherPref = teacherPrefs[question.id];
+      // Question is active if: teacher has explicitly activated it OR (no preference and it's a system question)
+      return teacherPref?.isActive ?? !question.isTeacherMade;
+    });
 
     if (activeQuestions.length < 5) {
       return res.status(400).json({ error: 'Not enough active questions for this topic' });
