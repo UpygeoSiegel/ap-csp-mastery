@@ -56,6 +56,17 @@ router.get('/', async (req, res) => {
 // Helper function to get topic titles
 function getTopicTitle(topicId) {
   const topicTitles = {
+    // Big Idea 1
+    'topic-1.1': 'Collaboration',
+    'topic-1.2': 'Program Function and Purpose',
+    'topic-1.3': 'Program Design and Development',
+    'topic-1.4': 'Identifying and Correcting Errors',
+    // Big Idea 2
+    'topic-2.1': 'Binary Numbers',
+    'topic-2.2': 'Data Compression',
+    'topic-2.3': 'Extracting Information from Data',
+    'topic-2.4': 'Using Programs with Data',
+    // Big Idea 3
     'topic-3.1': 'Variables and Assignment',
     'topic-3.2': 'Data Abstraction',
     'topic-3.3': 'Mathematical Expressions',
@@ -74,6 +85,11 @@ function getTopicTitle(topicId) {
     'topic-3.16': 'Simulations',
     'topic-3.17': 'Algorithmic Efficiency',
     'topic-3.18': 'Undecidable Problems',
+    // Big Idea 4
+    'topic-4.1': 'The Internet',
+    'topic-4.2': 'Fault Tolerance',
+    'topic-4.3': 'Parallel and Distributed Computing',
+    // Big Idea 5
     'topic-5.1': 'Beneficial and Harmful Effects',
     'topic-5.2': 'Digital Divide',
     'topic-5.3': 'Computing Bias',

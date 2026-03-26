@@ -124,7 +124,7 @@ router.get('/:topicId', async (req, res) => {
   }
 });
 
-// Upload image for question
+// Upload image for question (temporary base64 solution)
 router.post('/:topicId/upload-image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -133,43 +133,27 @@ router.post('/:topicId/upload-image', upload.single('image'), async (req, res) =
 
     const teacherId = req.user.uid;
     const { topicId } = req.params;
-    const fileName = `question-images/${topicId}/${teacherId}/${Date.now()}-${req.file.originalname}`;
     
-    const file = bucket.file(fileName);
-    const stream = file.createWriteStream({
-      metadata: {
-        contentType: req.file.mimetype,
-      },
+    // For now, convert to base64 and return data URL
+    // In production, you would want to use Firebase Storage or another cloud storage solution
+    const base64Image = req.file.buffer.toString('base64');
+    const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
+    
+    // Validate file size (limit to 5MB for base64 to avoid performance issues)
+    if (req.file.size > 5 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Image too large. Please use images smaller than 5MB.' });
+    }
+    
+    res.json({
+      message: 'Image processed successfully',
+      imageUrl: dataUrl,
+      fileName: req.file.originalname,
+      note: 'Using base64 data URL for development. In production, use Firebase Storage.'
     });
-
-    stream.on('error', (error) => {
-      console.error('Upload error:', error);
-      res.status(500).json({ error: 'Failed to upload image' });
-    });
-
-    stream.on('finish', async () => {
-      try {
-        // Make the file publicly readable
-        await file.makePublic();
-        
-        const imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-        
-        res.json({
-          message: 'Image uploaded successfully',
-          imageUrl,
-          fileName
-        });
-      } catch (error) {
-        console.error('Make public error:', error);
-        res.status(500).json({ error: 'Failed to make image public' });
-      }
-    });
-
-    stream.end(req.file.buffer);
     
   } catch (error) {
     console.error('Upload image error:', error);
-    res.status(500).json({ error: 'Failed to upload image' });
+    res.status(500).json({ error: 'Failed to process image' });
   }
 });
 
@@ -923,6 +907,31 @@ router.post('/:topicId/bulk-import', async (req, res) => {
   } catch (error) {
     console.error('Bulk import error:', error);
     res.status(500).json({ error: 'Failed to import questions' });
+  }
+});
+
+// Get a specific question
+router.get('/:topicId/:questionId', async (req, res) => {
+  try {
+    const { topicId, questionId } = req.params;
+
+    const questionDoc = await db.collection('questions').doc(questionId).get();
+    
+    if (!questionDoc.exists) {
+      return res.status(404).json({ error: 'Question not found' });
+    }
+
+    const question = { id: questionDoc.id, ...questionDoc.data() };
+
+    // Verify question belongs to topic
+    if (question.topicId !== topicId) {
+      return res.status(400).json({ error: 'Question does not belong to this topic' });
+    }
+
+    res.json(question);
+  } catch (error) {
+    console.error('Get single question error:', error);
+    res.status(500).json({ error: 'Failed to fetch question' });
   }
 });
 

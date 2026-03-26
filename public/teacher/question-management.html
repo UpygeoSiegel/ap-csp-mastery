@@ -397,6 +397,21 @@
     </style>
 </head>
 <body>
+    <header class="header">
+        <div class="dashboard-header">
+            <div class="logo">
+                <h1>APproval</h1>
+                <span>Teacher Dashboard</span>
+            </div>
+            <div class="user-info">
+                <a href="/teacher/item-analysis.html" class="btn-secondary" style="text-decoration: none;">Item Analysis</a>
+                <a href="/teacher/question-management.html" class="btn-secondary active" style="text-decoration: none; background: var(--gray-300);">Question Management</a>
+                <span id="user-name">Loading...</span>
+                <button id="logout-btn" class="btn-secondary">Logout</button>
+            </div>
+        </div>
+    </header>
+
     <div class="question-management">
         <!-- Header Section -->
         <div class="header-section">
@@ -411,7 +426,6 @@
             </div>
             <div>
                 <button class="btn-primary" onclick="showAddQuestionForm()">Add New Question</button>
-                <button class="btn-secondary" onclick="window.history.back()">Back to Dashboard</button>
             </div>
         </div>
 
@@ -559,16 +573,35 @@
             try {
                 // Check authentication
                 let token = localStorage.getItem('authToken');
+                let userData = JSON.parse(localStorage.getItem('userData') || '{}');
                 
                 // For development: use test token if no token exists
                 if (!token && window.location.hostname === 'localhost') {
                     token = 'test-token';
                     localStorage.setItem('authToken', token);
+                    userData = { displayName: 'Teacher', email: 'teacher@test.com' };
+                    localStorage.setItem('userData', JSON.stringify(userData));
                 }
                 
                 if (!token) {
                     window.location.href = '/';
                     return;
+                }
+
+                // Display user info
+                const userNameEl = document.getElementById('user-name');
+                if (userNameEl) {
+                    userNameEl.textContent = userData.displayName || userData.email || 'Teacher';
+                }
+
+                // Logout handler
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', () => {
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('userData');
+                        window.location.href = '/';
+                    });
                 }
                 
                 await loadTopics();
