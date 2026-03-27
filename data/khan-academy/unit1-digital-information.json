@@ -1,0 +1,318 @@
+{
+  "unit": "Unit 1: Digital Information",
+  "source": "Khan Academy",
+  "quizzes": [
+    {
+      "id": "quiz-1",
+      "title": "Quiz 1",
+      "topics": ["Bits", "bytes", "binary number system"],
+      "questions": [
+        {
+          "question": "A photographer is choosing how to store their digital photos. They want to use a format that preserves all the original data from the camera sensor, even if it takes up more space. Which of the following is the most likely reason they would choose a 'lossless' compression format over a 'lossy' one?",
+          "options": [
+            "(A) Lossless compression formats always result in smaller file sizes than lossy formats.",
+            "(B) Lossless compression allows the original data to be perfectly reconstructed, while lossy compression discards some data.",
+            "(C) Lossless compression is only used for text files, not for images.",
+            "(D) Lossy compression is more expensive to use than lossless compression."
+          ],
+          "answer": "B",
+          "explanation": "Lossless compression allows the original data to be perfectly reconstructed, while lossy compression discards some data."
+        },
+        {
+          "question": "A computer scientist is developing an algorithm to compress large text files. The algorithm replaces frequently occurring sequences of characters with shorter codes. What type of compression is this algorithm most likely using?",
+          "options": [
+            "(A) Lossy compression",
+            "(B) Lossless compression",
+            "(C) Analog compression",
+            "(D) Random compression"
+          ],
+          "answer": "B",
+          "explanation": "Replacing sequences with codes without discarding information is a hallmark of lossless compression."
+        },
+        {
+          "question": "Which of the following is a characteristic of 'lossy' compression?",
+          "options": [
+            "(A) It can always reduce a file to 10% of its original size.",
+            "(B) It allows for the exact original data to be recovered after decompressing.",
+            "(C) It is typically used for data where some loss of detail is acceptable, such as audio or video.",
+            "(D) It is never used for digital information because it is unreliable."
+          ],
+          "answer": "C",
+          "explanation": "Lossy compression is typically used for media like audio or video where perfect fidelity is not required."
+        },
+        {
+          "question": "A student is creating a digital drawing. They notice that when they zoom in very far, the image starts to look 'blocky' or 'pixelated.' Which of the following best explains why this happens?",
+          "options": [
+            "(A) The computer is running out of memory to display the image.",
+            "(B) Digital images are made up of a finite grid of pixels, and zooming in makes these individual pixels visible.",
+            "(C) The student used a lossy compression format that destroyed the smooth lines.",
+            "(D) The monitor's refresh rate is too low to handle the zoomed-in view."
+          ],
+          "answer": "B",
+          "explanation": "Digital images are composed of a discrete grid of pixels; zooming in reveals these individual squares."
+        },
+        {
+          "question": "How many different values can be represented by a 4-bit binary number?",
+          "options": [
+            "(A) 4",
+            "(B) 8",
+            "(C) 16",
+            "(D) 32"
+          ],
+          "answer": "C",
+          "explanation": "A 4-bit binary number can represent 2^4 = 16 different values."
+        },
+        {
+          "question": "Which of the following best describes the relationship between a 'bit' and a 'byte'?",
+          "options": [
+            "(A) A bit is made up of 8 bytes.",
+            "(B) A byte is made up of 8 bits.",
+            "(C) Bits and bytes are the same thing.",
+            "(D) A byte is used for storage, while a bit is used for processing speed."
+          ],
+          "answer": "B",
+          "explanation": "By definition, one byte is composed of eight bits."
+        }
+      ]
+    },
+    {
+      "id": "quiz-2",
+      "title": "Quiz 2",
+      "topics": ["Number limits", "Text in binary", "Analog vs Digital"],
+      "questions": [
+        {
+          "question": "A photographer is taking high-resolution photos for a gallery exhibit. They want to save the photos in a format that preserves all original data so they can make large prints without losing quality. Which type of compression should they use?",
+          "options": [
+            "(A) Lossy compression",
+            "(B) Lossless compression",
+            "(C) No compression at all",
+            "(D) Data encryption"
+          ],
+          "answer": "B",
+          "explanation": "Lossless compression preserves all original data, which is necessary for high-quality printing."
+        },
+        {
+          "question": "A computer system uses 6 bits to represent integers. What is the maximum number of unique values that can be represented?",
+          "options": [
+            "(A) 32",
+            "(B) 63",
+            "(C) 64",
+            "(D) 128"
+          ],
+          "answer": "C",
+          "explanation": "The number of unique values is 2^6 = 64."
+        },
+        {
+          "question": "Which of the following best describes the difference between digital and analog data?",
+          "options": [
+            "(A) Digital data is continuous, while analog data is discrete.",
+            "(B) Digital data is represented by a finite set of values, while analog data is represented by a continuous range of values.",
+            "(C) Analog data is always more accurate than digital data.",
+            "(D) Digital data cannot be converted back to analog data."
+          ],
+          "answer": "B",
+          "explanation": "Digital data is discrete and finite; analog data is continuous."
+        },
+        {
+          "question": "A streaming service uses lossy compression for its video content. What is the primary benefit of this approach?",
+          "options": [
+            "(A) It ensures the video quality is identical to the original source.",
+            "(B) It reduces the file size significantly, allowing for faster transmission over the internet.",
+            "(C) It makes the video files more secure from unauthorized access.",
+            "(D) It allows the video to be played on any device without a decoder."
+          ],
+          "answer": "B",
+          "explanation": "Lossy compression significantly reduces file size, which is critical for streaming efficiency."
+        },
+        {
+          "question": "A researcher is analyzing a large dataset of weather readings. They want to find the average temperature for each month over the last decade. Which process are they performing?",
+          "options": [
+            "(A) Data cleaning",
+            "(B) Data visualization",
+            "(C) Information extraction/Data analysis",
+            "(D) Data compression"
+          ],
+          "answer": "C",
+          "explanation": "Calculating averages to find patterns is part of information extraction."
+        }
+      ]
+    },
+    {
+      "id": "quiz-3",
+      "title": "Quiz 3",
+      "topics": ["Data compression", "Digital copyright", "Licensing"],
+      "questions": [
+        {
+          "question": "A photographer is deciding whether to use a lossy or lossless compression algorithm for their high-resolution photos. Which of the following is a true statement about the difference between the two?",
+          "options": [
+            "(A) Lossy compression can always be reversed to restore the original data, while lossless cannot.",
+            "(B) Lossless compression reduces the file size more significantly than lossy compression.",
+            "(C) Lossy compression discards some data to reduce file size, while lossless compression retains all original data.",
+            "(D) Lossless compression is only used for text files, while lossy is only used for images."
+          ],
+          "answer": "C",
+          "explanation": "Lossy compression discards data for space; lossless retains everything."
+        },
+        {
+          "question": "A computer uses 6 bits to represent integers. What is the largest unsigned integer that can be represented?",
+          "options": [
+            "(A) 31",
+            "(B) 32",
+            "(C) 63",
+            "(D) 64"
+          ],
+          "answer": "C",
+          "explanation": "The range for n bits is 0 to (2^n - 1). For 6 bits, it is 0 to 63."
+        },
+        {
+          "question": "Which of the following best describes the purpose of using a high-level data abstraction, such as a list or an array, in a program?",
+          "options": [
+            "(A) To make the program run faster by reducing the number of memory accesses.",
+            "(B) To allow the programmer to focus on the logic of the program rather than the low-level details of how data is stored.",
+            "(C) To ensure that the data is stored in a way that is compatible with all hardware.",
+            "(D) To prevent other programmers from seeing the underlying data structures."
+          ],
+          "answer": "B",
+          "explanation": "Abstractions hide complexity, allowing focus on high-level logic."
+        },
+        {
+          "question": "Which of the following is a true statement about the digital representation of analog data?",
+          "options": [
+            "(A) Digital representation is always a perfect copy of the original analog signal.",
+            "(B) Digital representation is created by sampling the analog signal at discrete intervals.",
+            "(C) Analog data cannot be converted to digital data without losing all its quality.",
+            "(D) Higher sampling rates lead to larger file sizes but lower quality digital representations."
+          ],
+          "answer": "B",
+          "explanation": "Analog-to-digital conversion involves sampling at discrete intervals."
+        },
+        {
+          "question": "A student is looking at the metadata of a digital image file. Which of the following information is most likely to be found in the metadata?",
+          "options": [
+            "(A) The exact color of every pixel in the image.",
+            "(B) The date and time the image was taken.",
+            "(C) The algorithm used to display the image on a screen.",
+            "(D) The total number of images stored on the device."
+          ],
+          "answer": "B",
+          "explanation": "Metadata is data about data, such as creation time, rather than the content (pixels) itself."
+        }
+      ]
+    }
+  ],
+  "unitTest": {
+    "title": "Unit 1 Test",
+    "questions": [
+      {
+        "question": "A photographer is taking digital photos and wants to ensure they are saved with the highest possible quality. Which of the following would most likely result in the highest quality digital image?",
+        "options": [
+          "(A) Using a higher resolution (more pixels) and a higher bit depth (more bits per pixel).",
+          "(B) Using a lower resolution and a higher bit depth.",
+          "(C) Using a higher resolution and a lower bit depth.",
+          "(D) Using a lower resolution and a lower bit depth."
+        ],
+        "answer": "A",
+        "explanation": "Higher resolution and higher bit depth both contribute to capturing more detail."
+      },
+      {
+        "question": "Which of the following is a true statement about data compression?",
+        "options": [
+          "(A) Lossless compression always results in a smaller file size than lossy compression.",
+          "(B) Lossy compression is best used when it is important to be able to reconstruct the original data exactly.",
+          "(C) Lossless compression is best used when it is important to be able to reconstruct the original data exactly.",
+          "(D) Lossy compression algorithms are never used for image or audio files."
+        ],
+        "answer": "C",
+        "explanation": "Lossless compression is required when exact reconstruction is necessary."
+      },
+      {
+        "question": "A student is creating a program to represent the colors of a sunset. They decide to use 6 bits to represent each color (Red, Green, Blue). How many different colors can be represented using this 18-bit RGB model?",
+        "options": [
+          "(A) 2^6",
+          "(B) 2^{18}",
+          "(C) 3 * 2^6",
+          "(D) 18^2"
+        ],
+        "answer": "B",
+        "explanation": "With 18 bits total, there are 2^18 possible combinations."
+      },
+      {
+        "question": "Which of the following is an example of metadata for a digital document?",
+        "options": [
+          "(A) The text content of the document.",
+          "(B) The font size used in the document.",
+          "(C) The date the document was created.",
+          "(D) The images embedded in the document."
+        ],
+        "answer": "C",
+        "explanation": "The creation date is metadata (data about the file), not the content itself."
+      },
+      {
+        "question": "A company wants to store a large collection of high-resolution videos. They are concerned about storage space and decide to use a lossy compression algorithm. What is a likely trade-off of this decision?",
+        "options": [
+          "(A) The videos will take up more storage space but will be of higher quality.",
+          "(B) The videos will take up less storage space but some data will be permanently lost, potentially reducing quality.",
+          "(C) The videos can be perfectly reconstructed to their original state, but the compression process will be slow.",
+          "(D) There is no trade-off; lossy compression is always superior to lossless compression."
+        ],
+        "answer": "B",
+        "explanation": "Lossy compression reduces size but at the cost of permanent data loss."
+      },
+      {
+        "question": "How many bits are needed to represent the decimal number 25?",
+        "options": [
+          "(A) 4 bits",
+          "(B) 5 bits",
+          "(C) 6 bits",
+          "(D) 8 bits"
+        ],
+        "answer": "B",
+        "explanation": "5 bits can represent up to 31 (2^5 - 1). 4 bits only go up to 15."
+      },
+      {
+        "question": "Which of the following best describes the relationship between a byte and a bit?",
+        "options": [
+          "(A) A bit is made up of 8 bytes.",
+          "(B) A byte is made up of 8 bits.",
+          "(C) A byte and a bit are the same thing.",
+          "(D) A byte is a unit of frequency, while a bit is a unit of storage."
+        ],
+        "answer": "B",
+        "explanation": "One byte equals 8 bits."
+      },
+      {
+        "question": "In the context of digital information, what does 'abstraction' refer to?",
+        "options": [
+          "(A) The process of making a file smaller.",
+          "(B) The process of hiding complex details and showing only the necessary features of an object.",
+          "(C) The physical hardware used to store data.",
+          "(D) The encryption of sensitive information."
+        ],
+        "answer": "B",
+        "explanation": "Abstraction is the reduction of complexity."
+      },
+      {
+        "question": "Which number system is most commonly used by computers to represent data at the lowest level?",
+        "options": [
+          "(A) Decimal (Base 10)",
+          "(B) Hexadecimal (Base 16)",
+          "(C) Binary (Base 2)",
+          "(D) Octal (Base 8)"
+        ],
+        "answer": "C",
+        "explanation": "Computers operate using binary (0s and 1s)."
+      },
+      {
+        "question": "If you have a 4-bit binary system, what is the largest decimal number you can represent?",
+        "options": [
+          "(A) 4",
+          "(B) 8",
+          "(C) 15",
+          "(D) 16"
+        ],
+        "answer": "C",
+        "explanation": "The largest number with 4 bits is 1111 in binary, which is 15 in decimal."
+      }
+    ]
+  }
+}

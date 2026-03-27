@@ -1,0 +1,186 @@
+{
+  "unit": "Unit 3: Programming",
+  "source": "Khan Academy",
+  "quizzes": [
+    {
+      "id": "quiz-1",
+      "title": "Quiz 1",
+      "topics": ["Variables", "Mathematical expressions", "Strings"],
+      "questions": [
+        {
+          "question": "What is a primary benefit of using pseudocode?",
+          "options": [
+            "(A) It runs faster than actual code.",
+            "(B) It can represent coding concepts common to all programming languages without being tied to specific syntax.",
+            "(C) It is the only way to write programs for older computers.",
+            "(D) It automatically finds errors in your logic."
+          ],
+          "answer": "B",
+          "explanation": "Pseudocode is used to represent algorithms in a language-neutral way."
+        },
+        {
+          "question": "What will be displayed after this code runs?\ntoday ← 11\ntomorrow ← 12\nDISPLAY (tomorrow)\nDISPLAY (today)",
+          "options": [
+            "(A) 11 12",
+            "(B) 12 11",
+            "(C) 11 11",
+            "(D) 12 12"
+          ],
+          "answer": "B",
+          "explanation": "The code first displays the value of 'tomorrow' (12) and then 'today' (11)."
+        },
+        {
+          "question": "In AP CSP pseudocode, using SUBSTRING(string, startPos, numChars), how do you extract the month '03' from userBday ← '03/14/2010'?",
+          "options": [
+            "(A) SUBSTRING(userBday, 0, 2)",
+            "(B) SUBSTRING(userBday, 1, 2)",
+            "(C) SUBSTRING(userBday, 1, 3)",
+            "(D) SUBSTRING(userBday, 0, 1)"
+          ],
+          "answer": "B",
+          "explanation": "AP CSP pseudocode uses 1-based indexing for strings and lists."
+        },
+        {
+          "question": "What does FIND(source, target) return if the target string is not found within the source string?",
+          "options": [
+            "(A) 0",
+            "(B) False",
+            "(C) -1",
+            "(D) Error"
+          ],
+          "answer": "C",
+          "explanation": "If a substring is not found, the FIND operation typically returns -1."
+        }
+      ]
+    },
+    {
+      "id": "quiz-2",
+      "title": "Quiz 2",
+      "topics": ["Conditionals", "Procedures", "Boolean logic"],
+      "questions": [
+        {
+          "question": "What is a primary benefit of using procedures (functions) in a program?",
+          "options": [
+            "(A) They make the program run faster.",
+            "(B) They allow for code reuse and make programs more organized and easier to maintain.",
+            "(C) They are required for any program to work.",
+            "(D) They prevent the use of variables."
+          ],
+          "answer": "B",
+          "explanation": "Procedures provide abstraction by grouping instructions together for reuse."
+        },
+        {
+          "question": "If x = 10 and y = 20, what is the result of the expression: (x > 15 OR y > 15)?",
+          "options": [
+            "(A) True",
+            "(B) False",
+            "(C) 10",
+            "(D) 20"
+          ],
+          "answer": "A",
+          "explanation": "Since y > 15 is true (20 > 15), the entire OR expression evaluates to True."
+        },
+        {
+          "question": "Consider the following code snippet:\nIF (x > y) {\n   mystery ← x - y\n} ELSE {\n   IF (x < y) {\n      mystery ← y / x\n   } ELSE {\n      mystery ← x + y\n   }\n}\nIf x = 8 and y = 24, what is the value of mystery?",
+          "options": [
+            "(A) -16",
+            "(B) 3",
+            "(C) 32",
+            "(D) 8"
+          ],
+          "answer": "B",
+          "explanation": "x is not > y, so it goes to the ELSE. x < y is true (8 < 24), so mystery becomes 24 / 8 = 3."
+        }
+      ]
+    },
+    {
+      "id": "quiz-3",
+      "title": "Quiz 3",
+      "topics": ["Loops", "Lists"],
+      "questions": [
+        {
+          "question": "A list 'myFruits' contains ['apple', 'banana', 'cherry']. In AP CSP pseudocode, what is the value of myFruits[2]?",
+          "options": [
+            "(A) apple",
+            "(B) banana",
+            "(C) cherry",
+            "(D) undefined"
+          ],
+          "answer": "B",
+          "explanation": "AP CSP pseudocode uses 1-based indexing; index 2 is the second item."
+        },
+        {
+          "question": "Which loop is best for repeating a block of code until a specific condition (like a sensor reading) is met?",
+          "options": [
+            "(A) REPEAT n TIMES",
+            "(B) REPEAT UNTIL (condition)",
+            "(C) FOR EACH item IN list",
+            "(D) REPEAT ALWAYS"
+          ],
+          "answer": "B",
+          "explanation": "REPEAT UNTIL is used when the number of iterations is not known in advance."
+        },
+        {
+          "question": "If a list contains [10, 20, 30] and you execute INSERT(list, 2, 15), what is the new state of the list?",
+          "options": [
+            "(A) [10, 20, 15, 30]",
+            "(B) [10, 15, 20, 30]",
+            "(C) [15, 10, 20, 30]",
+            "(D) [10, 15, 30]"
+          ],
+          "answer": "B",
+          "explanation": "INSERT(list, i, val) places the value at index i and shifts subsequent items to the right."
+        },
+        {
+          "question": "Which of the following robot commands will move a robot forward until it hits a wall?",
+          "options": [
+            "(A) REPEAT 10 TIMES { MOVE_FORWARD() }",
+            "(B) REPEAT UNTIL ( CAN_MOVE (forward) = False ) { MOVE_FORWARD() }",
+            "(C) IF ( CAN_MOVE (forward) ) { MOVE_FORWARD() }",
+            "(D) MOVE_FORWARD() UNTIL (wall)"
+          ],
+          "answer": "B",
+          "explanation": "A REPEAT UNTIL loop checks the condition (cannot move forward) to stop the loop."
+        }
+      ]
+    }
+  ],
+  "unitTest": {
+    "title": "Unit 3 Test",
+    "questions": [
+      {
+        "question": "Which of the following is true about string indexing in AP CSP pseudocode?",
+        "options": [
+          "(A) Indexing starts at 0.",
+          "(B) Indexing starts at 1.",
+          "(C) Negative indexing is allowed to access from the end.",
+          "(D) Strings cannot be indexed."
+        ],
+        "answer": "B",
+        "explanation": "AP CSP pseudocode uses 1-based indexing for both strings and lists."
+      },
+      {
+        "question": "A programmer wants to store the score of a game. Which of the following should they use?",
+        "options": [
+          "(A) A procedure",
+          "(B) A variable",
+          "(C) A loop",
+          "(D) A conditional"
+        ],
+        "answer": "B",
+        "explanation": "Variables are used to store data that can change during program execution."
+      },
+      {
+        "question": "What is the primary difference between a REPEAT n TIMES loop and a REPEAT UNTIL loop?",
+        "options": [
+          "(A) One is faster than the other.",
+          "(B) REPEAT n TIMES runs a fixed number of times; REPEAT UNTIL runs until a condition is met.",
+          "(C) REPEAT n TIMES can only use integers; REPEAT UNTIL can use strings.",
+          "(D) There is no difference."
+        ],
+        "answer": "B",
+        "explanation": "REPEAT n TIMES is for fixed iterations; REPEAT UNTIL is for conditional iterations."
+      }
+    ]
+  }
+}

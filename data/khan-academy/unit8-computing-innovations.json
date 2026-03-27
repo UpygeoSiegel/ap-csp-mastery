@@ -1,0 +1,106 @@
+{
+  "unit": "Unit 8: Computing Innovations",
+  "source": "Khan Academy",
+  "quizzes": [
+    {
+      "id": "quiz-1",
+      "title": "Quiz 1",
+      "topics": ["Communication Innovations", "Collaboration Innovations", "Crowdsourcing"],
+      "questions": [
+        {
+          "question": "Which of the following is a potential 'unintended effect' of a social media innovation designed to connect people?",
+          "options": [
+            "(A) People can share photos with their friends.",
+            "(B) Misinformation can spread rapidly through the network.",
+            "(C) Users can create profiles with their interests.",
+            "(D) The platform can be accessed from a smartphone."
+          ],
+          "answer": "B",
+          "explanation": "Unintended effects are consequences that the developers did not specifically design for, such as the spread of 'fake news'."
+        },
+        {
+          "question": "What is the primary benefit of 'crowdsourcing' for a scientific research project?",
+          "options": [
+            "(A) It ensures that only professional scientists work on the project.",
+            "(B) It allows for the collection or analysis of data on a scale that would be impossible for a small team.",
+            "(C) It makes the research project more expensive.",
+            "(D) It guarantees that all data collected is 100% accurate."
+          ],
+          "answer": "B",
+          "explanation": "Crowdsourcing leverages the power of many people to solve large-scale problems or gather massive amounts of data."
+        },
+        {
+          "question": "Which of the following best describes the 'Digital Divide'?",
+          "options": [
+            "(A) The difference in speed between two different computers.",
+            "(B) The gap between those who have access to high-speed internet and computing devices and those who do not.",
+            "(C) The separation between a computer's hardware and its software.",
+            "(D) The process of dividing a large dataset into smaller pieces for analysis."
+          ],
+          "answer": "B",
+          "explanation": "The digital divide is a major socioeconomic and geographic issue that affects who benefits from technology."
+        },
+        {
+          "question": "Which of these is an example of 'asynchronous' communication?",
+          "options": [
+            "(A) A live video call.",
+            "(B) An email sent today and read tomorrow.",
+            "(C) A face-to-face conversation.",
+            "(D) A real-time online chat."
+          ],
+          "answer": "B",
+          "explanation": "Asynchronous communication happens with a time delay, rather than in real-time."
+        }
+      ]
+    }
+  ],
+  "unitTest": {
+    "title": "Unit 8 Test",
+    "questions": [
+      {
+        "question": "A developer creates a new app that uses GPS to help hikers find each other in the wilderness. Which of the following is a significant privacy concern related to this innovation?",
+        "options": [
+          "(A) The app might use too much battery life.",
+          "(B) The GPS data could be used by unauthorized individuals to track a hiker's exact location.",
+          "(C) The app only works when there is a satellite signal.",
+          "(D) The map might be difficult to read on a small screen."
+        ],
+        "answer": "B",
+        "explanation": "Collecting location data always carries the risk of that data being misused for tracking or stalking."
+      },
+      {
+        "question": "What is 'citizen science'?",
+        "options": [
+          "(A) A law that requires all citizens to study science.",
+          "(B) Scientific research that is funded only by taxes.",
+          "(C) The participation of the general public in scientific research, often through data collection.",
+          "(D) Using computers to simulate scientific experiments."
+        ],
+        "answer": "C",
+        "explanation": "Citizen science is a form of crowdsourcing where non-professionals contribute to scientific discovery."
+      },
+      {
+        "question": "Which of the following is most likely to be a result of 'algorithmic bias' in a computing innovation?",
+        "options": [
+          "(A) The program runs more slowly on older computers.",
+          "(B) A facial recognition system is less accurate for certain ethnic groups because the training data was not diverse.",
+          "(C) The program requires a high-speed internet connection.",
+          "(D) The user interface is only available in one language."
+        ],
+        "answer": "B",
+        "explanation": "Bias in algorithms often stems from unrepresentative training data, leading to unfair outcomes."
+      },
+      {
+        "question": "Which of the following is a benefit of using 'Open Standards' for the Internet?",
+        "options": [
+          "(A) They allow a single company to control the entire network.",
+          "(B) They ensure that devices from different manufacturers can all communicate using the same protocols.",
+          "(C) They make the internet faster for everyone.",
+          "(D) They prevent the use of encryption."
+        ],
+        "answer": "B",
+        "explanation": "Open standards (like HTTP and IP) ensure interoperability across the global network."
+      }
+    ]
+  }
+}

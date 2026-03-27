@@ -1,0 +1,106 @@
+{
+  "unit": "Unit 6: Simulations",
+  "source": "Khan Academy",
+  "quizzes": [
+    {
+      "id": "quiz-1",
+      "title": "Quiz 1",
+      "topics": ["Exploring Simulations", "Simulating Randomness"],
+      "questions": [
+        {
+          "question": "Which of the following best describes a 'simulation' in computer science?",
+          "options": [
+            "(A) A perfect copy of reality.",
+            "(B) A representation of a real-world phenomenon using a computer model.",
+            "(C) A type of computer game designed for entertainment.",
+            "(D) A way to store large amounts of data in a database."
+          ],
+          "answer": "B",
+          "explanation": "Simulations use mathematical models to represent and study real-world systems."
+        },
+        {
+          "question": "What is the primary reason a scientist would choose to use a simulation instead of a real-world experiment?",
+          "options": [
+            "(A) Simulations are always 100% accurate.",
+            "(B) Real-world experiments are always boring.",
+            "(C) The real-world experiment is too dangerous, too expensive, or takes too much time.",
+            "(D) Simulations do not require the use of computer programs."
+          ],
+          "answer": "C",
+          "explanation": "Simulations allow for safe, cost-effective, and rapid testing of hypotheses."
+        },
+        {
+          "question": "In the context of simulations, what does 'abstraction' refer to?",
+          "options": [
+            "(A) Adding as much detail as possible to make the simulation realistic.",
+            "(B) Simplifying a complex system by leaving out unnecessary details to focus on specific variables.",
+            "(C) The process of converting digital data into analog data.",
+            "(D) The speed at which the simulation runs on a computer."
+          ],
+          "answer": "B",
+          "explanation": "Abstraction is necessary to make simulations computationally manageable and focused."
+        },
+        {
+          "question": "A researcher wants to simulate 10,000 coin flips to see the distribution of heads and tails. Which programming structure is most likely used?",
+          "options": [
+            "(A) A single IF statement.",
+            "(B) A REPEAT or FOR loop.",
+            "(C) A list of 10,000 different variables.",
+            "(D) A database query."
+          ],
+          "answer": "B",
+          "explanation": "Loops are used to repeat a process (like a coin flip) many times in a simulation."
+        }
+      ]
+    }
+  ],
+  "unitTest": {
+    "title": "Unit 6 Test",
+    "questions": [
+      {
+        "question": "What is a major limitation of computer simulations?",
+        "options": [
+          "(A) They can only be run once.",
+          "(B) They are based on abstractions and may not account for every single real-world variable.",
+          "(C) They are more expensive than real-world experiments.",
+          "(D) They cannot use random numbers."
+        ],
+        "answer": "B",
+        "explanation": "Because simulations simplify reality, they may miss certain nuances, leading to potential inaccuracies."
+      },
+      {
+        "question": "If a simulation of a fair six-sided die is run 6,000 times, what is the most likely outcome for the number of times the number '4' is rolled?",
+        "options": [
+          "(A) Exactly 1,000 times.",
+          "(B) Approximately 1,000 times.",
+          "(C) 0 times.",
+          "(D) 6,000 times."
+        ],
+        "answer": "B",
+        "explanation": "Probability suggests each side should appear about 1/6 of the time (6,000 / 6 = 1,000)."
+      },
+      {
+        "question": "Which of the following scenarios would be BEST suited for a simulation?",
+        "options": [
+          "(A) Testing the effect of a new medicine on a single patient.",
+          "(B) Predicting the long-term effects of climate change over the next 200 years.",
+          "(C) Sorting a list of 10 names alphabetically.",
+          "(D) Writing a letter to a friend."
+        ],
+        "answer": "B",
+        "explanation": "Simulations are ideal for long-term predictions that cannot be observed in real-time."
+      },
+      {
+        "question": "Why is randomness often used in simulations?",
+        "options": [
+          "(A) To make the simulation more fun to watch.",
+          "(B) To model the uncertainty and chance inherent in real-world events.",
+          "(C) To prevent the computer from crashing.",
+          "(D) To ensure that the simulation always produces the same result."
+        ],
+        "answer": "B",
+        "explanation": "Randomness allows simulations to account for the probabilistic nature of reality."
+      }
+    ]
+  }
+}

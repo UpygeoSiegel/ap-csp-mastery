@@ -1,0 +1,106 @@
+{
+  "unit": "Unit 5: Data Analysis",
+  "source": "Khan Academy",
+  "quizzes": [
+    {
+      "id": "quiz-1",
+      "title": "Quiz 1",
+      "topics": ["Big Data", "Scalability", "Metadata", "Data Cleaning"],
+      "questions": [
+        {
+          "question": "In the context of computer science, what is 'scalability'?",
+          "options": [
+            "(A) The ability to measure the weight of hardware.",
+            "(B) The ability of a system to accommodate larger amounts of data and/or more users as time progresses.",
+            "(C) The process of making a file smaller through compression.",
+            "(D) The speed at which a single computer can process a task."
+          ],
+          "answer": "B",
+          "explanation": "Scalability refers to a system's capacity to handle growth in data or users without failing."
+        },
+        {
+          "question": "What is 'metadata'?",
+          "options": [
+            "(A) The main content of a file (e.g., the text in a document).",
+            "(B) Data about data (e.g., the time a photo was taken).",
+            "(C) A type of computer virus that spreads via email.",
+            "(D) A programming language used for data analysis."
+          ],
+          "answer": "B",
+          "explanation": "Metadata provides additional information about a file, such as its author, size, or creation date."
+        },
+        {
+          "question": "Which of the following is an example of data cleaning?",
+          "options": [
+            "(A) Deleting all files from a hard drive.",
+            "(B) Standardizing date formats in a spreadsheet (e.g., changing all to MM/DD/YYYY).",
+            "(C) Encrypting a database to prevent unauthorized access.",
+            "(D) Moving data from a local computer to the cloud."
+          ],
+          "answer": "B",
+          "explanation": "Data cleaning is the process of removing errors or inconsistencies to improve data quality."
+        },
+        {
+          "question": "What is 'Citizen Science'?",
+          "options": [
+            "(A) A government-run science program.",
+            "(B) Scientific research conducted by professional scientists only.",
+            "(C) Public participation in scientific research (crowdsourcing) to help solve large-scale problems.",
+            "(D) The study of how citizens use technology."
+          ],
+          "answer": "C",
+          "explanation": "Citizen science leverages the power of many people to collect or analyze data that would be impossible for a small team."
+        }
+      ]
+    }
+  ],
+  "unitTest": {
+    "title": "Unit 5 Test",
+    "questions": [
+      {
+        "question": "A researcher has two separate datasets. Dataset A contains the names and zip codes of students. Dataset B contains the names and GPA of students. Which of the following can be determined by combining these datasets?",
+        "options": [
+          "(A) The average GPA for each zip code.",
+          "(B) The total number of students in the country.",
+          "(C) The average age of the students.",
+          "(D) Nothing can be determined because the datasets are separate."
+        ],
+        "answer": "A",
+        "explanation": "By matching students by 'Name' (the common field), the researcher can link zip codes to GPAs."
+      },
+      {
+        "question": "Which type of visualization is most effective for showing the correlation between two numeric variables, such as hours studied and test scores?",
+        "options": [
+          "(A) Bar Chart",
+          "(B) Pie Chart",
+          "(C) Scatterplot",
+          "(D) Line Graph"
+        ],
+        "answer": "C",
+        "explanation": "Scatterplots are used to identify relationships or correlations between two sets of numerical data."
+      },
+      {
+        "question": "What is a potential risk of using biased data to train a machine learning algorithm?",
+        "options": [
+          "(A) The algorithm will run slower.",
+          "(B) The algorithm may produce unfair or inaccurate results for certain groups of people.",
+          "(C) The algorithm will require more storage space.",
+          "(D) There is no risk; algorithms are always objective."
+        ],
+        "answer": "B",
+        "explanation": "Machine learning bias occurs when the training data doesn't represent the real world accurately, leading to discriminatory outcomes."
+      },
+      {
+        "question": "What is 'Open Data'?",
+        "options": [
+          "(A) Data that is only available to government officials.",
+          "(B) Data that is free for anyone to use, reuse, and redistribute.",
+          "(C) Data that is stored in an 'open' (non-encrypted) format.",
+          "(D) Data that is currently being used by a program."
+        ],
+        "answer": "B",
+        "explanation": "Open data promotes transparency and allows for innovation by making datasets publicly available."
+      }
+    ]
+  }
+}

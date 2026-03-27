@@ -1,0 +1,157 @@
+{
+  "unit": "Unit 4: Algorithms",
+  "source": "Khan Academy",
+  "quizzes": [
+    {
+      "id": "quiz-1",
+      "title": "Quiz 1",
+      "topics": ["Building blocks", "Expressing algorithms", "Verifying algorithms"],
+      "questions": [
+        {
+          "question": "Which of the following are the three fundamental building blocks of all algorithms?",
+          "options": [
+            "(A) Input, Output, and Processing",
+            "(B) Sequencing, Selection, and Iteration",
+            "(C) Hardware, Software, and Networks",
+            "(D) Binary, Decimal, and Hexadecimal"
+          ],
+          "answer": "B",
+          "explanation": "Every algorithm is built using sequencing (steps in order), selection (IF/ELSE), and iteration (loops)."
+        },
+        {
+          "question": "A student develops an algorithm to count all the words in an essay. They want to modify it to ONLY count words that are longer than 3 letters. Which structure must be added to the algorithm?",
+          "options": [
+            "(A) Sequencing",
+            "(B) Selection",
+            "(C) Iteration",
+            "(D) Recursion"
+          ],
+          "answer": "B",
+          "explanation": "Selection (an IF statement) is needed to check the length of each word before counting it."
+        },
+        {
+          "question": "A robot is in a grid. Which of the following is an example of an iteration structure?",
+          "options": [
+            "(A) MOVE_FORWARD()",
+            "(B) IF ( CAN_MOVE (forward) ) { MOVE_FORWARD() }",
+            "(C) REPEAT 5 TIMES { MOVE_FORWARD() }",
+            "(D) TURN_LEFT()"
+          ],
+          "answer": "C",
+          "explanation": "Iteration refers to repeating a set of instructions, which is what the REPEAT block does."
+        },
+        {
+          "question": "What happens if a REPEAT UNTIL loop's condition is never met?",
+          "options": [
+            "(A) The program skips the loop.",
+            "(B) The program crashes immediately.",
+            "(C) The program enters an infinite loop.",
+            "(D) The program automatically changes the condition."
+          ],
+          "answer": "C",
+          "explanation": "An infinite loop occurs when the stopping condition of a loop is never satisfied."
+        }
+      ]
+    },
+    {
+      "id": "quiz-2",
+      "title": "Quiz 2",
+      "topics": ["Efficiency", "Heuristics", "Parallel/Distributed Computing"],
+      "questions": [
+        {
+          "question": "Which of the following search algorithms requires the list to be sorted before it can be used?",
+          "options": [
+            "(A) Linear Search",
+            "(B) Binary Search",
+            "(C) Random Search",
+            "(D) Sequential Search"
+          ],
+          "answer": "B",
+          "explanation": "Binary search works by repeatedly dividing the search interval in half, which is only possible if the data is sorted."
+        },
+        {
+          "question": "In the context of computer science, what is a 'heuristic'?",
+          "options": [
+            "(A) A perfect mathematical formula for solving any problem.",
+            "(B) A shortcut or 'rule of thumb' used to find a 'good enough' solution when an exact one takes too long.",
+            "(C) A type of computer virus that copies itself.",
+            "(D) A method for encrypting data."
+          ],
+          "answer": "B",
+          "explanation": "Heuristics are used for computationally hard problems to find an approximate solution in a reasonable amount of time."
+        },
+        {
+          "question": "A program takes 60 seconds to run on a single processor. If the same program is run on 3 processors simultaneously and takes 20 seconds, what is the 'speedup'?",
+          "options": [
+            "(A) 3",
+            "(B) 20",
+            "(C) 40",
+            "(D) 0.33"
+          ],
+          "answer": "A",
+          "explanation": "Speedup is calculated as the sequential time divided by the parallel time: 60 / 20 = 3."
+        },
+        {
+          "question": "Which of the following best describes distributed computing?",
+          "options": [
+            "(A) Using multiple cores on a single CPU to run a program.",
+            "(B) Running a program across multiple separate computers connected by a network.",
+            "(C) Distributing software to users via the cloud.",
+            "(D) Using a single computer to store files for multiple users."
+          ],
+          "answer": "B",
+          "explanation": "Distributed computing involves multiple computers working together to solve a problem or perform a task."
+        }
+      ]
+    }
+  ],
+  "unitTest": {
+    "title": "Unit 4 Test",
+    "questions": [
+      {
+        "question": "An algorithm is developed to find the highest score in a list of 10,000 students. Which type of search would be most efficient if the list is NOT sorted?",
+        "options": [
+          "(A) Linear Search",
+          "(B) Binary Search",
+          "(C) Heuristic Search",
+          "(D) Distributed Search"
+        ],
+        "answer": "A",
+        "explanation": "If a list is not sorted, you must check every item to find the maximum, which is a linear search process."
+      },
+      {
+        "question": "Which of the following is true about parallel computing?",
+        "options": [
+          "(A) It always makes a program run 10 times faster.",
+          "(B) It involves breaking a problem into sub-problems that can be solved at the same time.",
+          "(C) It is only used for internet-based applications.",
+          "(D) It requires the use of at least 100 processors."
+        ],
+        "answer": "B",
+        "explanation": "Parallel computing increases efficiency by executing multiple tasks simultaneously."
+      },
+      {
+        "question": "Which of the following problems would most likely require a heuristic solution?",
+        "options": [
+          "(A) Finding the average of 10 numbers.",
+          "(B) Sorting a list of 50 names alphabetically.",
+          "(C) Finding the shortest possible route that visits 100 different cities (Traveling Salesperson Problem).",
+          "(D) Searching for a specific value in a sorted list."
+        ],
+        "answer": "C",
+        "explanation": "The Traveling Salesperson Problem is computationally 'hard,' meaning an exact solution takes an impractical amount of time for large inputs."
+      },
+      {
+        "question": "A robot is programmed with the following code:\nREPEAT UNTIL ( CAN_MOVE (forward) = False ) {\n   MOVE_FORWARD()\n   IF ( CAN_MOVE (right) ) {\n      TURN_RIGHT()\n   }\n}\nWhat will happen if the robot reaches a corner where it cannot move forward and cannot move right?",
+        "options": [
+          "(A) It will turn right anyway.",
+          "(B) It will stop repeating and exit the loop.",
+          "(C) It will crash into the wall.",
+          "(D) It will spin in a circle."
+        ],
+        "answer": "B",
+        "explanation": "The loop continues as long as it CAN move forward. Once CAN_MOVE(forward) is False, it stops immediately."
+      }
+    ]
+  }
+}

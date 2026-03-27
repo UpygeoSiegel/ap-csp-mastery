@@ -1,0 +1,175 @@
+{
+  "unit": "Unit 7: Online Data Security",
+  "source": "Khan Academy",
+  "quizzes": [
+    {
+      "id": "quiz-1",
+      "title": "Quiz 1",
+      "topics": ["PII", "User History", "Geolocation"],
+      "questions": [
+        {
+          "question": "Which of the following is considered Personally Identifiable Information (PII)?",
+          "options": [
+            "(A) A list of top-selling books on a website.",
+            "(B) A person's full name and social security number.",
+            "(C) The average temperature of a city over a month.",
+            "(D) The operating system version used by a web browser."
+          ],
+          "answer": "B",
+          "explanation": "PII is any data that can be used to identify a specific individual."
+        },
+        {
+          "question": "What is a major privacy risk associated with geolocation data?",
+          "options": [
+            "(A) It makes the internet run slower.",
+            "(B) It allows websites to show local weather.",
+            "(C) It can be used to track a person's physical location and movements over time.",
+            "(D) It prevents users from accessing certain websites."
+          ],
+          "answer": "C",
+          "explanation": "Geolocation data can reveal sensitive information about where a person lives, works, and visits."
+        },
+        {
+          "question": "Which of the following can be used to estimate a user's location?",
+          "options": [
+            "(A) GPS receivers only.",
+            "(B) IP addresses and Wi-Fi networks only.",
+            "(C) GPS, IP addresses, and Wi-Fi networks.",
+            "(D) Only the user's zip code entered manually."
+          ],
+          "answer": "C",
+          "explanation": "Modern devices use a combination of GPS, network signals, and IP addresses to determine location."
+        }
+      ]
+    },
+    {
+      "id": "quiz-2",
+      "title": "Quiz 2",
+      "topics": ["Cyber Attacks", "Phishing", "Rogue Access Points", "Malware"],
+      "questions": [
+        {
+          "question": "What is 'phishing'?",
+          "options": [
+            "(A) A type of computer game.",
+            "(B) Using fraudulent emails or websites to trick users into revealing sensitive information.",
+            "(C) A method for encrypting large files.",
+            "(D) The process of searching for a specific file on a computer."
+          ],
+          "answer": "B",
+          "explanation": "Phishing relies on social engineering to steal credentials or data."
+        },
+        {
+          "question": "Which of the following best describes a 'rogue access point'?",
+          "options": [
+            "(A) A Wi-Fi router that has lost its connection.",
+            "(B) A wireless access point installed on a network without authorization, used to intercept data.",
+            "(C) A high-speed internet connection in a rural area.",
+            "(D) A secure server used for backing up data."
+          ],
+          "answer": "B",
+          "explanation": "Rogue access points can be used for 'Man-in-the-Middle' attacks to steal information from unsuspecting users."
+        },
+        {
+          "question": "What is the primary function of antivirus software?",
+          "options": [
+            "(A) To make the computer run faster.",
+            "(B) To detect and remove malware from a computer system.",
+            "(C) To encrypt all outgoing emails.",
+            "(D) To prevent users from visiting social media sites."
+          ],
+          "answer": "B",
+          "explanation": "Antivirus software scans files and processes for known threats to protect the system."
+        }
+      ]
+    },
+    {
+      "id": "quiz-3",
+      "title": "Quiz 3",
+      "topics": ["Encryption", "Digital Certificates", "Authentication"],
+      "questions": [
+        {
+          "question": "In public key encryption, which key is used to decrypt a message?",
+          "options": [
+            "(A) The sender's public key.",
+            "(B) The receiver's public key.",
+            "(C) The receiver's private key.",
+            "(D) The same key used for encryption."
+          ],
+          "answer": "C",
+          "explanation": "In asymmetric encryption, the public key encrypts, but only the corresponding private key can decrypt."
+        },
+        {
+          "question": "What is the purpose of a digital certificate?",
+          "options": [
+            "(A) To provide a warranty for computer hardware.",
+            "(B) To verify the ownership of a public key and ensure a website is legitimate.",
+            "(C) To encrypt the contents of a hard drive.",
+            "(D) To certify that a programmer has passed an exam."
+          ],
+          "answer": "B",
+          "explanation": "Digital certificates are issued by trusted authorities to validate identities online."
+        },
+        {
+          "question": "What is Multi-Factor Authentication (MFA)?",
+          "options": [
+            "(A) Using a very long password.",
+            "(B) Requiring more than one piece of evidence to verify identity (e.g., password + phone code).",
+            "(C) Having multiple people check a user's ID card.",
+            "(D) Changing a password every 30 days."
+          ],
+          "answer": "B",
+          "explanation": "MFA significantly increases security by requiring different types of credentials."
+        }
+      ]
+    }
+  ],
+  "unitTest": {
+    "title": "Unit 7 Test",
+    "questions": [
+      {
+        "question": "Which of the following is a true statement about symmetric encryption?",
+        "options": [
+          "(A) It uses two different keys for encryption and decryption.",
+          "(B) It uses the same secret key for both encryption and decryption.",
+          "(C) It is more secure than public key encryption for internet use.",
+          "(D) It does not require a key at all."
+        ],
+        "answer": "B",
+        "explanation": "Symmetric encryption is faster but requires both parties to have the same secret key securely."
+      },
+      {
+        "question": "A user receives an email that appears to be from their bank, asking them to click a link and 'verify' their account details. This is likely an example of:",
+        "options": [
+          "(A) A software update notification.",
+          "(B) A phishing attack.",
+          "(C) A distributed denial of service attack.",
+          "(D) A rogue access point."
+        ],
+        "answer": "B",
+        "explanation": "Emails that mimic official entities to steal information are classic phishing attempts."
+      },
+      {
+        "question": "Which of the following best describes 'malware'?",
+        "options": [
+          "(A) Any software that is difficult to use.",
+          "(B) Software designed to gain unauthorized access to or damage a computer system.",
+          "(C) High-quality software used for professional design.",
+          "(D) Software that is available for free online."
+        ],
+        "answer": "B",
+        "explanation": "Malware includes viruses, worms, ransomware, and spyware."
+      },
+      {
+        "question": "Why is it important for a website to use HTTPS instead of HTTP?",
+        "options": [
+          "(A) HTTPS makes the website load much faster.",
+          "(B) HTTPS encrypts the data sent between the browser and the server, protecting it from interception.",
+          "(C) HTTPS allows the website to store more data about the user.",
+          "(D) HTTPS is only required for websites with many images."
+        ],
+        "answer": "B",
+        "explanation": "HTTPS uses SSL/TLS to provide secure, encrypted communication."
+      }
+    ]
+  }
+}

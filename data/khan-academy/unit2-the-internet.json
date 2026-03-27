@@ -1,0 +1,197 @@
+{
+  "unit": "Unit 2: The Internet",
+  "source": "Khan Academy",
+  "quizzes": [
+    {
+      "id": "quiz-1",
+      "title": "Quiz 1",
+      "topics": ["Computer networks", "Bit rate and bandwidth", "Internet addressing protocol (IP)"],
+      "questions": [
+        {
+          "question": "Which of the following best describes a computing device?",
+          "options": [
+            "(A) Only a laptop or desktop computer.",
+            "(B) Any physical artifact that can run a program.",
+            "(C) Only devices that are connected to the Internet.",
+            "(D) A program that runs on a computer."
+          ],
+          "answer": "B",
+          "explanation": "A computing device is any physical object capable of running a program, including routers, smart sensors, and tablets."
+        },
+        {
+          "question": "What is the difference between bandwidth and latency?",
+          "options": [
+            "(A) Bandwidth is speed, and latency is the amount of data.",
+            "(B) Bandwidth is the maximum amount of data that can be sent in a fixed time, while latency is the time it takes for a bit to travel from sender to receiver.",
+            "(C) Bandwidth and latency are different words for the same thing.",
+            "(D) Latency is measured in bits per second, while bandwidth is measured in milliseconds."
+          ],
+          "answer": "B",
+          "explanation": "Bandwidth is the capacity (bits/sec), while latency is the delay (time)."
+        },
+        {
+          "question": "Why was IPv6 created?",
+          "options": [
+            "(A) To make the internet faster.",
+            "(B) Because the 32-bit addresses of IPv4 were running out.",
+            "(C) To replace the DNS system.",
+            "(D) To allow for more secure connections."
+          ],
+          "answer": "B",
+          "explanation": "IPv6 uses 128-bit addresses to provide a much larger pool of addresses than the 32-bit IPv4."
+        },
+        {
+          "question": "How are IP addresses typically structured?",
+          "options": [
+            "(A) Randomly assigned to every device.",
+            "(B) Hierarchically, similar to a physical mailing address.",
+            "(C) Alphabetically based on the device owner's name.",
+            "(D) Chronologically based on when the device first connected."
+          ],
+          "answer": "B",
+          "explanation": "IP addresses are hierarchical (Network -> Subnetwork -> Device) to make routing efficient."
+        }
+      ]
+    },
+    {
+      "id": "quiz-2",
+      "title": "Quiz 2",
+      "topics": ["Internet routing protocol", "Redundancy and fault tolerance", "TCP/UDP", "HTTP/DNS"],
+      "questions": [
+        {
+          "question": "What makes the Internet 'fault-tolerant'?",
+          "options": [
+            "(A) It never makes mistakes in data transmission.",
+            "(B) It has redundancy, meaning there are multiple paths between devices.",
+            "(C) It is owned by a single organization that fixes errors quickly.",
+            "(D) It uses only one highly reliable path for all data."
+          ],
+          "answer": "B",
+          "explanation": "Redundancy ensures that if one path fails, data can take an alternative route."
+        },
+        {
+          "question": "Which protocol is responsible for breaking data into packets and ensuring they all arrive and are reassembled in the correct order?",
+          "options": [
+            "(A) IP",
+            "(B) UDP",
+            "(C) TCP",
+            "(D) HTTP"
+          ],
+          "answer": "C",
+          "explanation": "TCP (Transmission Control Protocol) provides reliable, ordered delivery of packets."
+        },
+        {
+          "question": "When would a developer choose UDP over TCP?",
+          "options": [
+            "(A) When every single bit of data must be accurate (e.g., file transfer).",
+            "(B) When speed is more important than perfect reliability (e.g., live video streaming).",
+            "(C) When the data needs to be encrypted.",
+            "(D) When the device is not connected to a router."
+          ],
+          "answer": "B",
+          "explanation": "UDP is faster because it doesn't check for missing packets, making it ideal for real-time applications."
+        },
+        {
+          "question": "What is the primary function of the Domain Name System (DNS)?",
+          "options": [
+            "(A) To encrypt web pages.",
+            "(B) To translate human-readable domain names into IP addresses.",
+            "(C) To route packets between networks.",
+            "(D) To store the physical files of a website."
+          ],
+          "answer": "B",
+          "explanation": "DNS acts as the 'phone book' of the internet, mapping names like google.com to IPs."
+        }
+      ]
+    },
+    {
+      "id": "quiz-3",
+      "title": "Quiz 3",
+      "topics": ["Scalability", "Protocol layers", "Open standards", "Digital divide"],
+      "questions": [
+        {
+          "question": "What is meant by the 'scalability' of the Internet?",
+          "options": [
+            "(A) The ability to measure the speed of the network.",
+            "(B) The ability to continue functioning and growing as more devices and networks are added.",
+            "(C) The cost of adding new devices to the network.",
+            "(D) The physical size of the routers used."
+          ],
+          "answer": "B",
+          "explanation": "Scalability is the property of the internet that allows it to grow without needing a fundamental redesign."
+        },
+        {
+          "question": "Why are open standards and protocols (like those from the IETF) important for the Internet?",
+          "options": [
+            "(A) They allow anyone to change the internet's core rules whenever they want.",
+            "(B) They ensure that devices from different manufacturers can communicate with each other.",
+            "(C) They make the internet free for everyone.",
+            "(D) They prevent government regulation of the internet."
+          ],
+          "answer": "B",
+          "explanation": "Open protocols ensure interoperability between different hardware and software."
+        },
+        {
+          "question": "Which of the following best describes the 'digital divide'?",
+          "options": [
+            "(A) The difference in speed between download and upload rates.",
+            "(B) The gap between those who have access to the Internet and those who do not.",
+            "(C) The separation between the hardware and software layers of a network.",
+            "(D) The time it takes for a packet to cross the ocean."
+          ],
+          "answer": "B",
+          "explanation": "The digital divide refers to the socioeconomic and geographic inequalities in internet access."
+        }
+      ]
+    }
+  ],
+  "unitTest": {
+    "title": "Unit 2 Test",
+    "questions": [
+      {
+        "question": "A message is broken into several packets. Which of the following is true about how these packets travel across the Internet?",
+        "options": [
+          "(A) All packets must follow the exact same path.",
+          "(B) Packets may take different paths and arrive out of order.",
+          "(C) Packets are sent one by one, and each must be acknowledged before the next is sent.",
+          "(D) Packets are only used for small messages; large messages are sent as a single stream."
+        ],
+        "answer": "B",
+        "explanation": "Packet switching allows for dynamic routing where packets can take the most efficient path available."
+      },
+      {
+        "question": "Which of the following is an example of a higher-level protocol using a lower-level protocol?",
+        "options": [
+          "(A) IP using TCP",
+          "(B) HTTP using TCP",
+          "(C) Ethernet using DNS",
+          "(D) TCP using HTTP"
+        ],
+        "answer": "B",
+        "explanation": "HTTP is an application layer protocol that relies on TCP for reliable transmission."
+      },
+      {
+        "question": "What is the primary difference between the World Wide Web and the Internet?",
+        "options": [
+          "(A) They are exactly the same thing.",
+          "(B) The Internet is a network of networks; the World Wide Web is a system of linked pages/files that use the Internet.",
+          "(C) The World Wide Web is the hardware, and the Internet is the software.",
+          "(D) The Internet is only for email, while the World Wide Web is for browsing."
+        ],
+        "answer": "B",
+        "explanation": "The Internet is the infrastructure; the Web is an application that runs on top of it."
+      },
+      {
+        "question": "A network administrator adds several new routers to a network to ensure that if one fails, there is still a connection. This is an example of:",
+        "options": [
+          "(A) Latency",
+          "(B) Redundancy",
+          "(C) DNS",
+          "(D) IP addressing"
+        ],
+        "answer": "B",
+        "explanation": "Redundancy is the inclusion of extra components so that a system continues to work even if individual components fail."
+      }
+    ]
+  }
+}
