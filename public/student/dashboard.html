@@ -261,23 +261,35 @@
 
     <div id="toast-container" class="toast-container"></div>
 
+    <!-- Firebase Client SDK for persistent auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="../js/auth-helper.js"></script>
+
     <script>
         const apiBase = window.location.origin + '/api';
 
-        // Check if user is logged in
-        const token = localStorage.getItem('authToken');
-        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        // Auth token will be refreshed by AuthHelper
+        let token = localStorage.getItem('authToken');
+        let userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-        if (!token) {
-            window.location.href = '/';
-        }
+        // Check auth and get fresh token
+        AuthHelper.checkAuth({ allowedRoles: ['student'] }).then(({ token: freshToken, userData: freshUserData }) => {
+            token = freshToken;
+            if (freshUserData) {
+                userData = freshUserData;
+                userClasses = userData.classes || [];
+            }
+            document.getElementById('user-name').textContent = userData.displayName || userData.username || 'Student';
+            renderClassSelector();
+            loadProgress();
+        }).catch(() => {
+            // AuthHelper will redirect to login
+        });
 
         // Current selected class
         let currentClassId = null;
-        const userClasses = userData.classes || [];
-
-        // Display user info
-        document.getElementById('user-name').textContent = userData.displayName || userData.username || 'Student';
+        let userClasses = userData.classes || [];
 
         // Render class selector if user has multiple classes
         function renderClassSelector() {
@@ -328,9 +340,7 @@
 
         // Logout handler
         document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userData');
-            window.location.href = '/';
+            AuthHelper.signOut();
         });
 
         // Load Big Ideas and overall progress
@@ -409,9 +419,7 @@
             setTimeout(() => toast.remove(), 4000);
         }
 
-        // Initial load
-        renderClassSelector();
-        loadProgress();
+        // Note: Initial load is handled by AuthHelper.checkAuth callback above
     </script>
 </body>
 </html>

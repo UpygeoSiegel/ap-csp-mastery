@@ -356,14 +356,15 @@
 
     <div id="toast-container" class="toast-container"></div>
 
+    <!-- Firebase Client SDK for persistent auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="../js/auth-helper.js"></script>
+
     <script>
         const apiBase = window.location.origin + '/api';
-        const token = localStorage.getItem('authToken');
-        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-
-        if (!token) {
-            window.location.href = '/';
-        }
+        let token = localStorage.getItem('authToken');
+        let userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
         // Get bigIdeaId and classId from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -374,12 +375,18 @@
             window.location.href = '/student/dashboard.html';
         }
 
-        document.getElementById('user-name').textContent = userData.displayName || userData.username || 'Student';
+        // Check auth and get fresh token
+        AuthHelper.checkAuth({ allowedRoles: ['student'] }).then(({ token: freshToken, userData: freshUserData }) => {
+            token = freshToken;
+            if (freshUserData) userData = freshUserData;
+            document.getElementById('user-name').textContent = userData.displayName || userData.username || 'Student';
+            loadBigIdea();
+        }).catch(() => {
+            // AuthHelper will redirect to login
+        });
 
         document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userData');
-            window.location.href = '/';
+            AuthHelper.signOut();
         });
 
         async function loadBigIdea() {
@@ -663,7 +670,7 @@
             return html;
         }
 
-        loadBigIdea();
+        // Note: Initial load is handled by AuthHelper.checkAuth callback above
     </script>
 </body>
 </html>

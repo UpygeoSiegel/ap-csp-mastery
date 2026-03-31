@@ -152,20 +152,7 @@
     <!-- Firebase Client SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDjfe2zgokw6CAkmdSM7TeLH0VBYYBRhQs", // You need to add your Firebase API key
-            authDomain: "ap-csp-mastery.firebaseapp.com",
-            projectId: "ap-csp-mastery"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        window.firebaseAuth = firebase.auth();
-    </script>
-
+    <script src="js/auth-helper.js"></script>
     <script src="js/auth.js"></script>
 </body>
 </html>

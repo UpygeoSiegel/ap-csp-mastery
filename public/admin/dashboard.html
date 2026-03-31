@@ -507,14 +507,15 @@
             </div>
         </div>
     </div>
+    <!-- Firebase Client SDK for persistent auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="../js/auth-helper.js"></script>
+
     <script>
     const apiBase = window.location.origin + '/api';
-    const token = localStorage.getItem('authToken');
-    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-
-    if (!token || userData.role !== 'admin') {
-        window.location.href = '/admin/login.html';
-    }
+    let token = localStorage.getItem('authToken');
+    let userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
     // State
     let bigIdeas = [];
@@ -522,14 +523,20 @@
     let currentQuestions = [];
     let expandedBigIdeas = {};
 
-    // Display user name
-    document.getElementById('user-name').textContent = userData.displayName || 'Admin';
+    // Check auth and get fresh token
+    AuthHelper.checkAuth({ allowedRoles: ['admin'] }).then(({ token: freshToken, userData: freshUserData }) => {
+        token = freshToken;
+        if (freshUserData) userData = freshUserData;
+        document.getElementById('user-name').textContent = userData.displayName || 'Admin';
+        loadSidebar();
+    }).catch(() => {
+        // Redirect to admin login
+        window.location.href = '/admin/login.html';
+    });
 
     // Logout handler
     document.getElementById('logout-btn').addEventListener('click', () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userData');
-        window.location.href = '/';
+        AuthHelper.signOut();
     });
 
     // Load big ideas and topics
@@ -1035,8 +1042,7 @@
         }
     });
 
-    // Initial load
-    loadSidebar();
+    // Note: Initial load is handled by AuthHelper.checkAuth callback above
     </script>
 </body>
 

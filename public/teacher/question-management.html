@@ -561,6 +561,10 @@
         </div>
     </div>
 
+    <!-- Firebase Client SDK for persistent auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="../js/auth-helper.js"></script>
     <script src="../js/auth.js"></script>
     <script>
         let currentTopic = null;
@@ -571,22 +575,8 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                // Check authentication
-                let token = localStorage.getItem('authToken');
-                let userData = JSON.parse(localStorage.getItem('userData') || '{}');
-                
-                // For development: use test token if no token exists
-                if (!token && window.location.hostname === 'localhost') {
-                    token = 'test-token';
-                    localStorage.setItem('authToken', token);
-                    userData = { displayName: 'Teacher', email: 'teacher@test.com' };
-                    localStorage.setItem('userData', JSON.stringify(userData));
-                }
-                
-                if (!token) {
-                    window.location.href = '/';
-                    return;
-                }
+                // Check auth and get fresh token
+                const { token, userData } = await AuthHelper.checkAuth({ allowedRoles: ['teacher', 'admin'] });
 
                 // Display user info
                 const userNameEl = document.getElementById('user-name');
@@ -598,17 +588,15 @@
                 const logoutBtn = document.getElementById('logout-btn');
                 if (logoutBtn) {
                     logoutBtn.addEventListener('click', () => {
-                        localStorage.removeItem('authToken');
-                        localStorage.removeItem('userData');
-                        window.location.href = '/';
+                        AuthHelper.signOut();
                     });
                 }
-                
+
                 await loadTopics();
                 initializeForm();
             } catch (error) {
                 console.error('Error initializing page:', error);
-                showError('Failed to load page. Please refresh and try again.');
+                // AuthHelper will redirect to login if auth fails
             }
         });
 

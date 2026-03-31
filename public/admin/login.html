@@ -135,26 +135,18 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="../js/auth-helper.js"></script>
 
     <script>
         const apiBase = window.location.origin + '/api';
+        const auth = firebase.auth();
 
         // Check if already logged in as admin
-        const token = localStorage.getItem('authToken');
-        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-        if (token && userData.role === 'admin') {
+        AuthHelper.checkAuth({ requireAuth: false, allowedRoles: ['admin'] }).then(() => {
             window.location.href = '/admin/dashboard.html';
-        }
-
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDjfe2zgokw6CAkmdSM7TeLH0VBYYBRhQs",
-            authDomain: "ap-csp-mastery.firebaseapp.com",
-            projectId: "ap-csp-mastery"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+        }).catch(() => {
+            // Not logged in as admin, show login form
+        });
 
         function showError(message) {
             const errorEl = document.getElementById('error-message');
