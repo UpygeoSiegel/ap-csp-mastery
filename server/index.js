@@ -59,7 +59,7 @@ app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    service: 'APproval API'
+    service: 'AP Mastery API'
   });
 });
 
@@ -78,7 +78,7 @@ app.use('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`APproval server running on port ${PORT}`);
+  console.log(`AP Mastery server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Access the application at: http://localhost:${PORT}`);
 });

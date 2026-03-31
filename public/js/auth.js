@@ -1,7 +1,7 @@
-// Authentication JavaScript for APproval
+// Authentication JavaScript for AP Mastery
 // This file handles the frontend authentication logic
 
-class APproval {
+class APMastery {
     constructor() {
         this.apiBase = window.location.origin + '/api';
         this.initializeEventListeners();
@@ -367,10 +367,10 @@ class APproval {
 
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.approval = new APproval();
+    window.apMastery = new APMastery();
 });
 
 // Export for module use (if needed)
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = APproval;
+    module.exports = APMastery;
 }
