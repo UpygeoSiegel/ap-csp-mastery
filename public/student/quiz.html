@@ -464,7 +464,8 @@
             const div = document.createElement('div');
             div.textContent = text;
             let escaped = div.innerHTML;
-            const codeBlockRegex = /```(?:[a-z]*\n)?([\s\S]*?)```/g;
+            // Support both ``` and ''' as indicators for code blocks
+            const codeBlockRegex = /(?:```|''')(?:[a-z]*\n)?([\s\S]*?)(?:```|''')/g;
             return escaped.replace(codeBlockRegex, (match, code) => `<div class="pseudocode-block">${code.trim()}</div>`);
         }
 

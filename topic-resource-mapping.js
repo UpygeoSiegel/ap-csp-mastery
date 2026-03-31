@@ -1,22 +1,17 @@
 const { db } = require('./server/firebase');
 
 // Mapping of AP CSP topics to Khan Academy resources and general study materials
+// All URLs verified as of 2026 - pointing to actual Khan Academy AP CSP content
 const topicResourceMapping = {
   // Big Idea 1: Creative Development
   '1.1': { // Collaboration
     topicName: 'Collaboration',
     khanAcademyResources: [
       {
-        title: 'Collaborative Programming',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-environment/a/collaborative-programming',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'Learn about pair programming and collaborative development practices'
-      },
-      {
-        title: 'Version Control Basics',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-environment/a/version-control',
-        type: 'article',
-        description: 'Understanding version control systems for collaborative work'
+        description: 'Review key AP CSP vocabulary including collaboration concepts'
       }
     ],
     additionalResources: [
@@ -28,21 +23,21 @@ const topicResourceMapping = {
       }
     ]
   },
-  
-  '1.2': { // Program Function and Purpose  
+
+  '1.2': { // Program Function and Purpose
     topicName: 'Program Function and Purpose',
     khanAcademyResources: [
       {
-        title: 'Planning a Program',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-environment/a/planning-a-program',
-        type: 'article',
-        description: 'How to plan and design programs with clear purpose'
+        title: 'Programming | AP CSP',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101',
+        type: 'unit',
+        description: 'Main programming unit covering program design and purpose'
       },
       {
-        title: 'Program Documentation',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-environment/a/program-documentation',
-        type: 'article', 
-        description: 'Best practices for documenting program functionality'
+        title: 'Programming Basics',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/what-is-programming/e/programming-basics',
+        type: 'exercise',
+        description: 'Practice basic programming concepts including DISPLAY() and pseudocode'
       }
     ],
     additionalResources: []
@@ -52,16 +47,16 @@ const topicResourceMapping = {
     topicName: 'Program Design and Development',
     khanAcademyResources: [
       {
-        title: 'Program Development Process',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-environment/a/program-development-process',
+        title: 'AP CSP Exam Pseudocode Reference',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/learn-ap-csp-exam-pseudocode/a/ap-csp-exam-pseudocode-reference',
         type: 'article',
-        description: 'Learn the iterative program development process'
+        description: 'Learn the pseudocode used in AP CSP exam questions'
       },
       {
-        title: 'Top-down Design',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-environment/a/top-down-design',
-        type: 'article',
-        description: 'Breaking down complex problems into manageable parts'
+        title: 'Building Algorithms',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/building-algorithms/e/expressing-an-algorithm',
+        type: 'exercise',
+        description: 'Practice expressing algorithms in different forms'
       }
     ],
     additionalResources: []
@@ -71,61 +66,103 @@ const topicResourceMapping = {
     topicName: 'Identifying and Correcting Errors',
     khanAcademyResources: [
       {
-        title: 'Debugging Strategies',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-environment/a/debugging-strategies',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'Systematic approaches to finding and fixing bugs'
-      },
-      {
-        title: 'Types of Errors',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-environment/a/types-of-errors',
-        type: 'article',
-        description: 'Understanding syntax, runtime, and logic errors'
+        description: 'Review key vocabulary including error types: syntax, runtime, and logic errors'
       }
     ],
     additionalResources: []
   },
 
-  // Big Idea 2: Data  
+  // Big Idea 2: Data
   '2.1': { // Binary Numbers
     topicName: 'Binary Numbers',
     khanAcademyResources: [
       {
-        title: 'Intro to Number Bases',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:number-bases/a/number-bases-introduction',
-        type: 'article',
-        description: 'Understanding binary and other number systems'
+        title: 'Digital Information Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information',
+        type: 'unit',
+        description: 'Comprehensive unit covering digital information concepts'
       },
       {
-        title: 'Binary to Decimal Conversion',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:number-bases/a/binary-decimal-conversions',
+        title: 'Binary Numbers',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:binary-numbers/a/bits-and-binary',
+        type: 'article',
+        description: 'Understanding bits and binary number systems'
+      },
+      {
+        title: 'Bits (Binary Digits)',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:bits-and-bytes/a/bits-binary-digits',
+        type: 'article',
+        description: 'Learn about bits as the fundamental unit of digital information'
+      },
+      {
+        title: 'Bytes',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:bits-and-bytes/a/byte-sized-bits',
+        type: 'article',
+        description: 'Understanding bytes and data size'
+      },
+      {
+        title: 'How Do Computers Represent Data?',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:bits-and-bytes/a/digital-data-introduction',
+        type: 'article',
+        description: 'Introduction to digital data representation'
+      },
+      {
+        title: 'Binary Numbers Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:binary-numbers/e/bits-and-binary-exercise',
         type: 'exercise',
-        description: 'Practice converting between binary and decimal'
+        description: 'Practice converting and working with binary numbers'
       },
       {
-        title: 'Hexadecimal Number System',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:number-bases/a/hexadecimal-number-system',
-        type: 'article',
-        description: 'Learn about hexadecimal representation'
+        title: 'Converting Decimal to Binary (Video)',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:binary-numbers/v/converting-decimal-numbers-to-binary',
+        type: 'video',
+        description: 'Video tutorial on decimal to binary conversion'
       }
     ],
     additionalResources: []
   },
 
   '2.2': { // Data Compression
-    topicName: 'Data Compression',  
+    topicName: 'Data Compression',
     khanAcademyResources: [
       {
-        title: 'Lossless Data Compression',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:data-compression/a/lossless-data-compression',
+        title: 'Lossy Compression',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:data-compression/a/lossy-compression',
         type: 'article',
-        description: 'Understanding lossless compression techniques'
+        description: 'Understanding lossy compression techniques and trade-offs'
       },
       {
-        title: 'Lossy Data Compression', 
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:data-compression/a/lossy-data-compression',
+        title: 'The Need for Compression',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:lossless-data-compression/a/file-compression-introduction',
         type: 'article',
-        description: 'Learn about lossy compression and trade-offs'
+        description: 'Introduction to why data compression is necessary'
+      },
+      {
+        title: 'Lossless Text Compression',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/a/text-compression',
+        type: 'article',
+        description: 'Learn about lossless text compression techniques'
+      },
+      {
+        title: 'Lossless Image Compression',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/a/simple-image-compression',
+        type: 'article',
+        description: 'Learn about lossless image compression'
+      },
+      {
+        title: 'Lossy vs Lossless Compression Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:data-compression/e/lossy-vs-lossless-compression',
+        type: 'exercise',
+        description: 'Practice comparing lossy and lossless compression'
+      },
+      {
+        title: 'Lossless File Compression Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:lossless-data-compression/e/lossless-file-compression',
+        type: 'exercise',
+        description: 'Practice with lossless compression concepts'
       }
     ],
     additionalResources: []
@@ -135,16 +172,16 @@ const topicResourceMapping = {
     topicName: 'Extracting Information from Data',
     khanAcademyResources: [
       {
-        title: 'Data Visualization',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:data-analysis/a/data-visualization',
-        type: 'article',
-        description: 'Creating meaningful visualizations from data'
+        title: 'Data Analysis & Big Data Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/data-analysis-101',
+        type: 'unit',
+        description: 'Comprehensive unit on data analysis and big data'
       },
       {
-        title: 'Filtering and Cleaning Data',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:data-analysis/a/filtering-cleaning-data',
-        type: 'article', 
-        description: 'Preparing data for analysis'
+        title: 'The Power of Big Data',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/data-analysis-101/big-data/a/the-power-of-big-data',
+        type: 'article',
+        description: 'Understanding big data and its applications'
       }
     ],
     additionalResources: []
@@ -154,10 +191,16 @@ const topicResourceMapping = {
     topicName: 'Using Programs with Data',
     khanAcademyResources: [
       {
-        title: 'Processing Data with Programs',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:data-analysis/a/processing-data-programs',
-        type: 'article',
-        description: 'Using programming to process and analyze data'
+        title: 'Data Analysis & Big Data',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/data-analysis-101',
+        type: 'unit',
+        description: 'Using programs to process and analyze data'
+      },
+      {
+        title: 'Storing Text in Binary',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:digital-information/x2d2f703b37b450a3:storing-text-in-binary/e/storing-other-data-in-binary',
+        type: 'exercise',
+        description: 'Practice storing different types of data in binary'
       }
     ],
     additionalResources: []
@@ -168,16 +211,16 @@ const topicResourceMapping = {
     topicName: 'Variables and Assignments',
     khanAcademyResources: [
       {
-        title: 'Variables and Expressions',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-variables/a/variables-expressions',
-        type: 'article',
-        description: 'Understanding variables and how to use them'
+        title: 'Programming Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101',
+        type: 'unit',
+        description: 'Main programming unit with coverage of variables'
       },
       {
-        title: 'Variable Practice',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-variables/e/variables-practice',
-        type: 'exercise',
-        description: 'Practice working with variables'
+        title: 'Programming Mathematical Expressions',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/numbers-and-math/a/programming-mathematical-expressions',
+        type: 'article',
+        description: 'Working with variables and mathematical expressions'
       }
     ],
     additionalResources: []
@@ -187,16 +230,10 @@ const topicResourceMapping = {
     topicName: 'Data Abstraction',
     khanAcademyResources: [
       {
-        title: 'Introduction to Lists',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-lists/a/intro-to-lists',
-        type: 'article',
-        description: 'Understanding data abstraction with lists'
-      },
-      {
-        title: 'Working with Lists',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-lists/a/working-with-lists',
-        type: 'article',
-        description: 'Operations and methods for list manipulation'
+        title: 'Programming Lists',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/lists/e/storing-and-updating-lists',
+        type: 'exercise',
+        description: 'Practice working with lists and data abstraction'
       }
     ],
     additionalResources: []
@@ -206,16 +243,16 @@ const topicResourceMapping = {
     topicName: 'Mathematical Expressions',
     khanAcademyResources: [
       {
-        title: 'Arithmetic Operations',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-expressions/a/arithmetic-operations',
+        title: 'Programming Mathematical Expressions',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/numbers-and-math/a/programming-mathematical-expressions',
         type: 'article',
         description: 'Using mathematical operations in programming'
       },
       {
-        title: 'Order of Operations',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-expressions/a/order-of-operations',
+        title: 'Math Procedures and Constants',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/numbers-and-math/a/mathematical-procedures-and-constants',
         type: 'article',
-        description: 'Understanding operator precedence'
+        description: 'Using math procedures and constants in programs'
       }
     ],
     additionalResources: []
@@ -225,16 +262,16 @@ const topicResourceMapping = {
     topicName: 'Strings',
     khanAcademyResources: [
       {
-        title: 'Working with Strings',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-strings/a/working-with-strings',
-        type: 'article',
-        description: 'String operations and manipulation'
+        title: 'Programming Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101',
+        type: 'unit',
+        description: 'Main programming unit covering string operations'
       },
       {
-        title: 'String Methods',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-strings/a/string-methods',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'Common string methods and functions'
+        description: 'Review key vocabulary including string concepts'
       }
     ],
     additionalResources: []
@@ -244,16 +281,10 @@ const topicResourceMapping = {
     topicName: 'Boolean Expressions',
     khanAcademyResources: [
       {
-        title: 'Boolean Logic',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-logic/a/boolean-logic',
-        type: 'article',
-        description: 'Understanding boolean values and logical operators'
-      },
-      {
-        title: 'Logical Operators',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-logic/a/logical-operators',
-        type: 'article',
-        description: 'AND, OR, and NOT operations'
+        title: 'Conditionals with if, else, and Booleans',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/boolean-logic/e/conditionals-with-if--else--and-booleans',
+        type: 'exercise',
+        description: 'Practice boolean logic and conditional statements'
       }
     ],
     additionalResources: []
@@ -263,16 +294,10 @@ const topicResourceMapping = {
     topicName: 'Conditionals',
     khanAcademyResources: [
       {
-        title: 'Conditional Statements',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-conditionals/a/conditional-statements',
-        type: 'article',
-        description: 'If-else statements and conditional logic'
-      },
-      {
-        title: 'Conditional Practice',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-conditionals/e/conditional-practice',
+        title: 'Conditionals with if, else, and Booleans',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/boolean-logic/e/conditionals-with-if--else--and-booleans',
         type: 'exercise',
-        description: 'Practice with conditional statements'
+        description: 'Practice if-else statements and conditional logic'
       }
     ],
     additionalResources: []
@@ -282,16 +307,10 @@ const topicResourceMapping = {
     topicName: 'Nested Conditionals',
     khanAcademyResources: [
       {
-        title: 'Nested Conditionals',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-conditionals/a/nested-conditionals',
-        type: 'article',
-        description: 'Complex conditional structures'
-      },
-      {
-        title: 'Else-if Statements',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-conditionals/a/else-if-statements',
-        type: 'article',
-        description: 'Chaining conditional statements'
+        title: 'Conditionals with if, else, and Booleans',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/boolean-logic/e/conditionals-with-if--else--and-booleans',
+        type: 'exercise',
+        description: 'Practice nested conditional statements'
       }
     ],
     additionalResources: []
@@ -301,22 +320,22 @@ const topicResourceMapping = {
     topicName: 'Iteration',
     khanAcademyResources: [
       {
-        title: 'Intro to Loops',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-loops/a/intro-to-loops',
+        title: 'Repetition in Programming',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/repetition-with-loops/a/repetition-with-for-loops',
         type: 'article',
-        description: 'Understanding loops and repetition'
+        description: 'Understanding for loops and repetition'
       },
       {
-        title: 'For Loops',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-loops/a/for-loops',
+        title: 'Conditional Repetition in Programs',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/repetition-with-loops/a/conditional-repetition-of-instructions',
         type: 'article',
-        description: 'Using for loops for iteration'
+        description: 'Using while loops and conditional repetition'
       },
       {
-        title: 'While Loops',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-loops/a/while-loops',
-        type: 'article',
-        description: 'Understanding while loops and their uses'
+        title: 'Conditional Repetition Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/repetition-with-loops/e/conditional-repetition-of-instructions',
+        type: 'exercise',
+        description: 'Practice with loops and iteration'
       }
     ],
     additionalResources: []
@@ -326,16 +345,16 @@ const topicResourceMapping = {
     topicName: 'Developing Algorithms',
     khanAcademyResources: [
       {
-        title: 'Intro to Algorithms',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/intro-to-algorithms/a/what-is-an-algorithm',
-        type: 'article',
-        description: 'Understanding what algorithms are and how to design them'
+        title: 'Algorithms Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101',
+        type: 'unit',
+        description: 'Comprehensive unit on algorithms and algorithm design'
       },
       {
-        title: 'Algorithm Design Strategies',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/intro-to-algorithms/a/algorithm-design-strategies',
-        type: 'article',
-        description: 'Approaches to designing effective algorithms'
+        title: 'Expressing an Algorithm',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/building-algorithms/e/expressing-an-algorithm',
+        type: 'exercise',
+        description: 'Practice expressing and designing algorithms'
       }
     ],
     additionalResources: []
@@ -345,22 +364,10 @@ const topicResourceMapping = {
     topicName: 'Lists',
     khanAcademyResources: [
       {
-        title: 'Introduction to Lists',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-lists/a/intro-to-lists',
-        type: 'article',
-        description: 'Working with lists and arrays'
-      },
-      {
-        title: 'List Operations',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-lists/a/list-operations',
-        type: 'article',
-        description: 'Adding, removing, and modifying list elements'
-      },
-      {
-        title: 'Iterating Through Lists',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-lists/a/iterating-through-lists',
-        type: 'article',
-        description: 'Using loops to process list data'
+        title: 'Programming Lists',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/lists/e/storing-and-updating-lists',
+        type: 'exercise',
+        description: 'Practice storing and updating lists'
       }
     ],
     additionalResources: []
@@ -370,16 +377,16 @@ const topicResourceMapping = {
     topicName: 'Binary Search',
     khanAcademyResources: [
       {
-        title: 'Binary Search Algorithm',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/searching-algorithms/a/binary-search',
-        type: 'article',
-        description: 'Understanding the binary search algorithm'
+        title: 'Algorithms Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101',
+        type: 'unit',
+        description: 'Algorithms unit including searching algorithms'
       },
       {
-        title: 'Linear vs Binary Search',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/searching-algorithms/a/linear-vs-binary-search',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'Comparing search algorithm efficiency'
+        description: 'Review key vocabulary including binary search concepts'
       }
     ],
     additionalResources: []
@@ -389,16 +396,16 @@ const topicResourceMapping = {
     topicName: 'Calling Procedures',
     khanAcademyResources: [
       {
-        title: 'Functions and Procedures',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-functions/a/functions-procedures',
-        type: 'article',
-        description: 'Understanding and using functions'
+        title: 'Programming Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101',
+        type: 'unit',
+        description: 'Main programming unit covering procedures and functions'
       },
       {
-        title: 'Function Parameters',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-functions/a/function-parameters',
+        title: 'Math Procedures and Constants',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/numbers-and-math/a/mathematical-procedures-and-constants',
         type: 'article',
-        description: 'Passing data to functions'
+        description: 'Using built-in math procedures'
       }
     ],
     additionalResources: []
@@ -408,16 +415,16 @@ const topicResourceMapping = {
     topicName: 'Developing Procedures',
     khanAcademyResources: [
       {
-        title: 'Writing Your Own Functions',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-functions/a/writing-functions',
-        type: 'article',
-        description: 'Creating custom functions and procedures'
+        title: 'Programming Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101',
+        type: 'unit',
+        description: 'Programming unit covering procedure development'
       },
       {
-        title: 'Function Return Values',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-functions/a/function-return-values',
+        title: 'AP CSP Exam Pseudocode Reference',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/learn-ap-csp-exam-pseudocode/a/ap-csp-exam-pseudocode-reference',
         type: 'article',
-        description: 'Understanding function outputs'
+        description: 'Reference for procedure syntax in AP CSP pseudocode'
       }
     ],
     additionalResources: []
@@ -427,16 +434,10 @@ const topicResourceMapping = {
     topicName: 'Libraries',
     khanAcademyResources: [
       {
-        title: 'Using Libraries',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-libraries/a/using-libraries',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'Importing and using external libraries'
-      },
-      {
-        title: 'API Documentation',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-libraries/a/api-documentation',
-        type: 'article',
-        description: 'Reading and understanding API documentation'
+        description: 'Review key vocabulary including library concepts'
       }
     ],
     additionalResources: []
@@ -446,16 +447,16 @@ const topicResourceMapping = {
     topicName: 'Random Values',
     khanAcademyResources: [
       {
-        title: 'Generating Random Numbers',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-random/a/generating-random-numbers',
-        type: 'article',
-        description: 'Using randomness in programs'
+        title: 'Simulations Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:simulations',
+        type: 'unit',
+        description: 'Simulations unit covering random values and their applications'
       },
       {
-        title: 'Random Selection',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/programming-101/programming-random/a/random-selection',
+        title: 'Programming a Simple Simulation',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:simulations/x2d2f703b37b450a3:creating-simulations/a/programming-simple-simulations',
         type: 'article',
-        description: 'Selecting random elements from lists'
+        description: 'Using random values in simulations'
       }
     ],
     additionalResources: []
@@ -465,16 +466,34 @@ const topicResourceMapping = {
     topicName: 'Simulations',
     khanAcademyResources: [
       {
-        title: 'Intro to Simulations',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/simulations/a/intro-to-simulations',
-        type: 'article',
-        description: 'Understanding computer simulations'
+        title: 'Simulations Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:simulations',
+        type: 'unit',
+        description: 'Comprehensive unit on computer simulations'
       },
       {
-        title: 'Building a Simple Simulation',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/simulations/a/building-simple-simulation',
+        title: "What's a Simulation?",
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:simulations/x2d2f703b37b450a3:exploring-simulations/a/whats-a-simulation',
         type: 'article',
-        description: 'Creating basic simulation models'
+        description: 'Introduction to computer simulations'
+      },
+      {
+        title: 'Simulations in Physics',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:simulations/x2d2f703b37b450a3:exploring-simulations/a/physics-simulations',
+        type: 'article',
+        description: 'Using simulations to model physical systems'
+      },
+      {
+        title: 'Programming a Simple Simulation',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:simulations/x2d2f703b37b450a3:creating-simulations/a/programming-simple-simulations',
+        type: 'article',
+        description: 'Creating basic simulation programs'
+      },
+      {
+        title: 'Simulations Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:simulations/x2d2f703b37b450a3:exploring-simulations/e/simulations-101',
+        type: 'exercise',
+        description: 'Practice with simulation concepts'
       }
     ],
     additionalResources: []
@@ -484,16 +503,28 @@ const topicResourceMapping = {
     topicName: 'Algorithmic Efficiency',
     khanAcademyResources: [
       {
-        title: 'Intro to Efficiency Analysis',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/algorithmic-efficiency/a/efficiency-analysis-intro',
+        title: "Measuring an Algorithm's Efficiency",
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/evaluating-algorithms/a/measuring-an-algorithms-efficiency',
         type: 'article',
-        description: 'Understanding algorithm performance'
+        description: 'Understanding how to measure algorithm performance'
       },
       {
-        title: 'Big-O Notation',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/algorithmic-efficiency/a/big-o-notation',
+        title: "Categorizing an Algorithm's Efficiency",
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/evaluating-algorithms/a/comparing-run-time-efficiency',
         type: 'article',
-        description: 'Measuring algorithm complexity'
+        description: 'Comparing run-time efficiency of algorithms'
+      },
+      {
+        title: 'Measuring Algorithm Efficiency Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/evaluating-algorithms/e/measuring-algorithm-efficiency',
+        type: 'exercise',
+        description: 'Practice measuring algorithm efficiency'
+      },
+      {
+        title: 'Comparing Efficiencies Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/evaluating-algorithms/e/comparing-run-time-efficiencies',
+        type: 'exercise',
+        description: 'Practice comparing algorithm efficiencies'
       }
     ],
     additionalResources: []
@@ -503,16 +534,16 @@ const topicResourceMapping = {
     topicName: 'Undecidable Problems',
     khanAcademyResources: [
       {
-        title: 'Decidable and Undecidable Problems',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/decidable-undecidable/a/decidable-undecidable-problems',
-        type: 'article',
-        description: 'Understanding computational limits'
+        title: 'Algorithms Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101',
+        type: 'unit',
+        description: 'Algorithms unit covering computational limits'
       },
       {
-        title: 'The Halting Problem',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/decidable-undecidable/a/halting-problem',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'A classic undecidable problem'
+        description: 'Review key vocabulary including undecidable problems'
       }
     ],
     additionalResources: []
@@ -523,22 +554,34 @@ const topicResourceMapping = {
     topicName: 'The Internet',
     khanAcademyResources: [
       {
-        title: 'What is the Internet?',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/intro-to-internet/a/what-is-the-internet',
-        type: 'article',
-        description: 'Understanding the structure of the Internet'
+        title: 'The Internet Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet',
+        type: 'unit',
+        description: 'Comprehensive unit on how the Internet works'
       },
       {
-        title: 'Internet Protocols',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/internet-protocols/a/internet-protocols-intro',
+        title: 'The Internet Protocol Suite',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/x2d2f703b37b450a3:the-internet-protocol-suite/a/the-internet-protocols',
         type: 'article',
-        description: 'TCP/IP and other Internet protocols'
+        description: 'Overview of Internet protocols (TCP/IP)'
+      },
+      {
+        title: 'IP Packets',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/x2d2f703b37b450a3:routing-with-redundancy/a/ip-packets',
+        type: 'article',
+        description: 'Understanding IP packets and data transmission'
+      },
+      {
+        title: 'IP Addresses',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/x2d2f703b37b450a3:addressing-the-internet/a/ip-v4-v6-addresses',
+        type: 'article',
+        description: 'Understanding IPv4 and IPv6 addresses'
       },
       {
         title: 'Domain Name System (DNS)',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/internet-protocols/a/domain-name-system-dns',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/x2d2f703b37b450a3:web-protocols/a/domain-name-system-dns-protocol',
         type: 'article',
-        description: 'How domain names work'
+        description: 'How domain names are resolved to IP addresses'
       }
     ],
     additionalResources: []
@@ -548,16 +591,22 @@ const topicResourceMapping = {
     topicName: 'Fault Tolerance',
     khanAcademyResources: [
       {
-        title: 'Internet Redundancy and Fault Tolerance',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/internet-works/a/internet-redundancy-fault-tolerance',
+        title: 'Internet Routing Protocol',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/x2d2f703b37b450a3:routing-with-redundancy/a/internet-routing',
         type: 'article',
-        description: 'How the Internet handles failures'
+        description: 'How the Internet routes data with redundancy'
       },
       {
-        title: 'Routing and Redundancy',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/internet-works/a/routing-redundancy',
+        title: 'Internet Routing Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/x2d2f703b37b450a3:routing-with-redundancy/e/internet-packets-and-routing-protocol',
+        type: 'exercise',
+        description: 'Practice with Internet routing and fault tolerance'
+      },
+      {
+        title: 'Transmission Control Protocol (TCP)',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/tcp-fault-tolerant-transmission-protocol/a/transmission-control-protocol-tcp',
         type: 'article',
-        description: 'Multiple paths for data transmission'
+        description: 'How TCP provides reliable data transmission'
       }
     ],
     additionalResources: []
@@ -567,16 +616,16 @@ const topicResourceMapping = {
     topicName: 'Parallel and Distributed Computing',
     khanAcademyResources: [
       {
-        title: 'Intro to Parallel Computing',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/parallel-computing/a/intro-to-parallel-computing',
-        type: 'article',
-        description: 'Understanding parallel processing'
+        title: 'Algorithms Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101',
+        type: 'unit',
+        description: 'Algorithms unit including parallel computing concepts'
       },
       {
-        title: 'Distributed Computing',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/parallel-computing/a/distributed-computing',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'Computing across multiple machines'
+        description: 'Review vocabulary including parallel and distributed computing'
       }
     ],
     additionalResources: []
@@ -587,16 +636,10 @@ const topicResourceMapping = {
     topicName: 'Beneficial and Harmful Effects',
     khanAcademyResources: [
       {
-        title: 'Computing Innovations',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/computing-innovations/a/computing-innovations-intro',
-        type: 'article',
-        description: 'Positive and negative impacts of technology'
-      },
-      {
-        title: 'Social Media Impact',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/computing-innovations/a/social-media-impact',
-        type: 'article',
-        description: 'How social media affects society'
+        title: 'Computing Innovations Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:computing-innovations',
+        type: 'unit',
+        description: 'Explore the positive and negative impacts of technology'
       }
     ],
     additionalResources: []
@@ -606,16 +649,16 @@ const topicResourceMapping = {
     topicName: 'Digital Divide',
     khanAcademyResources: [
       {
-        title: 'Digital Divide Overview',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/digital-divide/a/digital-divide-intro',
-        type: 'article',
+        title: 'Computing Innovations Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:computing-innovations',
+        type: 'unit',
         description: 'Understanding unequal access to technology'
       },
       {
-        title: 'Internet Access Barriers',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/digital-divide/a/internet-access-barriers',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'Economic and geographic barriers to Internet access'
+        description: 'Review key vocabulary including digital divide concepts'
       }
     ],
     additionalResources: []
@@ -625,16 +668,10 @@ const topicResourceMapping = {
     topicName: 'Computing Bias',
     khanAcademyResources: [
       {
-        title: 'Algorithmic Bias',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/computing-bias/a/algorithmic-bias',
-        type: 'article',
-        description: 'How algorithms can perpetuate bias'
-      },
-      {
-        title: 'Machine Learning Bias',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/computing-bias/a/machine-learning-bias',
-        type: 'article',
-        description: 'Bias in AI and machine learning systems'
+        title: 'Computing Innovations Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:computing-innovations',
+        type: 'unit',
+        description: 'Understanding bias in computing and AI systems'
       }
     ],
     additionalResources: []
@@ -644,16 +681,16 @@ const topicResourceMapping = {
     topicName: 'Crowdsourcing',
     khanAcademyResources: [
       {
-        title: 'Crowdsourcing and Human Computation',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/crowdsourcing/a/crowdsourcing-intro',
-        type: 'article',
-        description: 'Using crowds to solve problems'
+        title: 'Computing Innovations Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:computing-innovations',
+        type: 'unit',
+        description: 'Learn about crowdsourcing and collaborative problem-solving'
       },
       {
-        title: 'Citizen Science Projects',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/crowdsourcing/a/citizen-science-projects',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'Examples of crowdsourced research'
+        description: 'Review key vocabulary including crowdsourcing'
       }
     ],
     additionalResources: []
@@ -663,22 +700,16 @@ const topicResourceMapping = {
     topicName: 'Legal and Ethical Concerns',
     khanAcademyResources: [
       {
-        title: 'Intellectual Property',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/legal-ethical/a/intellectual-property',
-        type: 'article',
-        description: 'Copyright, patents, and digital rights'
+        title: 'Computing Innovations Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:computing-innovations',
+        type: 'unit',
+        description: 'Explore legal and ethical issues in computing'
       },
       {
-        title: 'Creative Commons',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/legal-ethical/a/creative-commons',
+        title: 'AP CSP Vocabulary Review',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/ap-csp-exam-preparation/prepare-for-the-2019-ap-cs-p-exam/a/vocabulary-review',
         type: 'article',
-        description: 'Alternative licensing for creative works'
-      },
-      {
-        title: 'Software Piracy',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/global-impact/legal-ethical/a/software-piracy',
-        type: 'article',
-        description: 'Legal issues around software distribution'
+        description: 'Review key vocabulary including copyright, Creative Commons, and open source'
       }
     ],
     additionalResources: []
@@ -688,28 +719,40 @@ const topicResourceMapping = {
     topicName: 'Safe Computing',
     khanAcademyResources: [
       {
-        title: 'Cybersecurity Overview',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/cybersecurity-encryption/cybersecurity/a/cybersecurity-intro',
-        type: 'article',
-        description: 'Introduction to cybersecurity concepts'
+        title: 'Online Data Security Unit',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:online-data-security',
+        type: 'unit',
+        description: 'Comprehensive unit on cybersecurity and safe computing'
       },
       {
-        title: 'Password Security',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/cybersecurity-encryption/cybersecurity/a/password-security',
+        title: 'Phishing Attacks',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:online-data-security/x2d2f703b37b450a3:cyber-attacks/a/phishing-attacks',
         type: 'article',
-        description: 'Creating and managing secure passwords'
+        description: 'Understanding and recognizing phishing attacks'
       },
       {
-        title: 'Phishing and Social Engineering',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/cybersecurity-encryption/cybersecurity/a/phishing-social-engineering',
+        title: 'Phishing and Passwords',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/cybercrime-and-prevention/a/phishing-and-passwords',
         type: 'article',
-        description: 'Recognizing and avoiding cyber attacks'
+        description: 'Password security and phishing prevention'
       },
       {
-        title: 'Multi-factor Authentication',
-        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/cybersecurity-encryption/cybersecurity/a/multi-factor-authentication',
-        type: 'article',
-        description: 'Additional security layers'
+        title: 'Public Key Encryption Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/the-internet/tls-secure-data-transport/e/public-key-encryption',
+        type: 'exercise',
+        description: 'Practice with encryption concepts'
+      },
+      {
+        title: 'Phishing Attacks Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:online-data-security/x2d2f703b37b450a3:cyber-attacks/e/phishing-attacks',
+        type: 'exercise',
+        description: 'Practice identifying phishing attacks'
+      },
+      {
+        title: 'Computer Malware Practice',
+        url: 'https://www.khanacademy.org/computing/ap-computer-science-principles/x2d2f703b37b450a3:online-data-security/x2d2f703b37b450a3:cyber-attacks/e/computer-malware',
+        type: 'exercise',
+        description: 'Practice identifying types of malware'
       }
     ],
     additionalResources: []
@@ -723,7 +766,7 @@ async function addTopicResources() {
 
     for (const [topicId, resources] of Object.entries(topicResourceMapping)) {
       const docId = `topic-${topicId}`;
-      
+
       // Update existing topic document with resources
       await db.collection('topics').doc(docId).update({
         resources: {

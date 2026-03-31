@@ -426,6 +426,132 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
+// Google login/signup for students and teachers
+router.post('/google-login', async (req, res) => {
+  try {
+    const { idToken, classCode, displayName, isTeacher } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({ error: 'ID token is required' });
+    }
+
+    // Verify the ID token
+    const decodedToken = await auth.verifyIdToken(idToken);
+    const { uid, email, name, picture } = decodedToken;
+
+    // Check if user already exists in Firestore
+    const userDoc = await db.collection('users').doc(uid).get();
+
+    if (userDoc.exists) {
+      const userData = userDoc.data();
+      
+      // Verify role matches login type
+      if (isTeacher && userData.role !== 'teacher') {
+        return res.status(403).json({ error: 'This Google account is registered as a student account.' });
+      }
+      if (!isTeacher && userData.role === 'teacher') {
+        return res.status(403).json({ error: 'This Google account is registered as a teacher account.' });
+      }
+
+      // Check teacher approval status
+      if (userData.role === 'teacher' && !userData.isApproved) {
+        return res.status(403).json({ error: 'Account pending admin approval. Please contact an administrator.' });
+      }
+
+      // Return user data
+      return res.json({
+        message: 'Login successful',
+        user: {
+          uid,
+          email: userData.email,
+          role: userData.role,
+          displayName: userData.displayName,
+          username: userData.username,
+          classIds: userData.classIds
+        }
+      });
+    }
+
+    // New user signup
+    if (isTeacher) {
+      // Create new teacher account
+      const newTeacherData = {
+        role: 'teacher',
+        displayName: displayName || name || email.split('@')[0],
+        email: email,
+        classIds: [],
+        isApproved: false, // Requires admin approval
+        authProvider: 'google',
+        createdAt: new Date()
+      };
+
+      await db.collection('users').doc(uid).set(newTeacherData);
+
+      return res.status(201).json({
+        message: 'Teacher account created with Google successfully. Pending admin approval.',
+        pendingApproval: true
+      });
+    }
+
+    // New student signup
+    if (!classCode) {
+      return res.status(404).json({ 
+        error: 'Account not found', 
+        needsSignup: true,
+        email,
+        name: name || displayName
+      });
+    }
+
+    // Find class by code
+    const classQuery = await db.collection('classes')
+      .where('code', '==', classCode.toUpperCase())
+      .get();
+
+    if (classQuery.empty) {
+      return res.status(400).json({ error: 'Invalid class code' });
+    }
+
+    const classDoc = classQuery.docs[0];
+    const classData = classDoc.data();
+    const classId = classDoc.id;
+
+    // Create new student account
+    const newUserData = {
+      role: 'student',
+      displayName: displayName || name || email.split('@')[0],
+      email: email,
+      username: email.split('@')[0], // Use email prefix as default username
+      classIds: [classId],
+      authProvider: 'google',
+      createdAt: new Date()
+    };
+
+    await db.collection('users').doc(uid).set(newUserData);
+
+    // Add student to class
+    await db.collection('classes').doc(classId).update({
+      studentIds: [...(classData.studentIds || []), uid]
+    });
+
+    res.status(201).json({
+      message: 'Student account created with Google successfully',
+      user: {
+        uid,
+        email: newUserData.email,
+        role: newUserData.role,
+        displayName: newUserData.displayName,
+        username: newUserData.username,
+        classIds: newUserData.classIds
+      }
+    });
+
+  } catch (error) {
+    console.error('Google login error:', error);
+    res.status(500).json({ error: 'Google login failed' });
+  }
+});
+
 // Join additional class (for logged-in students)
 router.post('/join-class', async (req, res) => {
   try {

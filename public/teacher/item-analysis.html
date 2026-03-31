@@ -359,6 +359,17 @@
             color: var(--muted);
             font-style: italic;
         }
+        .pseudocode-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            color: var(--text);
+        }
         .loading-state {
             text-align: center;
             padding: 4rem 2rem;
@@ -628,7 +639,7 @@
                     <div class="question-item ${q.deactivated ? 'deactivated' : ''}">
                         <div class="question-header">
                             <div class="question-text">
-                                ${i + 1}. ${q.text}
+                                ${i + 1}. ${formatQuestionText(q.text)}
                                 ${q.deactivated ? '<span class="deactivated-badge">Deactivated</span>' : ''}
                             </div>
                             <div class="question-stats">
@@ -678,6 +689,16 @@
                 return `${minutes}m ${remainingSeconds}s`;
             }
             return `${seconds}s`;
+        }
+
+        function formatQuestionText(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            let escaped = div.innerHTML;
+            // Support both ``` and ''' as indicators for code blocks
+            const codeBlockRegex = /(?:```|''')(?:[a-z]*\n)?([\s\S]*?)(?:```|''')/g;
+            return escaped.replace(codeBlockRegex, (match, code) => `<div class="pseudocode-block">${code.trim()}</div>`);
         }
 
         // Note: Initial load is handled by AuthHelper.checkAuth callback above

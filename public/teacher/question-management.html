@@ -328,6 +328,17 @@
             font-weight: 700;
             color: var(--warning);
         }
+        .pseudocode-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            color: var(--text);
+        }
 
         .star {
             font-size: 1.1rem;
@@ -1125,7 +1136,7 @@
                 explanationHtml = `
                     <div class="question-explanation">
                         <div class="question-explanation-title">Explanation:</div>
-                        <div>${escapeHtml(question.explanation)}</div>
+                        <div>${formatQuestionText(question.explanation)}</div>
                     </div>
                 `;
             }
@@ -1133,7 +1144,7 @@
             card.innerHTML = `
                 <div class="question-header">
                     <div class="question-info">
-                        <div class="question-text">${escapeHtml(question.text)}</div>
+                        <div class="question-text">${formatQuestionText(question.text)}</div>
                         <div class="question-meta">
                             <span class="question-badge ${typeClass}">${question.isTeacherMade ? 'Teacher-Made' : 'System'}</span>
                             <span class="question-badge ${difficultyClass}">${(question.difficulty || 'medium').toUpperCase()}</span>
@@ -1561,6 +1572,16 @@
         function clearErrors() {
             document.getElementById('errorMessage').style.display = 'none';
             document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function formatQuestionText(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            let escaped = div.innerHTML;
+            // Support both ``` and ''' as indicators for code blocks
+            const codeBlockRegex = /(?:```|''')(?:[a-z]*\n)?([\s\S]*?)(?:```|''')/g;
+            return escaped.replace(codeBlockRegex, (match, code) => `<div class="pseudocode-block">${code.trim()}</div>`);
         }
 
         function escapeHtml(text) {

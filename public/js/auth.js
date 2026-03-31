@@ -42,6 +42,14 @@ class APMastery {
         document.getElementById('student-login-btn')?.addEventListener('click', () => this.switchStudentForm('login'));
         document.getElementById('student-signup-btn')?.addEventListener('click', () => this.switchStudentForm('signup'));
 
+        // Google Auth - Student
+        document.getElementById('student-google-login')?.addEventListener('click', () => this.handleGoogleAuth(false, false));
+        document.getElementById('student-google-signup')?.addEventListener('click', () => this.handleGoogleAuth(true, false));
+
+        // Google Auth - Teacher
+        document.getElementById('teacher-google-login')?.addEventListener('click', () => this.handleGoogleAuth(false, true));
+        document.getElementById('teacher-google-signup')?.addEventListener('click', () => this.handleGoogleAuth(true, true));
+
         // Form submissions
         document.getElementById('teacher-login-form')?.addEventListener('submit', (e) => this.handleTeacherLogin(e));
         document.getElementById('teacher-signup-form')?.addEventListener('submit', (e) => this.handleTeacherSignup(e));
@@ -348,6 +356,102 @@ class APMastery {
             }
         } catch (error) {
             this.showToast('Signup failed. Please try again.', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle Google Auth for Students and Teachers
+    async handleGoogleAuth(isSignup, isTeacher) {
+        let classCode = null;
+        if (isSignup && !isTeacher) {
+            classCode = document.getElementById('student-class-code')?.value?.trim();
+            if (!classCode) {
+                this.showToast('Please enter a class code first', 'warning');
+                document.getElementById('student-class-code')?.focus();
+                return;
+            }
+            if (classCode.length !== 6) {
+                this.showToast('Invalid class code', 'error');
+                return;
+            }
+        }
+
+        this.showLoading();
+        try {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const result = await window.firebaseAuth.signInWithPopup(provider);
+            const idToken = await result.user.getIdToken();
+
+            const response = await fetch(`${this.apiBase}/auth/google-login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    idToken, 
+                    classCode,
+                    displayName: result.user.displayName,
+                    isTeacher
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (data.pendingApproval) {
+                    this.showToast(data.message, 'info');
+                    await window.firebaseAuth.signOut();
+                    this.hideLoading();
+                    return;
+                }
+
+                // Store auth data
+                localStorage.setItem('authToken', idToken);
+                localStorage.setItem('userData', JSON.stringify(data.user));
+
+                this.showToast(isSignup ? 'Account created successfully!' : 'Login successful!', 'success');
+                setTimeout(() => {
+                    window.location.href = isTeacher ? '/teacher/dashboard' : '/student/dashboard';
+                }, 1000);
+            } else if (response.status === 404 && data.needsSignup && !isTeacher) {
+                // Account doesn't exist, prompt for class code if we don't have one
+                this.hideLoading();
+                const code = prompt(`Welcome ${data.name}! Please enter your 6-character Class Code to join:`);
+                if (code) {
+                    this.handleGoogleAuthWithCode(idToken, code, data.name);
+                }
+            } else {
+                this.showToast(data.error || 'Google auth failed', 'error');
+                this.hideLoading();
+            }
+        } catch (error) {
+            console.error('Google Auth error:', error);
+            this.showToast('Google authentication failed', 'error');
+            this.hideLoading();
+        }
+    }
+
+    // Helper for Google Signup when code is prompted (students only)
+    async handleGoogleAuthWithCode(idToken, classCode, displayName) {
+        this.showLoading();
+        try {
+            const response = await fetch(`${this.apiBase}/auth/google-login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken, classCode, displayName, isTeacher: false })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('authToken', idToken);
+                localStorage.setItem('userData', JSON.stringify(data.user));
+                this.showToast('Account created successfully!', 'success');
+                setTimeout(() => { window.location.href = '/student/dashboard'; }, 1000);
+            } else {
+                this.showToast(data.error || 'Signup failed', 'error');
+            }
+        } catch (error) {
+            this.showToast('Signup failed', 'error');
         } finally {
             this.hideLoading();
         }
