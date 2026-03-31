@@ -6,249 +6,505 @@
     <title>AP Mastery · AP CSP Mastery</title>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 150px);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: sticky;
+            top: 0;
+            height: fit-content;
+            min-height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 2rem 0;
+            overflow: hidden;
+            border-right: none;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 1.5rem;
+            left: 280px;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 101;
+            box-shadow: var(--shadow-sm);
+            color: var(--muted);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(-50%);
+        }
+
+        .sidebar.collapsed + .sidebar-toggle,
+        .sidebar.collapsed ~ .sidebar-toggle {
+            left: 0;
+            transform: translateX(0) rotate(180deg);
+        }
+
+        .sidebar-toggle:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-header {
+            padding: 0 0.5rem;
+        }
+
+        .sidebar-header h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 0.15em;
+            margin-bottom: 1.5rem;
+        }
+
+        .class-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .class-item {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .class-item:hover {
+            background: var(--surface2);
+            border-color: var(--border2);
+        }
+
+        .class-item.active {
+            background: rgba(59, 130, 246, 0.08);
+            border-color: var(--accent);
+        }
+
+        .class-item .class-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .class-item.active .class-name {
+            color: var(--accent);
+        }
+
+        .class-item .teacher-name {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .btn-join-class {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.85rem;
+            background: var(--surface2);
+            border: 1px dashed var(--border2);
+            border-radius: 10px;
+            color: var(--muted);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-join-class:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2.5rem;
+            transition: all 0.3s;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
         .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
         }
+
         .dashboard-header .user-info {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
+
         .btn-secondary {
             padding: 0.5rem 1rem;
-            background: var(--gray-200);
-            color: var(--gray-700);
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 0.875rem;
-            font-weight: 500;
+            background: var(--surface2);
+            color: var(--muted);
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
+
         .btn-secondary:hover {
-            background: var(--gray-300);
+            background: var(--border);
+            color: var(--text);
+            border-color: var(--accent);
         }
+
         .progress-overview {
-            background: var(--white);
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-md);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
         }
+
         .progress-overview h3 {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
         }
+
         .overall-progress {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
+
         .overall-progress .progress-bar {
             flex: 1;
-            height: 12px;
+            height: 14px;
+            background: var(--surface2);
+            border-radius: 7px;
+            overflow: hidden;
         }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
         .progress-percentage {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-blue);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+            font-family: 'Barlow Condensed', sans-serif;
             min-width: 60px;
         }
+
         .topics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
         }
+
         .topic-card-link {
             text-decoration: none;
             color: inherit;
             display: block;
         }
+
         .topic-card {
-            background: var(--white);
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-md);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
             padding: 1.5rem;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
             cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
+
         .topic-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            border-color: var(--accent);
             box-shadow: var(--shadow-lg);
         }
+
         .topic-card.locked {
             opacity: 0.6;
-        }
-        .topic-card h4 {
-            font-size: 1.125rem;
-            margin-bottom: 0.5rem;
-            color: var(--gray-900);
-        }
-        .topic-card p {
-            color: var(--gray-500);
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-        }
-        .topic-progress {
-            margin-top: 1rem;
-        }
-        .topic-progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-        .topic-progress-text span:first-child {
-            color: var(--gray-600);
-        }
-        .topic-progress-text span:last-child {
-            font-weight: 600;
-            color: var(--primary-blue);
-        }
-        .btn-start {
-            width: 100%;
-            padding: 0.75rem;
-            margin-top: 1rem;
-        }
-        .btn-start:disabled {
-            background: var(--gray-300);
             cursor: not-allowed;
         }
-        .class-info {
-            background: var(--gray-100);
-            padding: 0.5rem 1rem;
-            border-radius: var(--border-radius);
-            font-size: 0.875rem;
-            color: var(--gray-600);
+
+        .topic-card h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text);
         }
-        .class-selector {
-            background: var(--white);
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-md);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+
+        .topic-card p {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            flex: 1;
         }
-        .class-selector h3 {
-            margin-bottom: 1rem;
+
+        .btn-start {
+            width: 100%;
+            padding: 0.85rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-        .class-tabs {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .class-tab {
-            padding: 0.5rem 1rem;
-            border: 2px solid var(--gray-200);
-            background: var(--white);
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .class-tab:hover {
-            border-color: var(--primary-blue);
-        }
-        .class-tab.active {
-            border-color: var(--primary-blue);
-            background: var(--primary-blue);
-            color: white;
-        }
-        .class-tab .class-code {
-            font-size: 0.75rem;
-            opacity: 0.7;
-            margin-left: 0.5rem;
-        }
+
         .breadcrumb {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             margin-bottom: 1.5rem;
-            flex-wrap: wrap;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
+
         .breadcrumb-item {
-            color: var(--gray-500);
+            color: var(--muted);
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        .breadcrumb-item:hover {
-            color: var(--primary-blue);
-        }
+
         .breadcrumb-item.active {
-            color: var(--gray-900);
-            font-weight: 500;
+            color: var(--text);
         }
-        .breadcrumb-separator {
-            color: var(--gray-400);
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+            }
+            .sidebar.collapsed {
+                left: -280px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="dashboard-header">
+    <div class="dashboard-container">
+        <!-- Sidebar Toggle (Outside sidebar so it stays visible) -->
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6" id="toggle-icon"></polyline>
+            </svg>
+        </button>
+
+        <!-- Sidebar for Classes -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Your Classes</h3>
+            </div>
+
+            <div id="class-list" class="class-list">
+                <!-- Class items will be loaded here -->
+            </div>
+
+            <button class="btn-join-class" onclick="openJoinModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Join New Class
+            </button>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="dashboard-header">
                 <div class="logo">
-                    <h1>AP Mastery</h1>
-                    <span>Student Dashboard</span>
+                    <h1 id="class-title">AP Mastery</h1>
+                    <span id="class-subtitle">Student Dashboard</span>
                 </div>
                 <div class="user-info">
-                    <span class="class-info" id="class-info">Loading...</span>
                     <span id="user-name">Loading...</span>
                     <button id="logout-btn" class="btn-secondary">Logout</button>
                 </div>
-            </div>
-        </header>
+            </header>
 
-        <main class="main">
             <nav class="breadcrumb">
                 <span class="breadcrumb-item active">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                         <polyline points="9 22 9 12 15 12 15 22"/>
                     </svg>
-                    Big Ideas
+                    Dashboard
                 </span>
             </nav>
 
-            <div id="class-selector-container" class="class-selector" style="display: none;">
-                <h3>Your Classes</h3>
-                <div id="class-tabs" class="class-tabs">
-                    <!-- Class tabs will be loaded here -->
-                </div>
-            </div>
-
             <div class="progress-overview">
-                <h3>Your Progress</h3>
+                <h3 id="progress-class-name">Progress</h3>
                 <div class="overall-progress">
                     <div class="progress-bar">
                         <div class="progress-fill" id="overall-progress-fill" style="width: 0%"></div>
                     </div>
                     <div class="progress-percentage" id="overall-percentage">0%</div>
                 </div>
-                <p style="color: var(--gray-500); font-size: 0.875rem;">
+                <p style="color: var(--muted); font-size: 0.85rem;">
                     Complete topics in order to unlock new content. Master each topic before moving on.
                 </p>
             </div>
 
-            <h2 style="margin-bottom: 1.5rem;">Topics</h2>
-
             <div id="topics-container" class="topics-grid">
-                <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
-                    Loading...
+                <div style="text-align: center; padding: 2rem; color: var(--muted);">
+                    Loading curriculum...
                 </div>
             </div>
         </main>
+    </div>
 
-        <footer class="footer">
-            <p>&copy; 2024 AP Mastery. Built for AP Computer Science Principles educators.</p>
-        </footer>
+    <!-- Join Class Modal -->
+    <div id="join-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Join a Class</h3>
+                <button class="btn-icon" onclick="closeJoinModal()" style="background:none; border:none; cursor:pointer; color:var(--muted);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="join-error" class="error-message" style="display:none; margin-bottom:1rem; padding:0.75rem; background:rgba(255,107,107,0.1); color:var(--danger); border-radius:8px; font-size:0.85rem;"></div>
+                <div class="form-group">
+                    <label for="join-class-code">Class Code</label>
+                    <input type="text" id="join-class-code" placeholder="e.g. ABC123" maxlength="6" style="text-transform: uppercase;">
+                    <small style="color:var(--muted); font-size:0.75rem; margin-top:0.5rem; display:block;">Enter the 6-character code from your teacher.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" style="flex:1; margin:0;" onclick="closeJoinModal()">Cancel</button>
+                <button class="btn-primary" style="flex:2; margin:0;" onclick="handleJoinClass()">Join Class</button>
+            </div>
+        </div>
     </div>
 
     <div id="loading-overlay" class="loading-overlay">
@@ -266,104 +522,100 @@
     <script>
         const apiBase = window.location.origin + '/api';
 
-        // Auth token will be refreshed by AuthHelper
         let token = localStorage.getItem('authToken');
         let userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        let userClasses = [];
+        let currentClassId = null;
 
-        // Check auth and get fresh token
+        // Check auth and load initial data
         AuthHelper.checkAuth({ allowedRoles: ['student'] }).then(({ token: freshToken, userData: freshUserData }) => {
             token = freshToken;
             if (freshUserData) {
                 userData = freshUserData;
                 userClasses = userData.classes || [];
             }
+            
             document.getElementById('user-name').textContent = userData.displayName || userData.username || 'Student';
-            renderClassSelector();
-            loadProgress();
-        }).catch(() => {
-            // AuthHelper will redirect to login
+            
+            // Set initial state of sidebar
+            const sidebar = document.getElementById('sidebar');
+            if (userClasses.length >= 2) {
+                sidebar.classList.remove('collapsed');
+            } else {
+                sidebar.classList.add('collapsed');
+            }
+
+            renderClassSidebar();
+            
+            // Default to first class if available
+            if (userClasses.length > 0) {
+                selectClass(userClasses[0].id);
+            } else {
+                document.getElementById('topics-container').innerHTML = `
+                    <div class="empty-state" style="text-align:center; padding:4rem;">
+                        <h3>Not in any classes yet</h3>
+                        <p>Join a class using a code from your teacher to see your curriculum.</p>
+                        <button class="btn-primary" onclick="openJoinModal()" style="margin-top:1rem; width:auto; padding:0.85rem 2rem;">Join Your First Class</button>
+                    </div>
+                `;
+            }
+        }).catch(err => {
+            console.error('Auth check failed:', err);
         });
 
-        // Current selected class
-        let currentClassId = null;
-        let userClasses = userData.classes || [];
+        // Sidebar Toggle
+        document.getElementById('sidebar-toggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
 
-        // Render class selector if user has multiple classes
-        function renderClassSelector() {
-            const container = document.getElementById('class-selector-container');
-            const tabsContainer = document.getElementById('class-tabs');
-            const classInfoEl = document.getElementById('class-info');
-
+        function renderClassSidebar() {
+            const list = document.getElementById('class-list');
+            
             if (userClasses.length === 0) {
-                classInfoEl.textContent = 'No classes';
+                list.innerHTML = '<p style="padding:1rem; color:var(--muted); font-size:0.8rem; text-align:center;">No classes joined.</p>';
                 return;
             }
 
-            if (userClasses.length === 1) {
-                // Single class - just show the name
-                currentClassId = userClasses[0].id;
-                classInfoEl.textContent = userClasses[0].name;
-                return;
-            }
-
-            // Multiple classes - show selector
-            container.style.display = 'block';
-            classInfoEl.style.display = 'none';
-
-            // Set default to first class
-            currentClassId = userClasses[0].id;
-
-            tabsContainer.innerHTML = userClasses.map(cls => `
-                <button class="class-tab ${cls.id === currentClassId ? 'active' : ''}"
-                        onclick="selectClass('${cls.id}')">
-                    ${cls.name}
-                    <span class="class-code">${cls.code}</span>
+            list.innerHTML = userClasses.map(cls => `
+                <button class="class-item ${cls.id === currentClassId ? 'active' : ''}" onclick="selectClass('${cls.id}')">
+                    <span class="class-name">${cls.name}</span>
+                    <span class="teacher-name">${cls.teacherName || 'Teacher'}</span>
                 </button>
             `).join('');
         }
 
         function selectClass(classId) {
             currentClassId = classId;
+            const selectedClass = userClasses.find(c => c.id === classId);
+            
+            if (selectedClass) {
+                document.getElementById('class-subtitle').textContent = selectedClass.name;
+                document.getElementById('progress-class-name').textContent = `Progress in ${selectedClass.name}`;
+            }
 
-            // Update active tab
-            document.querySelectorAll('.class-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.closest('.class-tab').classList.add('active');
-
-            // Reload progress for selected class
+            // Update UI
+            renderClassSidebar();
+            
+            // Load content
             loadProgress();
         }
 
-        // Logout handler
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            AuthHelper.signOut();
-        });
-
-        // Load Big Ideas and overall progress
         async function loadProgress() {
             try {
                 // Load Big Ideas
                 const bigIdeasResponse = await fetch(`${apiBase}/topics/big-ideas`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-
                 const bigIdeasData = await bigIdeasResponse.json();
 
-                if (bigIdeasResponse.ok && bigIdeasData.bigIdeas && bigIdeasData.bigIdeas.length > 0) {
+                if (bigIdeasResponse.ok && bigIdeasData.bigIdeas) {
                     renderBigIdeas(bigIdeasData.bigIdeas);
-                } else {
-                    renderDefaultBigIdeas();
                 }
 
-                // Load overall progress if we have a class selected
+                // Load progress for current class
                 if (currentClassId) {
                     const progressResponse = await fetch(`${apiBase}/progress/${userData.uid}?classId=${currentClassId}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
+                        headers: { 'Authorization': `Bearer ${token}` }
                     });
 
                     if (progressResponse.ok) {
@@ -376,7 +628,6 @@
                 }
             } catch (error) {
                 console.error('Failed to load:', error);
-                renderDefaultBigIdeas();
             }
         }
 
@@ -384,29 +635,90 @@
             const container = document.getElementById('topics-container');
             container.innerHTML = bigIdeas.map(bigIdea => `
                 <a href="/student/big-idea.html?id=${bigIdea.id}&classId=${currentClassId || ''}" class="topic-card-link">
-                    <div class="topic-card" style="border-left: 4px solid ${bigIdea.color || '#3B82F6'}">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <h4>${bigIdea.name}</h4>
-                        </div>
+                    <div class="topic-card" style="border-top: 4px solid ${bigIdea.color || 'var(--accent)'}">
+                        <h4>${bigIdea.name}</h4>
                         <p>${bigIdea.description || ''}</p>
-                        <button class="btn-primary btn-start">
-                            View Topics
-                        </button>
+                        <button class="btn-primary btn-start">View Topics</button>
                     </div>
                 </a>
             `).join('');
         }
 
-        function renderDefaultBigIdeas() {
-            const defaultBigIdeas = [
-                { id: 'big-idea-1', name: 'Big Idea 1: Creative Development', description: 'Computing is a creative discipline that enables innovation through collaboration and iterative design.', color: '#3B82F6' },
-                { id: 'big-idea-2', name: 'Big Idea 2: Data', description: 'Data is central to computing and understanding how to work with it is essential.', color: '#10B981' },
-                { id: 'big-idea-3', name: 'Big Idea 3: Algorithms and Programming', description: 'Algorithms are the foundation of programming and computational thinking.', color: '#F59E0B' },
-                { id: 'big-idea-4', name: 'Big Idea 4: Computing Systems and Networks', description: 'Computer systems and networks enable problem solving and communication.', color: '#8B5CF6' },
-                { id: 'big-idea-5', name: 'Big Idea 5: Impact of Computing', description: 'Computing has both beneficial and harmful effects on society.', color: '#EF4444' }
-            ];
-            renderBigIdeas(defaultBigIdeas);
+        // Join Class Functionality
+        function openJoinModal() {
+            document.getElementById('join-modal').classList.add('active');
+            document.getElementById('join-error').style.display = 'none';
+            document.getElementById('join-class-code').value = '';
         }
+
+        function closeJoinModal() {
+            document.getElementById('join-modal').classList.remove('active');
+        }
+
+        async function handleJoinClass() {
+            const codeInput = document.getElementById('join-class-code');
+            const code = codeInput.value.trim().toUpperCase();
+            const errorEl = document.getElementById('join-error');
+
+            if (code.length !== 6) {
+                errorEl.textContent = 'Please enter a valid 6-character code.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            document.getElementById('loading-overlay').classList.add('active');
+            
+            try {
+                const response = await fetch(`${apiBase}/auth/join-class`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ classCode: code, uid: userData.uid })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast(data.message, 'success');
+                    userClasses = data.classes;
+                    
+                    // Update user data in local storage
+                    userData.classes = data.classes;
+                    userData.classIds = data.classes.map(c => c.id);
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    
+                    closeJoinModal();
+                    
+                    // Switch to the newly joined class
+                    const newClass = data.classes.find(c => c.code === code);
+                    if (newClass) {
+                        selectClass(newClass.id);
+                    }
+                    
+                    renderClassSidebar();
+                    
+                    // Open sidebar if now multiple classes
+                    if (userClasses.length >= 2) {
+                        document.getElementById('sidebar').classList.remove('collapsed');
+                    }
+                } else {
+                    errorEl.textContent = data.error || 'Failed to join class.';
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                errorEl.textContent = 'A server error occurred. Please try again.';
+                errorEl.style.display = 'block';
+            } finally {
+                document.getElementById('loading-overlay').classList.remove('active');
+            }
+        }
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            AuthHelper.signOut();
+        });
 
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
@@ -415,8 +727,6 @@
             document.getElementById('toast-container').appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
         }
-
-        // Note: Initial load is handled by AuthHelper.checkAuth callback above
     </script>
 </body>
 </html>

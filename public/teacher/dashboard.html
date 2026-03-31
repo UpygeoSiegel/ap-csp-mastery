@@ -811,6 +811,9 @@
 
                 // Settings option is always available
                 menuItems += `
+                    <button class="kebab-item" onclick="event.preventDefault(); event.stopPropagation(); closeAllMenus(); shareClassCode('${cls.code}')">
+                        Share code
+                    </button>
                     <button class="kebab-item" onclick="event.preventDefault(); event.stopPropagation(); closeAllMenus(); openSettingsModal('${cls.id}', '${escapeHtml(cls.name)}', ${cls.retakeWaitMinutes || 0}, '${cls.progressionMode || 'linear'}')">
                         Settings
                     </button>
@@ -1072,6 +1075,26 @@
                 showToast('Failed to update settings', 'error');
             }
         });
+
+        function shareClassCode(code) {
+            const joinUrl = `${window.location.origin}/?join=${code}`;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(joinUrl).then(() => {
+                    showToast('Join link copied to clipboard!', 'success');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    promptShareLink(joinUrl);
+                });
+            } else {
+                promptShareLink(joinUrl);
+            }
+        }
+
+        function promptShareLink(url) {
+            // Fallback for browsers that don't support clipboard API or when not in secure context
+            window.prompt("Copy this join link for your students:", url);
+        }
 
         // Close settings modal on overlay click
         document.getElementById('settings-modal').addEventListener('click', (e) => {

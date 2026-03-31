@@ -518,7 +518,18 @@
         <main class="main">
             <div class="admin-layout">
                 <aside class="sidebar">
-                    <h3>Big Ideas</h3>
+                    <div id="system-sidebar" style="margin-bottom: 2rem;">
+                        <h3>System</h3>
+                        <div class="sidebar-item" id="sidebar-teachers" onclick="loadTeacherManagement()">
+                            <span>Teacher Approval</span>
+                            <span class="count" id="pending-teachers-count">0</span>
+                        </div>
+                        <div class="sidebar-item" id="sidebar-flags" onclick="loadFlaggedQuestions()">
+                            <span>Flagged Questions</span>
+                            <span class="count" id="pending-flags-count">0</span>
+                        </div>
+                    </div>
+                    <h3>Curriculum</h3>
                     <div id="sidebar-content">
                         <div class="loading-spinner">
                             <div class="spinner"></div>
@@ -649,6 +660,20 @@
     // Load big ideas and topics
     async function loadSidebar() {
         try {
+            // Load pending teachers count
+            try {
+                const teacherRes = await fetch(`${apiBase}/admin/teachers`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (teacherRes.ok) {
+                    const teacherData = await teacherRes.json();
+                    const pendingCount = teacherData.teachers.filter(t => !t.isApproved).length;
+                    document.getElementById('pending-teachers-count').textContent = pendingCount;
+                }
+            } catch (err) {
+                console.error('Error loading pending count:', err);
+            }
+
             const response = await fetch(`${apiBase}/admin/big-ideas`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -664,6 +689,19 @@
             const data = await response.json();
             bigIdeas = data.bigIdeas;
             renderSidebar();
+
+            // Also load pending flags count
+            try {
+                const flagRes = await fetch(`${apiBase}/admin/flags`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (flagRes.ok) {
+                    const flagData = await flagRes.json();
+                    document.getElementById('pending-flags-count').textContent = flagData.flags.length;
+                }
+            } catch (err) {
+                console.error('Error loading flags count:', err);
+            }
 
         } catch (error) {
             console.error('Error loading sidebar:', error);
@@ -1037,8 +1075,21 @@
 
             if (response.ok) {
                 showToast(questionId ? 'Question updated!' : 'Question created!', 'success');
+                
+                // If we were reviewing a flag, resolve it
+                if (activeFlagId && questionId) {
+                    await resolveFlag(activeFlagId, 'resolved', 'Question updated after review.');
+                    activeFlagId = null;
+                }
+                
                 closeQuestionModal();
-                loadTopic(currentTopicId, '');
+                
+                // If we are in the flagged questions view, reload it
+                if (document.getElementById('sidebar-flags').classList.contains('active')) {
+                    loadFlaggedQuestions();
+                } else {
+                    loadTopic(currentTopicId, '');
+                }
                 loadSidebar(); // Refresh counts
             } else {
                 const data = await response.json();
@@ -1121,6 +1172,256 @@
 
     function escapeHtml(text) {
         return formatQuestionText(text);
+    }
+
+    async function loadTeacherManagement() {
+        // Update UI
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        document.getElementById('sidebar-teachers').classList.add('active');
+        
+        const mainContent = document.getElementById('main-content');
+        mainContent.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        
+        try {
+            const response = await fetch(`${apiBase}/admin/teachers`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) throw new Error(data.error);
+            
+            const teachers = data.teachers;
+            const pendingCount = teachers.filter(t => !t.isApproved).length;
+            document.getElementById('pending-teachers-count').textContent = pendingCount;
+            
+            if (teachers.length === 0) {
+                mainContent.innerHTML = `
+                    <div class="content-header">
+                        <h2>Teacher Management</h2>
+                    </div>
+                    <div class="empty-state">
+                        <h3>No Teachers Found</h3>
+                        <p>No teacher accounts have been created yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let teacherRows = teachers.map(teacher => `
+                <div class="question-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.25rem;">${teacher.displayName}</h4>
+                            <p style="margin: 0.25rem 0; color: var(--muted); font-size: 0.9rem;">${teacher.email}</p>
+                            <p style="margin: 0; font-size: 0.75rem; color: var(--dim);">Joined: ${new Date(teacher.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1.5rem;">
+                            <span class="status-badge ${teacher.isApproved ? 'passed' : 'locked'}">
+                                ${teacher.isApproved ? 'Approved' : 'Pending'}
+                            </span>
+                            <button class="btn-primary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" 
+                                onclick="toggleTeacherApproval('${teacher.uid}', ${teacher.isApproved})">
+                                ${teacher.isApproved ? 'Revoke Approval' : 'Approve Teacher'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            mainContent.innerHTML = `
+                <div class="content-header">
+                    <h2>Teacher Management</h2>
+                    <p style="color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">
+                        ${teachers.length} total teachers · ${pendingCount} pending approval
+                    </p>
+                </div>
+                <div class="question-list">
+                    ${teacherRows}
+                </div>
+            `;
+            
+        } catch (error) {
+            console.error('Error loading teachers:', error);
+            showToast('Failed to load teachers', 'error');
+        }
+    }
+
+    async function toggleTeacherApproval(uid, currentStatus) {
+        if (currentStatus && !confirm('Are you sure you want to revoke approval for this teacher? They will lose access immediately.')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${apiBase}/admin/teachers/${uid}/toggle-approval`, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                showToast(data.message, 'success');
+                loadTeacherManagement();
+            } else {
+                showToast(data.error, 'error');
+            }
+        } catch (error) {
+            console.error('Error toggling approval:', error);
+            showToast('Failed to update approval status', 'error');
+        }
+    }
+
+    async function loadFlaggedQuestions() {
+        console.log('Loading flagged questions...');
+        // Update UI
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        document.getElementById('sidebar-flags').classList.add('active');
+        
+        const mainContent = document.getElementById('main-content');
+        mainContent.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        
+        try {
+            console.log('Fetching flags from:', `${apiBase}/admin/flags`);
+            const response = await fetch(`${apiBase}/admin/flags`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            const data = await response.json();
+            console.log('Flags data received:', data);
+            
+            if (!response.ok) throw new Error(data.error);
+            
+            const flags = data.flags;
+            console.log(`Found ${flags.length} pending flags`);
+            document.getElementById('pending-flags-count').textContent = flags.length;
+            
+            if (flags.length === 0) {
+                mainContent.innerHTML = `
+                    <div class="content-header">
+                        <h2>Flagged Questions</h2>
+                    </div>
+                    <div class="empty-state">
+                        <h3>No Pending Flags</h3>
+                        <p>All student flags have been reviewed.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let flagRows = flags.map(flag => {
+                const questionText = flag.question ? flag.question.text : 'Question not found';
+                const reasonMap = {
+                    'incorrect_answer': 'Incorrect answer',
+                    'confusing_text': 'Wording is confusing',
+                    'broken_image': 'Image is broken',
+                    'incorrect_explanation': 'Incorrect explanation',
+                    'other': 'Other'
+                };
+                
+                return `
+                    <div class="question-card">
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <span class="status-badge locked" style="background: rgba(255, 107, 107, 0.1); color: var(--danger); border-color: rgba(255, 107, 107, 0.2);">
+                                    ${reasonMap[flag.reason] || flag.reason}
+                                </span>
+                                <span style="font-size: 0.75rem; color: var(--dim);">
+                                    Flagged by ${flag.studentName} on ${new Date(flag.createdAt).toLocaleDateString()}
+                                </span>
+                            </div>
+                            <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text);">
+                                Topic: ${flag.topicName || flag.topicId}
+                            </div>
+                            <div class="question-text" style="background: var(--surface2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.95rem;">
+                                ${escapeHtml(questionText)}
+                            </div>
+                            ${flag.comment ? `
+                                <div style="font-size: 0.85rem; color: var(--muted); border-left: 3px solid var(--border2); padding-left: 1rem; margin-bottom: 1rem;">
+                                    <strong>Student Comment:</strong> ${flag.comment}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button class="btn-secondary" style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.8rem;" 
+                                onclick="resolveFlag('${flag.id}', 'dismissed')">
+                                Dismiss Flag
+                            </button>
+                            <button class="btn-primary" style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.8rem;" 
+                                onclick="openQuestionModalForFlag('${flag.id}', '${flag.questionId}', '${flag.topicId}')">
+                                Review & Edit Question
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            mainContent.innerHTML = `
+                <div class="content-header">
+                    <h2>Flagged Questions</h2>
+                    <p style="color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">
+                        ${flags.length} reports pending review
+                    </p>
+                </div>
+                <div class="question-list">
+                    ${flagRows}
+                </div>
+            `;
+            
+        } catch (error) {
+            console.error('Error loading flags:', error);
+            showToast('Failed to load flagged questions', 'error');
+        }
+    }
+
+    let activeFlagId = null;
+
+    async function openQuestionModalForFlag(flagId, questionId, topicId) {
+        activeFlagId = flagId;
+        // First load the question details
+        try {
+            // Need a way to get a single question by ID for admin
+            // We'll use the existing topic questions endpoint and filter
+            const response = await fetch(`${apiBase}/admin/topics/${topicId}/questions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            const question = data.questions.find(q => q.id === questionId);
+            
+            if (question) {
+                openQuestionModal(question, topicId);
+                // We'll hook into the modal save to also resolve the flag
+            } else {
+                showToast('Could not find question. It may have been deleted.', 'error');
+            }
+        } catch (err) {
+            console.error('Error loading question for flag review:', err);
+            showToast('Failed to load question', 'error');
+        }
+    }
+
+    async function resolveFlag(flagId, status, adminComment = '') {
+        try {
+            const response = await fetch(`${apiBase}/admin/flags/${flagId}/resolve`, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status, adminComment })
+            });
+            
+            if (response.ok) {
+                showToast(`Flag ${status} successfully`, 'success');
+                loadFlaggedQuestions();
+                loadSidebar(); // Update count
+            }
+        } catch (err) {
+            console.error('Error resolving flag:', err);
+        }
     }
 
     function showToast(message, type = 'info') {

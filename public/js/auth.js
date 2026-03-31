@@ -5,6 +5,27 @@ class APMastery {
     constructor() {
         this.apiBase = window.location.origin + '/api';
         this.initializeEventListeners();
+        this.checkJoinLink();
+    }
+
+    // Check for join code in URL
+    checkJoinLink() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const joinCode = urlParams.get('join');
+        
+        if (joinCode) {
+            // Switch to student signup
+            this.switchTab('student');
+            this.switchStudentForm('signup');
+            
+            // Fill class code
+            const codeInput = document.getElementById('student-class-code');
+            if (codeInput) {
+                codeInput.value = joinCode.toUpperCase();
+                // Trigger validation
+                this.validateClassCode(joinCode.toUpperCase());
+            }
+        }
     }
 
     // Initialize all event listeners
@@ -26,6 +47,16 @@ class APMastery {
         document.getElementById('teacher-signup-form')?.addEventListener('submit', (e) => this.handleTeacherSignup(e));
         document.getElementById('student-login-form')?.addEventListener('submit', (e) => this.handleStudentLogin(e));
         document.getElementById('student-signup-form')?.addEventListener('submit', (e) => this.handleStudentSignup(e));
+
+        // Forgot password
+        document.getElementById('teacher-forgot-btn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.handleForgotPassword(true);
+        });
+        document.getElementById('student-forgot-btn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.handleForgotPassword(false);
+        });
 
         // Class code validation
         document.getElementById('student-class-code')?.addEventListener('input', (e) => this.handleClassCodeInput(e));
@@ -317,6 +348,45 @@ class APMastery {
             }
         } catch (error) {
             this.showToast('Signup failed. Please try again.', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle password reset
+    async handleForgotPassword(isTeacher) {
+        const inputLabel = isTeacher ? 'email' : 'username';
+        const value = prompt(`Please enter your ${inputLabel} to reset your password:`);
+        
+        if (!value) return;
+
+        this.showLoading();
+        try {
+            // First, call backend to get the email (for students) and validate
+            const response = await fetch(`${this.apiBase}/auth/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    [inputLabel]: value,
+                    isTeacher
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.email) {
+                // Now trigger Firebase password reset email
+                await window.firebaseAuth.sendPasswordResetEmail(data.email);
+                this.showToast(data.message || 'Password reset email sent!', 'success');
+            } else if (response.ok) {
+                // If it was a mock success for security
+                this.showToast(data.message, 'info');
+            } else {
+                this.showToast(data.error || 'Failed to process request', 'error');
+            }
+        } catch (error) {
+            console.error('Forgot password error:', error);
+            this.showToast('Failed to send reset email. Please try again.', 'error');
         } finally {
             this.hideLoading();
         }

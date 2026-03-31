@@ -55,7 +55,6 @@ router.get('/big-ideas/:bigIdeaId/topics', async (req, res) => {
 
     const topicsSnapshot = await db.collection('topics')
       .where('bigIdeaId', '==', bigIdeaId)
-      .orderBy('order', 'asc')
       .get();
 
     const topics = [];
@@ -86,6 +85,9 @@ router.get('/big-ideas/:bigIdeaId/topics', async (req, res) => {
         deactivatedQuestions: deactivatedCount
       });
     }
+
+    // Sort by order asc in memory
+    topics.sort((a, b) => (a.order || 0) - (b.order || 0));
 
     res.json({ topics });
 
@@ -390,3 +392,138 @@ router.post('/questions/bulk', async (req, res) => {
 });
 
 module.exports = router;
+
+// Teacher Management
+router.get('/teachers', async (req, res) => {
+  try {
+    const teachersSnapshot = await db.collection('users')
+      .where('role', '==', 'teacher')
+      .get();
+
+    const teachers = teachersSnapshot.docs.map(doc => ({
+      uid: doc.id,
+      ...doc.data()
+    }));
+
+    // Sort by createdAt desc in memory to avoid needing a composite index
+    teachers.sort((a, b) => {
+      const dateA = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : 0;
+      const dateB = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : 0;
+      return dateB - dateA;
+    });
+
+    res.json({ teachers });
+
+  } catch (error) {
+    console.error('Admin get teachers error:', error);
+    res.status(500).json({ error: 'Failed to fetch teachers' });
+  }
+});
+
+router.post('/teachers/:uid/toggle-approval', async (req, res) => {
+  try {
+    const { uid } = req.params;
+
+    const userRef = db.collection('users').doc(uid);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'Teacher not found' });
+    }
+
+    const userData = userDoc.data();
+    if (userData.role !== 'teacher') {
+      return res.status(400).json({ error: 'User is not a teacher' });
+    }
+
+    const newApprovalStatus = !userData.isApproved;
+    await userRef.update({
+      isApproved: newApprovalStatus,
+      updatedAt: new Date()
+    });
+
+    res.json({
+      uid,
+      isApproved: newApprovalStatus,
+      message: newApprovalStatus ? 'Teacher approved' : 'Teacher approval revoked'
+    });
+
+  } catch (error) {
+    console.error('Admin toggle teacher approval error:', error);
+    res.status(500).json({ error: 'Failed to update teacher approval status' });
+  }
+});
+
+// Flag Management
+router.get('/flags', async (req, res) => {
+  try {
+    const flagsSnapshot = await db.collection('questionFlags')
+      .where('status', '==', 'pending')
+      .get();
+
+    const flags = [];
+    for (const doc of flagsSnapshot.docs) {
+      const flag = { id: doc.id, ...doc.data() };
+      
+      // Get question details safely
+      try {
+        const questionDoc = await db.collection('questions').doc(flag.questionId).get();
+        if (questionDoc.exists) {
+          flag.question = { id: questionDoc.id, ...questionDoc.data() };
+        } else {
+          flag.question = { text: '[Question Deleted]' };
+        }
+      } catch (e) {
+        flag.question = { text: '[Error loading question]' };
+      }
+      
+      // Get topic details safely
+      try {
+        const topicDoc = await db.collection('topics').doc(flag.topicId).get();
+        if (topicDoc.exists) {
+          flag.topicName = topicDoc.data().name || topicDoc.data().title;
+        }
+      } catch (e) {}
+      
+      flags.push(flag);
+    }
+
+    // Sort by createdAt desc in memory
+    flags.sort((a, b) => {
+      const dateA = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : 0;
+      const dateB = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : 0;
+      return dateB - dateA;
+    });
+
+    res.json({ flags });
+
+  } catch (error) {
+    console.error('Admin get flags error:', error);
+    res.status(500).json({ error: 'Failed to fetch question flags' });
+  }
+});
+
+router.post('/flags/:flagId/resolve', async (req, res) => {
+  try {
+    const { flagId } = req.params;
+    const { status, adminComment } = req.body; // status: 'resolved' or 'dismissed'
+
+    if (!['resolved', 'dismissed'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    await db.collection('questionFlags').doc(flagId).update({
+      status,
+      adminComment: adminComment || '',
+      resolvedAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    res.json({ message: `Flag ${status} successfully` });
+
+  } catch (error) {
+    console.error('Admin resolve flag error:', error);
+    res.status(500).json({ error: 'Failed to resolve flag' });
+  }
+});
+

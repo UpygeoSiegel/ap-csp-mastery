@@ -25,6 +25,7 @@ router.post('/teacher-signup', async (req, res) => {
       displayName,
       email,
       classIds: [],
+      isApproved: false, // Requires admin approval
       createdAt: new Date()
     });
 
@@ -74,20 +75,46 @@ router.post('/student-signup', async (req, res) => {
     const classData = classDoc.data();
     const classId = classDoc.id;
 
-    // Check if username is already taken (globally unique)
+    // Check if username is already taken
     const existingUserQuery = await db.collection('users')
       .where('username', '==', username)
       .limit(1)
       .get();
 
     if (!existingUserQuery.empty) {
-      return res.status(400).json({ error: 'Username already taken. Please choose a different username.' });
+      const existingUserDoc = existingUserQuery.docs[0];
+      const existingUserData = existingUserDoc.data();
+
+      if (existingUserData.role !== 'student') {
+        return res.status(400).json({ error: 'Username already taken by a non-student account.' });
+      }
+
+      // If user exists, we check if they are already in this class
+      if (existingUserData.classIds && existingUserData.classIds.includes(classId)) {
+        return res.status(400).json({ error: 'You are already a member of this class.' });
+      }
+
+      // Add student to class
+      await db.collection('classes').doc(classId).update({
+        studentIds: [...(classData.studentIds || []), existingUserDoc.id]
+      });
+
+      // Update user document with new classId
+      await db.collection('users').doc(existingUserDoc.id).update({
+        classIds: [...(existingUserData.classIds || []), classId]
+      });
+
+      return res.status(200).json({ 
+        message: 'Successfully joined additional class',
+        userId: existingUserDoc.id,
+        classId,
+        className: classData.name
+      });
     }
 
     // Generate email for Firebase Auth
-    // Sanitize username: lowercase, replace spaces with dots, remove invalid characters
     const sanitizedUsername = username.toLowerCase().replace(/\s+/g, '.').replace(/[^a-z0-9._-]/g, '');
-    const generatedEmail = `${sanitizedUsername}_${classCode.toUpperCase()}@${process.env.APP_DOMAIN || 'cspready.app'}`;
+    const generatedEmail = `${sanitizedUsername}@${process.env.APP_DOMAIN || 'apmastery.com'}`;
 
     // Create Firebase Auth user
     const userRecord = await auth.createUser({
@@ -166,6 +193,12 @@ router.post('/verify-login', async (req, res) => {
     if (isTeacher && userData.role !== 'teacher') {
       return res.status(403).json({ error: 'Not a teacher account' });
     }
+    
+    // Check if teacher is approved
+    if (userData.role === 'teacher' && !userData.isApproved) {
+      return res.status(403).json({ error: 'Account pending admin approval. Please contact an administrator.' });
+    }
+
     if (!isTeacher && !isAdmin && userData.role !== 'student') {
       return res.status(403).json({ error: 'Not a student account' });
     }
@@ -262,13 +295,19 @@ router.post('/login', async (req, res) => {
     if (!isTeacher && userData.role !== 'student') {
       return res.status(401).json({ error: 'Invalid student credentials' });
     }
+    
+    // Check if teacher is approved
+    if (userData.role === 'teacher' && !userData.isApproved) {
+      return res.status(403).json({ error: 'Account pending admin approval. Please contact an administrator.' });
+    }
 
     res.json({
       message: 'Login validation successful',
       userId: userRecord.uid,
       email: loginEmail,
       role: userData.role,
-      displayName: userData.displayName
+      displayName: userData.displayName,
+      isApproved: userData.role === 'teacher' ? userData.isApproved : true
     });
 
   } catch (error) {
@@ -330,6 +369,134 @@ router.post('/check-username', async (req, res) => {
   } catch (error) {
     console.error('Username check error:', error);
     res.status(500).json({ error: 'Username check failed' });
+  }
+});
+
+// Request password reset email
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email, username, isTeacher } = req.body;
+
+    let resetEmail = email;
+
+    if (!isTeacher) {
+      if (!username) {
+        return res.status(400).json({ error: 'Username is required for students' });
+      }
+
+      // Find student by username
+      const userQuery = await db.collection('users')
+        .where('username', '==', username)
+        .where('role', '==', 'student')
+        .limit(1)
+        .get();
+
+      if (userQuery.empty) {
+        // We return success anyway for security to prevent account enumeration
+        return res.json({ message: 'If an account exists, a reset link has been sent.' });
+      }
+
+      const userData = userQuery.docs[0].data();
+      resetEmail = userData.email;
+    } else {
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required for teachers' });
+      }
+    }
+
+    // Generate password reset link via Firebase Admin SDK
+    // This allows us to get the link and send it ourselves if we wanted, 
+    // but standard Firebase Auth "sendPasswordResetEmail" is usually done on client side.
+    // However, for students with generated emails, the teacher might need to provide the link.
+    
+    // For now, we'll just return the email it would be sent to, 
+    // or tell the client to use the Firebase Client SDK with this email.
+    
+    res.json({ 
+      success: true,
+      email: resetEmail,
+      message: isTeacher 
+        ? 'Password reset email will be sent to your inbox.' 
+        : 'A reset link has been sent to your student account email. Your teacher can also help you reset it.'
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Failed to process password reset request' });
+  }
+});
+
+// Join additional class (for logged-in students)
+router.post('/join-class', async (req, res) => {
+  try {
+    const { classCode, uid } = req.body;
+
+    if (!classCode || !uid) {
+      return res.status(400).json({ error: 'Class code and user ID are required' });
+    }
+
+    // Find class by code
+    const classQuery = await db.collection('classes')
+      .where('code', '==', classCode.toUpperCase())
+      .get();
+
+    if (classQuery.empty) {
+      return res.status(404).json({ error: 'Class code not found' });
+    }
+
+    const classDoc = classQuery.docs[0];
+    const classData = classDoc.data();
+    const classId = classDoc.id;
+
+    // Get student data
+    const studentRef = db.collection('users').doc(uid);
+    const studentDoc = await studentRef.get();
+
+    if (!studentDoc.exists) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    const studentData = studentDoc.data();
+
+    // Verify student doesn't already have this class
+    if (studentData.classIds && studentData.classIds.includes(classId)) {
+      return res.status(400).json({ error: 'You are already in this class' });
+    }
+
+    // Add student to class
+    await db.collection('classes').doc(classId).update({
+      studentIds: [...(classData.studentIds || []), uid]
+    });
+
+    // Update user document
+    const updatedClassIds = [...(studentData.classIds || []), classId];
+    await studentRef.update({
+      classIds: updatedClassIds
+    });
+
+    // Get fresh classes data for response
+    const classes = [];
+    for (const id of updatedClassIds) {
+      const clsDoc = await db.collection('classes').doc(id).get();
+      if (clsDoc.exists) {
+        const clsData = clsDoc.data();
+        classes.push({
+          id,
+          name: clsData.name,
+          code: clsData.code,
+          teacherName: clsData.teacherName
+        });
+      }
+    }
+
+    res.json({
+      message: `Successfully joined ${classData.name}`,
+      classes
+    });
+
+  } catch (error) {
+    console.error('Join class error:', error);
+    res.status(500).json({ error: 'Failed to join class' });
   }
 });
 

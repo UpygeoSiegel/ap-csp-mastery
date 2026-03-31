@@ -99,6 +99,62 @@
         .quiz-actions button {
             min-width: 120px;
         }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: var(--surface);
+            border: 2px solid var(--border2);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .btn-flag.flagged {
+            background: #ff4d4d !important;
+            color: white !important;
+            border-color: #ff4d4d !important;
+        }
+        .btn-flag.flagged:hover {
+            background: #ff3333 !important;
+            border-color: #ff3333 !important;
+        }
+        .onboarding-modal {
+            max-width: 450px;
+            text-align: center;
+        }
+        .onboarding-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
         .results-container {
             background: var(--white);
             border-radius: var(--border-radius-lg);
@@ -135,200 +191,125 @@
             padding: 1rem;
             margin-bottom: 1rem;
         }
-        .result-item.correct {
-            border-left: 4px solid var(--success-green);
-        }
-        .result-item.incorrect {
-            border-left: 4px solid var(--danger-red);
-        }
         .result-question {
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 0.5rem;
         }
         .result-answer {
             font-size: 0.875rem;
             color: var(--gray-600);
         }
+        .result-item.correct {
+            border-left: 4px solid var(--success-green);
+        }
+        .result-item.incorrect {
+            border-left: 4px solid var(--danger-red);
+        }
         .result-explanation {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed var(--gray-300);
             font-size: 0.875rem;
             color: var(--gray-700);
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid var(--gray-200);
-        }
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-        .breadcrumb-item {
-            color: var(--gray-500);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .breadcrumb-item:hover {
-            color: var(--primary-blue);
-        }
-        .breadcrumb-item.active {
-            color: var(--gray-900);
-            font-weight: 500;
-        }
-        .breadcrumb-separator {
-            color: var(--gray-400);
-        }
-        .loading-state {
-            text-align: center;
-            padding: 3rem;
-            color: var(--gray-500);
-        }
-        .error-state {
-            text-align: center;
-            padding: 3rem;
-            color: var(--danger-red);
         }
         .study-resources {
-            background: rgba(26, 86, 219, 0.05);
-            border: 1px solid rgba(26, 86, 219, 0.2);
-            border-radius: var(--border-radius-lg);
-            padding: 1.5rem;
-            margin: 2rem 0;
+            margin-top: 2.5rem;
+            padding: 2rem;
+            background: var(--surface2);
+            border-radius: 16px;
+            text-align: left;
         }
         .study-resources h3 {
-            margin-top: 0;
-            margin-bottom: 1rem;
-            color: var(--primary-blue);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--text);
         }
         .resource-category {
             margin-bottom: 1.5rem;
         }
         .resource-category h4 {
+            font-size: 0.9rem;
+            color: var(--muted);
             margin-bottom: 0.75rem;
-            color: var(--gray-700);
-            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         .resource-list {
-            display: grid;
+            display: flex;
+            flex-direction: column;
             gap: 0.75rem;
         }
         .resource-item {
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--border-radius);
+            background: var(--surface);
             padding: 1rem;
-            transition: all 0.2s;
-        }
-        .resource-item:hover {
-            border-color: var(--primary-blue);
-            box-shadow: 0 2px 8px rgba(26, 86, 219, 0.1);
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
         .resource-title {
-            font-weight: 500;
-            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             margin-bottom: 0.25rem;
         }
         .resource-title a {
-            color: var(--primary-blue);
+            font-weight: 600;
+            color: var(--accent);
             text-decoration: none;
         }
         .resource-title a:hover {
             text-decoration: underline;
         }
         .resource-type {
-            display: inline-block;
-            background: var(--gray-100);
-            color: var(--gray-600);
+            font-size: 0.65rem;
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
-            font-size: 0.75rem;
             text-transform: uppercase;
-            font-weight: 500;
-            margin-right: 0.5rem;
+            font-weight: 700;
         }
-        .resource-type.article {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--success-green);
-        }
-        .resource-type.video {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger-red);
-        }
-        .resource-type.exercise {
-            background: rgba(168, 85, 247, 0.1);
-            color: #8b5cf6;
-        }
+        .resource-type.video { background: #ffebee; color: #d32f2f; }
+        .resource-type.article { background: #e3f2fd; color: #1976d2; }
+        .resource-type.practice { background: #e8f5e9; color: #388e3c; }
+        
         .resource-description {
-            font-size: 0.875rem;
-            color: var(--gray-600);
-            margin-top: 0.25rem;
+            font-size: 0.85rem;
+            color: var(--muted);
         }
-        /* Pseudocode Styling */
         .pseudocode-block {
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 1rem;
-            margin: 0.75rem 0;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
             font-family: 'Courier New', Courier, monospace;
             white-space: pre-wrap;
             overflow-x: auto;
-            color: #212529;
-            line-height: 1.5;
-            position: relative;
-            font-size: 0.9rem;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-            text-align: left;
-        }
-        .pseudocode-block::before {
-            content: "PSEUDOCODE";
-            position: absolute;
-            top: 0;
-            right: 0;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.6rem;
-            font-family: var(--font-family);
-            background: #e9ecef;
-            color: #6c757d;
-            border-bottom-left-radius: 4px;
-            font-weight: 600;
+            color: var(--text);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <div class="logo">
-                <h1>AP Mastery</h1>
-                <span>Quiz</span>
+            <div class="quiz-container">
+                <nav class="breadcrumb">
+                    <a href="/student/dashboard.html" class="breadcrumb-item">Dashboard</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="#" id="breadcrumb-bigidea" class="breadcrumb-item">Big Idea</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span id="breadcrumb-topic" class="breadcrumb-item active">Topic</span>
+                </nav>
             </div>
         </header>
 
-        <main class="main quiz-container">
-            <nav class="breadcrumb" id="breadcrumb">
-                <a href="/student/dashboard.html" class="breadcrumb-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                        <polyline points="9 22 9 12 15 12 15 22"/>
-                    </svg>
-                    Big Ideas
-                </a>
-                <span class="breadcrumb-separator">/</span>
-                <a href="#" class="breadcrumb-item" id="breadcrumb-bigidea">Topics</a>
-                <span class="breadcrumb-separator">/</span>
-                <span class="breadcrumb-item active" id="breadcrumb-topic">Quiz</span>
-            </nav>
-
-            <div id="quiz-content">
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <p>Loading quiz...</p>
+        <main class="main">
+            <div class="quiz-container">
+                <div id="quiz-content">
+                    <div class="loading-state" style="text-align: center; padding: 4rem;">
+                        <div class="spinner"></div>
+                        <p>Loading quiz...</p>
+                    </div>
                 </div>
             </div>
         </main>
@@ -340,472 +321,307 @@
 
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Firebase Client SDK for persistent auth -->
+    <!-- Flag Question Modal -->
+    <div id="flag-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Flag Question</h3>
+                <button class="btn-icon" onclick="closeFlagModal()" style="background:none; border:none; cursor:pointer; color:var(--muted);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem;">Help us improve! Please tell us what's wrong with this question.</p>
+                <div class="form-group">
+                    <label>Reason for flagging</label>
+                    <select id="flag-reason" style="width:100%; padding:0.85rem; border-radius:8px; background:var(--surface); border:1px solid var(--border2); color:var(--text); font-family:inherit;">
+                        <option value="incorrect_answer">Incorrect answer</option>
+                        <option value="confusing_text">Wording is confusing</option>
+                        <option value="broken_image">Image is broken/missing</option>
+                        <option value="incorrect_explanation">Explanation is wrong</option>
+                        <option value="other">Other issue</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Comments (optional)</label>
+                    <textarea id="flag-comment" placeholder="Describe the issue..." style="width:100%; padding:0.85rem; border-radius:8px; background:var(--surface); border:1px solid var(--border2); color:var(--text); font-family:inherit; min-height:100px; resize:vertical;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" style="flex:1; margin:0;" onclick="closeFlagModal()">Cancel</button>
+                <button class="btn-primary" style="flex:2; margin:0;" onclick="handleFlagQuestion()">Submit Flag</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flag Onboarding Modal -->
+    <div id="flag-onboarding-modal" class="modal-overlay">
+        <div class="modal onboarding-modal">
+            <div class="modal-body" style="padding: 3rem 2rem;">
+                <div class="onboarding-icon">🚩</div>
+                <h3>Question Review</h3>
+                <p style="margin: 1.5rem 0; color: var(--muted); line-height: 1.6;">
+                    Please flag a question if you think there is an error with this question. Our team will review the question to make sure it is error free in the future.
+                </p>
+                <button class="btn-primary" onclick="closeFlagOnboarding()" style="width: 100%;">Got it!</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="../js/auth-helper.js"></script>
 
     <script>
         const apiBase = window.location.origin + '/api';
-        let token = localStorage.getItem('authToken');
-        let userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        let token = null;
+        let userData = null;
+        let quizData = null;
+        let currentQuestionIndex = 0;
+        let answers = {};
+        let questionTimes = {};
+        let questionStartTime = null;
+        const flaggedQuestions = new Set();
 
-        // Check auth and get fresh token
-        AuthHelper.checkAuth({ allowedRoles: ['student'] }).then(({ token: freshToken, userData: freshUserData }) => {
-            token = freshToken;
-            if (freshUserData) userData = freshUserData;
-            loadQuiz();
-        }).catch(() => {
-            // AuthHelper will redirect to login
-        });
-
-        // Get topic, class, and bigIdea from URL
         const urlParams = new URLSearchParams(window.location.search);
         const topicId = urlParams.get('topicId');
         const classId = urlParams.get('classId');
         const bigIdeaId = urlParams.get('bigIdeaId');
+        const topicsUrl = bigIdeaId ? `/student/big-idea.html?id=${bigIdeaId}&classId=${classId}` : '/student/dashboard.html';
 
-        // Build back URL for topics page
-        const topicsUrl = bigIdeaId
-            ? `/student/big-idea.html?id=${bigIdeaId}&classId=${classId}`
-            : '/student/dashboard.html';
+        // Check auth
+        AuthHelper.checkAuth({ allowedRoles: ['student'] }).then(({ token: freshToken, userData: freshUserData }) => {
+            token = freshToken;
+            userData = freshUserData;
+            document.getElementById('breadcrumb-bigidea').href = topicsUrl;
+            startQuiz();
+        }).catch(err => console.error('Auth failed:', err));
 
-        // Update breadcrumb links
-        document.getElementById('breadcrumb-bigidea').href = topicsUrl;
-
-        if (!topicId || !classId) {
-            window.location.href = '/student/dashboard.html';
+        // Flag Functions
+        function openFlagModal() {
+            if (!localStorage.getItem('hasSeenFlagOnboarding')) {
+                document.getElementById('flag-onboarding-modal').classList.add('active');
+                return;
+            }
+            const question = quizData.questions[currentQuestionIndex];
+            if (flaggedQuestions.has(question.id)) {
+                showToast('You already flagged this question.', 'info');
+                return;
+            }
+            document.getElementById('flag-modal').classList.add('active');
+            document.getElementById('flag-reason').value = 'incorrect_answer';
+            document.getElementById('flag-comment').value = '';
         }
 
-        // Quiz state
-        let quizData = null;
-        let currentQuestionIndex = 0;
-        let answers = {};
-        let questionTimes = {}; // Track time spent per question
-        let questionStartTime = null; // When current question was shown
+        function closeFlagOnboarding() {
+            localStorage.setItem('hasSeenFlagOnboarding', 'true');
+            document.getElementById('flag-onboarding-modal').classList.remove('active');
+            openFlagModal();
+        }
 
-        // Utility functions
+        function closeFlagModal() {
+            document.getElementById('flag-modal').classList.remove('active');
+        }
+
+        async function handleFlagQuestion() {
+            const question = quizData.questions[currentQuestionIndex];
+            const reason = document.getElementById('flag-reason').value;
+            const comment = document.getElementById('flag-comment').value;
+            const submitBtn = document.querySelector('#flag-modal .btn-primary');
+
+            if (submitBtn) submitBtn.disabled = true;
+
+            try {
+                console.log(`Flagging question ${question.id}...`);
+                const response = await fetch(`${apiBase}/quizzes/flag`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ questionId: question.id, topicId: quizData.topicId, reason, comment })
+                });
+
+                if (response.ok) {
+                    showToast('Question flagged. Thank you!', 'success');
+                    flaggedQuestions.add(question.id);
+                    renderQuiz();
+                    closeFlagModal();
+                } else {
+                    const data = await response.json();
+                    showToast(data.error || 'Failed to flag', 'error');
+                }
+            } catch (err) {
+                console.error('Flagging error:', err);
+                showToast('Failed to flag', 'error');
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        }
+
         function formatQuestionText(text) {
             if (!text) return '';
-            
-            // First escape HTML to prevent XSS
             const div = document.createElement('div');
             div.textContent = text;
             let escaped = div.innerHTML;
-            
-            // Replace Markdown code blocks with styled div
             const codeBlockRegex = /```(?:[a-z]*\n)?([\s\S]*?)```/g;
-            
-            return escaped.replace(codeBlockRegex, (match, code) => {
-                return `<div class="pseudocode-block">${code.trim()}</div>`;
-            });
-        }
-
-        function escapeHtml(text) {
-            return formatQuestionText(text);
+            return escaped.replace(codeBlockRegex, (match, code) => `<div class="pseudocode-block">${code.trim()}</div>`);
         }
 
         async function startQuiz() {
             try {
                 const response = await fetch(`${apiBase}/quizzes/start`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ topicId, classId })
                 });
-
                 const data = await response.json();
-
                 if (!response.ok) {
-                    // Check if this is a wait time error
-                    if (data.waitRequired && data.remainingMinutes) {
-                        const mins = data.remainingMinutes;
-                        let waitText = '';
-                        if (mins >= 60) {
-                            const hours = Math.floor(mins / 60);
-                            const remainingMins = mins % 60;
-                            waitText = remainingMins > 0
-                                ? `${hours} hour${hours > 1 ? 's' : ''} and ${remainingMins} minute${remainingMins > 1 ? 's' : ''}`
-                                : `${hours} hour${hours > 1 ? 's' : ''}`;
-                        } else {
-                            waitText = `${mins} minute${mins > 1 ? 's' : ''}`;
-                        }
-                        showWaitError(waitText);
-                    } else {
-                        showError(data.error || 'Failed to start quiz');
-                    }
+                    showError(data.error || 'Failed to start quiz');
                     return;
                 }
-
                 quizData = data;
-
-                // Update breadcrumb with topic name
                 document.getElementById('breadcrumb-topic').textContent = quizData.topicName;
-
-                // Update breadcrumb with big idea name if available
-                if (quizData.bigIdeaName) {
-                    document.getElementById('breadcrumb-bigidea').textContent = quizData.bigIdeaName;
-                }
-
+                if (quizData.bigIdeaName) document.getElementById('breadcrumb-bigidea').textContent = quizData.bigIdeaName;
                 renderQuiz();
-
             } catch (error) {
-                console.error('Start quiz error:', error);
-                showError('Failed to start quiz. Please try again.');
+                showError('Failed to start quiz');
             }
         }
 
-        function recordTimeForCurrentQuestion() {
-            if (questionStartTime !== null && quizData) {
-                const questionId = quizData.questions[currentQuestionIndex].id;
-                const timeSpent = Date.now() - questionStartTime;
-                // Add to existing time (in case they revisit the question)
-                questionTimes[questionId] = (questionTimes[questionId] || 0) + timeSpent;
+        function recordTime() {
+            if (questionStartTime && quizData) {
+                const qId = quizData.questions[currentQuestionIndex].id;
+                questionTimes[qId] = (questionTimes[qId] || 0) + (Date.now() - questionStartTime);
             }
         }
 
         function renderQuiz() {
-            // Record time for previous question before rendering new one
-            recordTimeForCurrentQuestion();
-
-            // Start timing the new question
+            recordTime();
             questionStartTime = Date.now();
-
-            const content = document.getElementById('quiz-content');
             const question = quizData.questions[currentQuestionIndex];
             const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
+            const isFlagged = flaggedQuestions.has(question.id);
 
-            const questionText = question.text || question.question || '';
-
-            content.innerHTML = `
+            document.getElementById('quiz-content').innerHTML = `
                 <div class="quiz-header">
                     <h2>${quizData.topicName}</h2>
                     <div class="quiz-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${progress}%"></div>
-                        </div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
                         <span class="quiz-progress-text">Question ${currentQuestionIndex + 1} of ${quizData.questions.length}</span>
                     </div>
                 </div>
-
                 <div class="question-card">
-                    <div class="question-number">Question ${currentQuestionIndex + 1}</div>
-                    <div class="question-text">${formatQuestionText(questionText)}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <div class="question-number">Question ${currentQuestionIndex + 1}</div>
+                        <button class="btn-secondary btn-flag ${isFlagged ? 'flagged' : ''}" style="width:auto; margin:0; padding:0.4rem 0.8rem; font-size:0.75rem; display:flex; align-items:center; gap:0.4rem;" onclick="openFlagModal()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" fill="${isFlagged ? 'currentColor' : 'none'}"></path>
+                                <line x1="4" y1="22" x2="4" y2="15"></line>
+                            </svg>
+                            ${isFlagged ? 'Flagged' : 'Flag Question'}
+                        </button>
+                    </div>
+                    <div class="question-text">${formatQuestionText(question.text || question.question)}</div>
                     <div class="options-list">
-                        ${question.options.map((option, index) => {
-                            const optionText = typeof option === 'string' ? option : option.text;
-                            const optionId = typeof option === 'string' ? index.toString() : option.id;
-                            
+                        ${question.options.map((opt, idx) => {
+                            const oId = opt.id || idx.toString();
+                            const selected = (answers[question.id] || []).includes(oId);
                             return `
-                                <label class="option-item ${isOptionSelected(question.id, optionId) ? 'selected' : ''}"
-                                       onclick="selectOption('${question.id}', '${optionId}', '${question.type}')">
-                                    <input type="${question.type === 'multiple_select' ? 'checkbox' : 'radio'}"
-                                           name="question-${question.id}"
-                                           value="${optionId}"
-                                           ${isOptionSelected(question.id, optionId) ? 'checked' : ''}>
-                                    <span class="option-text">${formatQuestionText(optionText)}</span>
+                                <label class="option-item ${selected ? 'selected' : ''}" onclick="selectOption('${question.id}', '${oId}', '${question.type}')">
+                                    <input type="${question.type === 'multiple_select' ? 'checkbox' : 'radio'}" name="q-${question.id}" ${selected ? 'checked' : ''}>
+                                    <span class="option-text">${formatQuestionText(opt.text || opt)}</span>
                                 </label>
                             `;
                         }).join('')}
                     </div>
                 </div>
-
                 <div class="quiz-actions">
-                    <button class="btn-secondary" onclick="previousQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''}>
-                        Previous
-                    </button>
-                    ${currentQuestionIndex === quizData.questions.length - 1 ? `
-                        <button class="btn-primary" onclick="submitQuiz()">
-                            Submit Quiz
-                        </button>
-                    ` : `
-                        <button class="btn-primary" onclick="nextQuestion()">
-                            Next
-                        </button>
-                    `}
+                    <button class="btn-secondary" onclick="previousQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''}>Previous</button>
+                    ${currentQuestionIndex === quizData.questions.length - 1 
+                        ? `<button class="btn-primary" onclick="submitQuiz()">Submit Quiz</button>`
+                        : `<button class="btn-primary" onclick="nextQuestion()">Next</button>`}
                 </div>
             `;
         }
 
-        function isOptionSelected(questionId, optionId) {
-            const selected = answers[questionId] || [];
-            return selected.includes(optionId);
-        }
-
-        function selectOption(questionId, optionId, questionType) {
-            if (questionType === 'multiple_select') {
-                // Toggle selection for multiple select
-                if (!answers[questionId]) {
-                    answers[questionId] = [];
-                }
-                const index = answers[questionId].indexOf(optionId);
-                if (index > -1) {
-                    answers[questionId].splice(index, 1);
-                } else {
-                    answers[questionId].push(optionId);
-                }
-            } else {
-                // Single selection for multiple choice
-                answers[questionId] = [optionId];
-            }
+        function selectOption(qId, oId, type) {
+            if (type === 'multiple_select') {
+                if (!answers[qId]) answers[qId] = [];
+                const i = answers[qId].indexOf(oId);
+                i > -1 ? answers[qId].splice(i, 1) : answers[qId].push(oId);
+            } else answers[qId] = [oId];
             renderQuiz();
         }
 
-        function nextQuestion() {
-            if (currentQuestionIndex < quizData.questions.length - 1) {
-                currentQuestionIndex++;
-                renderQuiz();
-            }
-        }
-
-        function previousQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                renderQuiz();
-            }
-        }
+        function nextQuestion() { if (currentQuestionIndex < quizData.questions.length - 1) { currentQuestionIndex++; renderQuiz(); } }
+        function previousQuestion() { if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuiz(); } }
 
         async function submitQuiz() {
-            // Record time for current question before submitting
-            recordTimeForCurrentQuestion();
-
-            // Check if all questions are answered
+            recordTime();
             const unanswered = quizData.questions.filter(q => !answers[q.id] || answers[q.id].length === 0);
             if (unanswered.length > 0) {
                 showToast(`Please answer all questions. ${unanswered.length} remaining.`, 'warning');
-                // Restart timing since they're staying on this question
                 questionStartTime = Date.now();
                 return;
             }
-
             try {
-                const submissionData = {
-                    attemptId: quizData.attemptId,
-                    topicId: topicId,
-                    classId: classId,
-                    answers: Object.entries(answers).map(([questionId, selectedAnswerIds]) => ({
-                        questionId,
-                        selectedAnswerIds,
-                        timeSpentMs: questionTimes[questionId] || 0
-                    }))
-                };
-
                 const response = await fetch(`${apiBase}/quizzes/submit`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(submissionData)
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        attemptId: quizData.attemptId, topicId, classId,
+                        answers: Object.entries(answers).map(([qId, sIds]) => ({ questionId: qId, selectedAnswerIds: sIds, timeSpentMs: questionTimes[qId] || 0 }))
+                    })
                 });
-
                 const data = await response.json();
-
-                if (!response.ok) {
-                    showToast(data.error || 'Failed to submit quiz', 'error');
-                    return;
-                }
-
-                console.log('Quiz submission response:', data);
-                renderResults(data);
-
-            } catch (error) {
-                console.error('Submit quiz error:', error);
-                showToast('Failed to submit quiz. Please try again.', 'error');
-            }
+                if (response.ok) renderResults(data);
+                else showToast(data.error || 'Failed to submit', 'error');
+            } catch (err) { showToast('Error submitting quiz', 'error'); }
         }
 
         function renderResults(results) {
-            const content = document.getElementById('quiz-content');
             const scoreClass = results.passed ? 'passed' : 'failed';
-
-            content.innerHTML = `
+            document.getElementById('quiz-content').innerHTML = `
                 <div class="results-container">
                     <h2>${results.passed ? 'Congratulations!' : 'Keep Practicing!'}</h2>
                     <div class="results-score ${scoreClass}">${results.score}/${results.totalQuestions}</div>
                     <p class="results-message">${results.message}</p>
-
-                    <div style="display: flex; gap: 1rem; justify-content: center;">
-                        <a href="${topicsUrl}" class="btn-secondary" style="text-decoration: none;">
-                            Back to Topics
-                        </a>
-                        ${!results.passed ? `
-                            <button class="btn-primary" onclick="location.reload()">
-                                Try Again
-                            </button>
-                        ` : ''}
+                    <div style="display:flex; gap:1rem; justify-content:center;">
+                        <a href="${topicsUrl}" class="btn-secondary" style="text-decoration:none;">Back to Topics</a>
+                        ${!results.passed ? `<button class="btn-primary" onclick="location.reload()">Try Again</button>` : ''}
                     </div>
-
                     ${renderStudyResources(results)}
-
                     <div class="results-details">
                         <h3>Review Your Answers</h3>
-                        ${results.results.map((result, index) => {
-                            return `
-                                <div class="result-item ${result.correct ? 'correct' : 'incorrect'}">
-                                    <div class="result-question">${index + 1}. ${formatQuestionText(result.questionText)}</div>
-                                    <div class="result-answer">
-                                        Your answer: ${result.selectedAnswerTexts.join(', ')}
-                                        ${!result.correct ? `<br>Correct answer: ${result.correctAnswerTexts.join(', ')}` : ''}
-                                    </div>
-                                    ${result.explanation ? `
-                                        <div class="result-explanation">
-                                            <strong>Explanation:</strong> ${formatQuestionText(result.explanation)}
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `;
-                        }).join('')}
+                        ${results.results.map((r, i) => `
+                            <div class="result-item ${r.correct ? 'correct' : 'incorrect'}">
+                                <div class="result-question">${i + 1}. ${formatQuestionText(r.questionText)}</div>
+                                <div class="result-answer">Your answer: ${r.selectedAnswerTexts.join(', ')}${!r.correct ? `<br>Correct: ${r.correctAnswerTexts.join(', ')}` : ''}</div>
+                                ${r.explanation ? `<div class="result-explanation"><strong>Explanation:</strong> ${formatQuestionText(r.explanation)}</div>` : ''}
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             `;
         }
 
         function renderStudyResources(results) {
-            console.log('renderStudyResources called with:', results);
-            console.log('results.passed:', results.passed);
-            console.log('results.studyResources:', results.studyResources);
-            
-            // Only show resources if the student failed and resources are provided
-            if (results.passed || !results.studyResources) {
-                console.log('No resources to display - either passed or no resources provided');
-                return '';
-            }
-
-            const resources = results.studyResources;
-            let resourcesHtml = `
-                <div class="study-resources">
-                    <h3>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                        </svg>
-                        ${results.resourcesMessage || 'Study Resources'}
-                    </h3>
-                    <p style="margin-bottom: 1.5rem; color: var(--gray-600);">
-                        Review these materials to strengthen your understanding of this topic:
-                    </p>
-            `;
-
-            // Khan Academy Resources
-            if (resources.khanAcademy && resources.khanAcademy.length > 0) {
-                resourcesHtml += `
-                    <div class="resource-category">
-                        <h4>📚 Khan Academy Resources</h4>
-                        <div class="resource-list">
-                            ${resources.khanAcademy.map(resource => `
-                                <div class="resource-item">
-                                    <div class="resource-title">
-                                        <span class="resource-type ${resource.type}">${resource.type}</span>
-                                        <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
-                                            ${resource.title}
-                                        </a>
-                                    </div>
-                                    <div class="resource-description">${resource.description}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Additional Resources
-            if (resources.additional && resources.additional.length > 0) {
-                resourcesHtml += `
-                    <div class="resource-category">
-                        <h4>🌐 Additional Resources</h4>
-                        <div class="resource-list">
-                            ${resources.additional.map(resource => `
-                                <div class="resource-item">
-                                    <div class="resource-title">
-                                        <span class="resource-type ${resource.type}">${resource.type}</span>
-                                        <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
-                                            ${resource.title}
-                                        </a>
-                                    </div>
-                                    <div class="resource-description">${resource.description}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Custom Teacher Resources
-            if (resources.customTeacherResources && resources.customTeacherResources.length > 0) {
-                resourcesHtml += `
-                    <div class="resource-category">
-                        <h4>👩‍🏫 Teacher Recommended</h4>
-                        <div class="resource-list">
-                            ${resources.customTeacherResources.map(resource => `
-                                <div class="resource-item">
-                                    <div class="resource-title">
-                                        <span class="resource-type ${resource.type}">${resource.type}</span>
-                                        <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
-                                            ${resource.title}
-                                        </a>
-                                    </div>
-                                    <div class="resource-description">${resource.description}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            resourcesHtml += `</div>`;
-            return resourcesHtml;
+            if (results.passed || !results.studyResources) return '';
+            const res = results.studyResources;
+            let html = `<div class="study-resources"><h3>Study Resources</h3>`;
+            if (res.khanAcademy?.length) html += `<div class="resource-category"><h4>Khan Academy</h4><div class="resource-list">${res.khanAcademy.map(r => `<div class="resource-item"><div class="resource-title"><span class="resource-type ${r.type}">${r.type}</span><a href="${r.url}" target="_blank">${r.title}</a></div></div>`).join('')}</div></div>`;
+            return html + `</div>`;
         }
 
-        function getOptionTexts(options, ids) {
-            return ids.map(id => {
-                const option = options.find(o => o.id === id);
-                return option ? option.text : 'Unknown';
-            }).join(', ');
+        function showError(msg) { document.getElementById('quiz-content').innerHTML = `<div class="error-state"><h3>Error</h3><p>${msg}</p><a href="${topicsUrl}" class="btn-primary" style="display:inline-block; margin-top:1rem; text-decoration:none;">Back to Topics</a></div>`; }
+        function showToast(msg, type = 'info') {
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.textContent = msg;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(() => t.remove(), 4000);
         }
-
-        function showError(message) {
-            document.getElementById('quiz-content').innerHTML = `
-                <div class="error-state">
-                    <h3>Error</h3>
-                    <p>${message}</p>
-                    <a href="${topicsUrl}" class="btn-primary" style="display: inline-block; margin-top: 1rem; text-decoration: none;">
-                        Back to Topics
-                    </a>
-                </div>
-            `;
-        }
-
-        function showWaitError(waitTime) {
-            document.getElementById('quiz-content').innerHTML = `
-                <div class="results-container" style="text-align: center;">
-                    <h2>Practice Time!</h2>
-                    <div style="font-size: 4rem; margin: 1rem 0;">&#9203;</div>
-                    <p class="results-message" style="color: var(--gray-700);">
-                        Please wait <strong>${waitTime}</strong> before retaking this quiz.
-                    </p>
-                    <p style="color: var(--gray-500); margin-bottom: 2rem;">
-                        Use this time to review the material and practice the concepts.
-                    </p>
-                    <a href="${topicsUrl}" class="btn-primary" style="display: inline-block; text-decoration: none;">
-                        Back to Topics
-                    </a>
-                </div>
-            `;
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
-
-        // Start the quiz
-        startQuiz();
     </script>
 </body>
 </html>

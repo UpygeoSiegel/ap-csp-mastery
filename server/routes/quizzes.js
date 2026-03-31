@@ -619,4 +619,43 @@ async function updateQuestionStats(topicId, results) {
   }
 }
 
+// Flag a question
+router.post('/flag', async (req, res) => {
+  try {
+    const { questionId, topicId, reason, comment } = req.body;
+    const studentId = req.user.uid;
+
+    console.log(`[DEBUG] Flagging question ${questionId} in topic ${topicId} by student ${studentId}`);
+
+    if (!questionId || !topicId || !reason) {
+      console.log(`[DEBUG] Missing required fields: questionId=${!!questionId}, topicId=${!!topicId}, reason=${!!reason}`);
+      return res.status(400).json({ error: 'Question ID, topic ID, and reason are required' });
+    }
+
+    const flagData = {
+      questionId,
+      topicId,
+      studentId,
+      studentName: req.user.displayName || req.user.username,
+      reason,
+      comment: comment || '',
+      status: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const flagRef = await db.collection('questionFlags').add(flagData);
+    console.log(`[DEBUG] Successfully created flag with ID: ${flagRef.id}`);
+
+    res.status(201).json({
+      message: 'Question flagged successfully. Thank you for your feedback!',
+      flagId: flagRef.id
+    });
+
+  } catch (error) {
+    console.error('Flag question error:', error);
+    res.status(500).json({ error: 'Failed to flag question' });
+  }
+});
+
 module.exports = router;
