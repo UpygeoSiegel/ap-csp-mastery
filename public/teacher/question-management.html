@@ -9,6 +9,99 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Navbar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .nav-link.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .nav-link.active:hover {
+            background: var(--primary-blue-dark, #1a56db);
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-logout:hover {
+            background: var(--gray-300);
+        }
+
+        /* Breadcrumb styles */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--gray-600);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-blue);
+            text-decoration: underline;
+        }
+
+        .breadcrumb-separator {
+            color: var(--gray-400);
+        }
+
+        .breadcrumb-current {
+            color: var(--gray-900);
+            font-weight: 500;
+        }
+
         .question-management {
             max-width: 1400px;
             margin: 0 auto;
@@ -190,6 +283,100 @@
 
         .star {
             color: var(--yellow-500);
+        }
+
+        .question-options {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .question-options-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.25rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            background: var(--gray-50);
+        }
+
+        .option-item.correct {
+            background: var(--green-100);
+            border: 1px solid var(--green-300);
+        }
+
+        .option-letter {
+            font-weight: 600;
+            color: var(--gray-600);
+            min-width: 1.5rem;
+        }
+
+        .option-item.correct .option-letter {
+            color: var(--green-700);
+        }
+
+        .option-text {
+            flex: 1;
+            color: var(--gray-700);
+        }
+
+        .option-item.correct .option-text {
+            color: var(--green-800);
+            font-weight: 500;
+        }
+
+        .correct-indicator {
+            font-size: 0.75rem;
+            color: var(--green-600);
+            font-weight: 600;
+        }
+
+        .question-explanation {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: var(--blue-50);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            color: var(--blue-800);
+        }
+
+        .question-explanation-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--blue-700);
+        }
+
+        .toggle-details-btn {
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 0.5rem;
+        }
+
+        .toggle-details-btn:hover {
+            text-decoration: underline;
+        }
+
+        .question-details {
+            display: none;
+        }
+
+        .question-details.expanded {
+            display: block;
         }
 
         .question-form {
@@ -398,16 +585,19 @@
 </head>
 <body>
     <header class="header">
-        <div class="dashboard-header">
+        <div class="navbar">
             <div class="logo">
                 <h1>APproval</h1>
-                <span>Teacher Dashboard</span>
+                <span>Teacher Portal</span>
             </div>
-            <div class="user-info">
-                <a href="/teacher/item-analysis.html" class="btn-secondary" style="text-decoration: none;">Item Analysis</a>
-                <a href="/teacher/question-management.html" class="btn-secondary active" style="text-decoration: none; background: var(--gray-300);">Question Management</a>
+            <div class="nav-links">
+                <a href="/teacher/dashboard.html" class="nav-link">Dashboard</a>
+                <a href="/teacher/item-analysis.html" class="nav-link">Item Analysis</a>
+                <a href="/teacher/question-management.html" class="nav-link active">Questions</a>
+            </div>
+            <div class="user-section">
                 <span id="user-name">Loading...</span>
-                <button id="logout-btn" class="btn-secondary">Logout</button>
+                <button id="logout-btn" class="btn-logout">Logout</button>
             </div>
         </div>
     </header>
@@ -780,14 +970,41 @@
         function createQuestionCard(question, type) {
             const card = document.createElement('div');
             card.className = 'question-card';
-            
+
             const difficultyClass = `badge-difficulty-${question.difficulty || 'medium'}`;
             const typeClass = question.isTeacherMade ? 'badge-teacher' : 'badge-system';
-            
+            const cardId = `question-${question.id}`;
+
+            // Build options HTML
+            let optionsHtml = '';
+            if (question.options && question.options.length > 0) {
+                optionsHtml = question.options.map(option => {
+                    const isCorrect = question.correctAnswers && question.correctAnswers.includes(option.id);
+                    return `
+                        <div class="option-item ${isCorrect ? 'correct' : ''}">
+                            <span class="option-letter">${option.id}.</span>
+                            <span class="option-text">${escapeHtml(option.text)}</span>
+                            ${isCorrect ? '<span class="correct-indicator">✓ Correct</span>' : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Build explanation HTML
+            let explanationHtml = '';
+            if (question.explanation) {
+                explanationHtml = `
+                    <div class="question-explanation">
+                        <div class="question-explanation-title">Explanation:</div>
+                        <div>${escapeHtml(question.explanation)}</div>
+                    </div>
+                `;
+            }
+
             card.innerHTML = `
                 <div class="question-header">
                     <div class="question-info">
-                        <div class="question-text">${escapeHtml(question.text.substring(0, 200))}${question.text.length > 200 ? '...' : ''}</div>
+                        <div class="question-text">${escapeHtml(question.text)}</div>
                         <div class="question-meta">
                             <span class="question-badge ${typeClass}">${question.isTeacherMade ? 'Teacher-Made' : 'System'}</span>
                             <span class="question-badge ${difficultyClass}">${(question.difficulty || 'medium').toUpperCase()}</span>
@@ -795,14 +1012,38 @@
                             ${question.hasImage ? '<span>📷 Has Image</span>' : ''}
                             ${question.activationCount ? `<span class="popularity-score"><span class="star">⭐</span> ${question.activationCount}</span>` : ''}
                         </div>
+                        <button class="toggle-details-btn" onclick="toggleQuestionDetails('${cardId}')">
+                            Show Answer Choices ▼
+                        </button>
+                        <div id="${cardId}" class="question-details">
+                            <div class="question-options">
+                                <div class="question-options-title">Answer Choices</div>
+                                ${optionsHtml}
+                            </div>
+                            ${explanationHtml}
+                        </div>
                     </div>
                     <div class="question-actions">
                         ${createActionButtons(question, type)}
                     </div>
                 </div>
             `;
-            
+
             return card;
+        }
+
+        // Toggle question details visibility
+        function toggleQuestionDetails(cardId) {
+            const details = document.getElementById(cardId);
+            const btn = details.previousElementSibling;
+
+            if (details.classList.contains('expanded')) {
+                details.classList.remove('expanded');
+                btn.textContent = 'Show Answer Choices ▼';
+            } else {
+                details.classList.add('expanded');
+                btn.textContent = 'Hide Answer Choices ▲';
+            }
         }
 
         // Create action buttons for question card
