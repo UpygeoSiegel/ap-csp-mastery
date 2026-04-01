@@ -10,7 +10,6 @@
             display: flex;
             min-height: calc(100vh - 150px);
             position: relative;
-            transition: all 0.3s ease;
         }
 
         /* Sidebar Styles */
@@ -22,25 +21,22 @@
             display: flex;
             flex-direction: column;
             gap: 2rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: sticky;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed;
             top: 0;
-            height: fit-content;
-            min-height: 100vh;
+            left: 0;
+            bottom: 0;
             z-index: 100;
         }
 
         .sidebar.collapsed {
-            width: 0;
-            padding: 2rem 0;
-            overflow: hidden;
-            border-right: none;
+            transform: translateX(-100%);
         }
 
         .sidebar-toggle {
             position: absolute;
             top: 1.5rem;
-            left: 280px;
+            right: -1.25rem; /* Positioned half-way across the right border */
             width: 2.5rem;
             height: 2.5rem;
             background: var(--surface);
@@ -54,13 +50,10 @@
             box-shadow: var(--shadow-sm);
             color: var(--muted);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateX(-50%);
         }
 
-        .sidebar.collapsed + .sidebar-toggle,
-        .sidebar.collapsed ~ .sidebar-toggle {
-            left: 0;
-            transform: translateX(0) rotate(180deg);
+        .sidebar.collapsed .sidebar-toggle {
+            transform: rotate(180deg);
         }
 
         .sidebar-toggle:hover {
@@ -156,7 +149,6 @@
         .main-content {
             flex: 1;
             padding: 2.5rem;
-            transition: all 0.3s;
             max-width: 1000px;
             margin: 0 auto;
             width: 100%;
@@ -410,15 +402,15 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar Toggle (Outside sidebar so it stays visible) -->
-        <button id="sidebar-toggle" class="sidebar-toggle">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="15 18 9 12 15 6" id="toggle-icon"></polyline>
-            </svg>
-        </button>
-
         <!-- Sidebar for Classes -->
         <aside id="sidebar" class="sidebar">
+            <!-- Sidebar Toggle (Inside sidebar so it moves with it) -->
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6" id="toggle-icon"></polyline>
+                </svg>
+            </button>
+
             <div class="sidebar-header">
                 <h3>Your Classes</h3>
             </div>
