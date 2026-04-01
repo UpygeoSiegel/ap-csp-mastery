@@ -2,6 +2,30 @@ const express = require('express');
 const { auth, db, generateUniqueClassCode } = require('../firebase');
 const router = express.Router();
 
+// Helper to get student classes details
+async function getStudentClasses(classIds) {
+  const classes = [];
+  if (classIds && classIds.length > 0) {
+    for (const classId of classIds) {
+      try {
+        const classDoc = await db.collection('classes').doc(classId).get();
+        if (classDoc.exists) {
+          const classData = classDoc.data();
+          classes.push({
+            id: classId,
+            name: classData.name,
+            code: classData.code,
+            teacherName: classData.teacherName
+          });
+        }
+      } catch (err) {
+        console.error(`Error fetching class ${classId}:`, err);
+      }
+    }
+  }
+  return classes;
+}
+
 // Teacher signup
 router.post('/teacher-signup', async (req, res) => {
   try {
@@ -205,19 +229,8 @@ router.post('/verify-login', async (req, res) => {
 
     // Get all classes for students
     let classes = [];
-    if (userData.role === 'student' && userData.classIds && userData.classIds.length > 0) {
-      for (const classId of userData.classIds) {
-        const classDoc = await db.collection('classes').doc(classId).get();
-        if (classDoc.exists) {
-          const classData = classDoc.data();
-          classes.push({
-            id: classId,
-            name: classData.name,
-            code: classData.code,
-            teacherName: classData.teacherName
-          });
-        }
-      }
+    if (userData.role === 'student') {
+      classes = await getStudentClasses(userData.classIds);
     }
 
     res.json({
@@ -458,6 +471,12 @@ router.post('/google-login', async (req, res) => {
         return res.status(403).json({ error: 'Account pending admin approval. Please contact an administrator.' });
       }
 
+      // Get all classes for students
+      let classes = [];
+      if (userData.role === 'student') {
+        classes = await getStudentClasses(userData.classIds);
+      }
+
       // Return user data
       return res.json({
         message: 'Login successful',
@@ -467,6 +486,7 @@ router.post('/google-login', async (req, res) => {
           role: userData.role,
           displayName: userData.displayName,
           username: userData.username,
+          classes,
           classIds: userData.classIds
         }
       });
@@ -474,7 +494,7 @@ router.post('/google-login', async (req, res) => {
 
     // New user signup
     if (isTeacher) {
-      // Create new teacher account
+      // ... (teacher code) ...
       const newTeacherData = {
         role: 'teacher',
         displayName: displayName || name || email.split('@')[0],
@@ -534,6 +554,9 @@ router.post('/google-login', async (req, res) => {
       studentIds: [...(classData.studentIds || []), uid]
     });
 
+    // Get all classes (just the one they joined)
+    const classes = await getStudentClasses(newUserData.classIds);
+
     res.status(201).json({
       message: 'Student account created with Google successfully',
       user: {
@@ -542,6 +565,7 @@ router.post('/google-login', async (req, res) => {
         role: newUserData.role,
         displayName: newUserData.displayName,
         username: newUserData.username,
+        classes,
         classIds: newUserData.classIds
       }
     });

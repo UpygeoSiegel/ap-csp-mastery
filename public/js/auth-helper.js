@@ -63,19 +63,58 @@ window.AuthHelper = {
                         const token = await user.getIdToken();
                         localStorage.setItem('authToken', token);
 
-                        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                        // Try to get cached userData
+                        let userData = JSON.parse(localStorage.getItem('userData') || 'null');
+
+                        // If no cached data, or we want fresh data, fetch from backend
+                        if (!userData || options.fresh) {
+                            try {
+                                const response = await fetch(`${window.location.origin}/api/auth/verify-login`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({
+                                        // We don't strictly need these as backend checks the role in DB
+                                        // but it helps the backend verify intent
+                                        isTeacher: window.location.pathname.includes('/teacher/'),
+                                        isAdmin: window.location.pathname.includes('/admin/')
+                                    })
+                                });
+
+                                if (response.ok) {
+                                    const data = await response.json();
+                                    userData = data.user;
+                                    localStorage.setItem('userData', JSON.stringify(userData));
+                                } else {
+                                    // If backend verification fails, sign out
+                                    console.warn('Backend verification failed');
+                                    if (requireAuth) {
+                                        this.signOut();
+                                    }
+                                    reject(new Error('Backend verification failed'));
+                                    return;
+                                }
+                            } catch (err) {
+                                console.error('Error fetching user data:', err);
+                                // If we have cached data, we can still proceed
+                                if (!userData) {
+                                    reject(err);
+                                    return;
+                                }
+                            }
+                        }
 
                         // Check role if required
                         if (allowedRoles && !allowedRoles.includes(userData.role)) {
-                            // Don't sign out or redirect here - let the calling code handle it
-                            // The user might be logged in with a different role (e.g., teacher vs admin)
                             reject(new Error('Unauthorized role'));
                             return;
                         }
 
                         resolve({ token, userData, user });
                     } catch (error) {
-                        console.error('Error getting token:', error);
+                        console.error('Error in auth check:', error);
                         reject(error);
                     }
                 } else {

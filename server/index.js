@@ -22,7 +22,18 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static(path.join(__dirname, '../public')));
+
+// Request logger for debugging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// DEBUG ROUTE
+app.put('/api/admin/topics/:topicId/update-resources', (req, res) => {
+  console.log('DEBUG ROUTE HIT!');
+  res.json({ message: 'DEBUG ROUTE HIT OK' });
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -30,10 +41,13 @@ app.use('/api/classes', classRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/questions', questionRoutes);
-app.use('/api/topics', topicRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/topics', topicRoutes);
 
-// Serve static files
+// Static files
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Serve static files HTML fallback
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
