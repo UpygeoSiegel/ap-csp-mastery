@@ -391,7 +391,54 @@ router.post('/questions/bulk', async (req, res) => {
   }
 });
 
-module.exports = router;
+
+// Update topic resources (admin only)
+router.put('/topics/:topicId/update-resources', async (req, res) => {
+  try {
+    const { topicId } = req.params;
+    const { resources } = req.body;
+
+    // Validate input
+    if (!resources || typeof resources !== 'object') {
+      return res.status(400).json({ error: 'Resources object is required' });
+    }
+
+    // Get existing topic
+    const topicRef = db.collection('topics').doc(topicId);
+    const topicDoc = await topicRef.get();
+
+    if (!topicDoc.exists) {
+      return res.status(404).json({ error: 'Topic not found' });
+    }
+
+    const existingTopic = topicDoc.data();
+    
+    // Preserve existing custom teacher resources
+    const existingCustomResources = existingTopic.resources?.customTeacherResources || [];
+    
+    // Update topic with new resources
+    const updatedResources = {
+      khanAcademy: resources.khanAcademy || [],
+      additional: resources.additional || [],
+      customTeacherResources: existingCustomResources
+    };
+
+    await topicRef.update({
+      resources: updatedResources,
+      updatedAt: new Date()
+    });
+
+    res.json({
+      message: 'Topic resources updated successfully',
+      topicId,
+      resources: updatedResources
+    });
+
+  } catch (error) {
+    console.error('Admin update topic resources error:', error);
+    res.status(500).json({ error: 'Failed to update topic resources' });
+  }
+});
 
 // Teacher Management
 router.get('/teachers', async (req, res) => {
@@ -527,3 +574,4 @@ router.post('/flags/:flagId/resolve', async (req, res) => {
   }
 });
 
+module.exports = router;

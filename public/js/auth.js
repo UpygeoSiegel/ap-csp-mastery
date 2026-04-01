@@ -68,7 +68,6 @@ class APMastery {
 
         // Class code validation
         document.getElementById('student-class-code')?.addEventListener('input', (e) => this.handleClassCodeInput(e));
-        document.getElementById('student-login-class-code')?.addEventListener('input', (e) => this.handleClassCodeInput(e));
 
         // Username availability checking
         document.getElementById('student-username')?.addEventListener('blur', () => this.checkUsernameAvailability());
@@ -349,7 +348,6 @@ class APMastery {
                 // Switch to login form
                 this.switchStudentForm('login');
                 // Pre-fill login form
-                document.getElementById('student-login-class-code').value = formData.get('classCode');
                 document.getElementById('student-login-username').value = formData.get('username');
             } else {
                 this.showToast(data.error, 'error');
@@ -364,11 +362,15 @@ class APMastery {
     // Handle Google Auth for Students and Teachers
     async handleGoogleAuth(isSignup, isTeacher) {
         let classCode = null;
-        if (isSignup && !isTeacher) {
-            classCode = document.getElementById('student-class-code')?.value?.trim();
+        if (!isTeacher && isSignup) {
+            // Get class code from signup field
+            const classCodeInput = document.getElementById('student-class-code');
+            
+            classCode = classCodeInput?.value?.trim();
+            
             if (!classCode) {
                 this.showToast('Please enter a class code first', 'warning');
-                document.getElementById('student-class-code')?.focus();
+                classCodeInput?.focus();
                 return;
             }
             if (classCode.length !== 6) {
@@ -416,8 +418,10 @@ class APMastery {
                 // Account doesn't exist, prompt for class code if we don't have one
                 this.hideLoading();
                 const code = prompt(`Welcome ${data.name}! Please enter your 6-character Class Code to join:`);
-                if (code) {
-                    this.handleGoogleAuthWithCode(idToken, code, data.name);
+                if (code && code.trim().length === 6) {
+                    await this.handleGoogleAuthWithCode(idToken, code.toUpperCase().trim(), data.name);
+                } else if (code) {
+                    this.showToast('Please enter a valid 6-character class code', 'error');
                 }
             } else {
                 this.showToast(data.error || 'Google auth failed', 'error');

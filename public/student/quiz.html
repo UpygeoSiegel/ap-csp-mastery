@@ -63,10 +63,12 @@
             display: flex;
             align-items: center;
             padding: 1rem;
+            padding-right: 3rem; /* Make room for cross-out button */
             border: 2px solid var(--gray-200);
             border-radius: var(--border-radius);
             cursor: pointer;
             transition: all 0.2s;
+            position: relative;
         }
         .option-item:hover {
             border-color: var(--primary-blue);
@@ -83,6 +85,43 @@
         .option-item.incorrect {
             border-color: var(--danger-red);
             background: rgba(220, 38, 38, 0.1);
+        }
+        .option-item.crossed-out {
+            opacity: 0.6;
+            position: relative;
+        }
+        .option-item.crossed-out .option-text {
+            text-decoration: line-through;
+            text-decoration-color: var(--danger-red);
+            text-decoration-thickness: 2px;
+        }
+        .cross-out-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            user-select: none;
+            line-height: 1;
+        }
+        .cross-out-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text);
+        }
+        .cross-out-btn.active {
+            color: var(--danger-red);
+            background: rgba(220, 38, 38, 0.1);
+        }
+        .cross-out-btn.active:hover {
+            background: rgba(220, 38, 38, 0.2);
         }
         .option-item input {
             margin-right: 1rem;
@@ -382,6 +421,7 @@
         let quizData = null;
         let currentQuestionIndex = 0;
         let answers = {};
+        let crossedOutChoices = {};
         let questionTimes = {};
         let questionStartTime = null;
         const flaggedQuestions = new Set();
@@ -528,10 +568,17 @@
                         ${question.options.map((opt, idx) => {
                             const oId = opt.id || idx.toString();
                             const selected = (answers[question.id] || []).includes(oId);
+                            const crossedOut = (crossedOutChoices[question.id] || []).includes(oId);
                             return `
-                                <label class="option-item ${selected ? 'selected' : ''}" onclick="selectOption('${question.id}', '${oId}', '${question.type}')">
+                                <label class="option-item ${selected ? 'selected' : ''} ${crossedOut ? 'crossed-out' : ''}" 
+                                       onclick="selectOption('${question.id}', '${oId}', '${question.type}')">
                                     <input type="${question.type === 'multiple_select' ? 'checkbox' : 'radio'}" name="q-${question.id}" ${selected ? 'checked' : ''}>
                                     <span class="option-text">${formatQuestionText(opt.text || opt)}</span>
+                                    <button type="button" class="cross-out-btn ${crossedOut ? 'active' : ''}" 
+                                            onclick="event.stopPropagation(); toggleCrossOut('${question.id}', '${oId}')"
+                                            title="${crossedOut ? 'Remove cross-out' : 'Cross out this option'}">
+                                        ${crossedOut ? '↺' : '—'}
+                                    </button>
                                 </label>
                             `;
                         }).join('')}
@@ -552,6 +599,17 @@
                 const i = answers[qId].indexOf(oId);
                 i > -1 ? answers[qId].splice(i, 1) : answers[qId].push(oId);
             } else answers[qId] = [oId];
+            renderQuiz();
+        }
+
+        function toggleCrossOut(qId, oId) {
+            if (!crossedOutChoices[qId]) crossedOutChoices[qId] = [];
+            const index = crossedOutChoices[qId].indexOf(oId);
+            if (index > -1) {
+                crossedOutChoices[qId].splice(index, 1);
+            } else {
+                crossedOutChoices[qId].push(oId);
+            }
             renderQuiz();
         }
 
