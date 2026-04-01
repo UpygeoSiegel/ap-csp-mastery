@@ -54,6 +54,9 @@ router.put('/topics/:topicId/update-resources', async (req, res) => {
     const { topicId } = req.params;
     const { resources } = req.body;
 
+    console.log(`Updating resources for topic: ${topicId}`);
+    console.log('Received resources:', JSON.stringify(resources, null, 2));
+
     // Validate input
     if (!resources || typeof resources !== 'object') {
       return res.status(400).json({ error: 'Resources object is required' });
@@ -64,10 +67,12 @@ router.put('/topics/:topicId/update-resources', async (req, res) => {
     const topicDoc = await topicRef.get();
 
     if (!topicDoc.exists) {
+      console.log(`Topic NOT FOUND: ${topicId}`);
       return res.status(404).json({ error: 'Topic not found' });
     }
 
     const existingTopic = topicDoc.data();
+    console.log(`Found topic: ${existingTopic.name || existingTopic.title}`);
     
     // Preserve existing custom teacher resources
     const existingCustomResources = existingTopic.resources?.customTeacherResources || [];
@@ -79,10 +84,14 @@ router.put('/topics/:topicId/update-resources', async (req, res) => {
       customTeacherResources: existingCustomResources
     };
 
+    console.log('Final updatedResources object to save:', JSON.stringify(updatedResources, null, 2));
+
     await topicRef.update({
       resources: updatedResources,
       updatedAt: new Date()
     });
+
+    console.log('Successfully updated topic in Firestore');
 
     res.json({
       message: 'Topic resources updated successfully',

@@ -29,12 +29,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// DEBUG ROUTE
-app.put('/api/admin/topics/:topicId/update-resources', (req, res) => {
-  console.log('DEBUG ROUTE HIT!');
-  res.json({ message: 'DEBUG ROUTE HIT OK' });
-});
-
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);

@@ -1490,6 +1490,7 @@
                                 ${bigIdea.topics.map(topic => `
                                     <div class="topic-resource-card" style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--surface2);">
                                         <h4 style="margin: 0 0 0.5rem 0; color: var(--accent);">${topic.topicCode} - ${topic.title}</h4>
+                                        <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem;">ID: ${topic.id}</p>
                                         <button class="btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="editTopicResources('${topic.id}', '${escapeHtml(topic.title)}')">
                                             Edit Resources
                                         </button>
@@ -1541,7 +1542,7 @@
                                     <h4>📚 Khan Academy Resources</h4>
                                     <div id="khan-resources">
                                         ${resources.khanAcademy.map((resource, index) => `
-                                            <div class="resource-item" id="khan-resource-${index}" data-edit-mode="false" style="border: 1px solid var(--border); padding: 1rem; margin-bottom: 0.5rem; border-radius: 6px; background: var(--surface2);">
+                                            <div class="resource-item" id="khanAcademy-resource-${index}" data-edit-mode="false" style="border: 1px solid var(--border); padding: 1rem; margin-bottom: 0.5rem; border-radius: 6px; background: var(--surface2);">
                                                 <div style="display: flex; gap: 1rem; align-items: flex-start;">
                                                     <div style="flex: 1;">
                                                         <div class="resource-preview" style="display: block;">
@@ -1563,14 +1564,14 @@
                                                         </div>
                                                     </div>
                                                     <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 80px;">
-                                                        <button type="button" onclick="toggleResourceEdit('khan', ${index})" class="btn-secondary resource-edit-btn" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; white-space: nowrap;">Edit</button>
-                                                        <button type="button" onclick="saveIndividualResource('khan', ${index})" class="btn-primary resource-save-btn" style="display: none; padding: 0.4rem 0.8rem; font-size: 0.75rem; white-space: nowrap;">Save</button>
-                                                        <button type="button" onclick="removeResource('khan', ${index})" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background: var(--danger-red); color: white; border-color: var(--danger-red);">Remove</button>
+                                                        <button type="button" onclick="toggleResourceEdit('khanAcademy', ${index})" class="btn-secondary resource-edit-btn" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; white-space: nowrap;">Edit</button>
+                                                        <button type="button" onclick="saveIndividualResource('khanAcademy', ${index})" class="btn-primary resource-save-btn" style="display: none; padding: 0.4rem 0.8rem; font-size: 0.75rem; white-space: nowrap;">Save</button>
+                                                        <button type="button" onclick="removeResource('khanAcademy', ${index})" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background: var(--danger-red); color: white; border-color: var(--danger-red);">Remove</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         `).join('')}
-                                        <button type="button" onclick="addResource('khan')" class="btn-secondary" style="margin-top: 0.5rem;">+ Add Khan Academy Resource</button>
+                                        <button type="button" onclick="addResource('khanAcademy')" class="btn-secondary" style="margin-top: 0.5rem;">+ Add Khan Academy Resource</button>
                                     </div>
                                 </div>
                                 
@@ -1678,21 +1679,24 @@
         const resources = container.querySelectorAll('.resource-item');
         const newIndex = resources.length;
         
+        // Standardize type name
+        const standardizedType = (type === 'khan' || type === 'khanAcademy') ? 'khanAcademy' : 'additional';
+        
         const newResourceHTML = `
-            <div class="resource-item" id="${type}-resource-${newIndex}" data-edit-mode="true" style="border: 1px solid var(--border); padding: 1rem; margin-bottom: 0.5rem; border-radius: 6px; background: var(--surface2);">
+            <div class="resource-item" id="${standardizedType}-resource-${newIndex}" data-edit-mode="true" style="border: 1px solid var(--border); padding: 1rem; margin-bottom: 0.5rem; border-radius: 6px; background: var(--surface2);">
                 <div style="display: flex; gap: 1rem; align-items: flex-start;">
                     <div style="flex: 1;">
                         <div class="resource-preview" style="display: none;">
                             <h5 style="margin: 0 0 0.5rem 0; color: var(--accent);">New Resource</h5>
-                            <p style="margin: 0 0 0.5rem 0; font-size: 0.85rem; color: var(--muted);"><strong>Type:</strong> ${type === 'khanAcademy' ? 'article' : 'external'}</p>
+                            <p style="margin: 0 0 0.5rem 0; font-size: 0.85rem; color: var(--muted);"><strong>Type:</strong> ${standardizedType === 'khanAcademy' ? 'article' : 'external'}</p>
                             <p style="margin: 0 0 0.5rem 0; font-size: 0.85rem; color: var(--muted);"><strong>URL:</strong> Not set</p>
                             <p style="margin: 0; font-size: 0.85rem; color: var(--text);">No description</p>
                         </div>
                         <div class="resource-edit" style="display: block;">
-                            <input type="text" placeholder="Resource Title" value="" data-field="title" data-type="${type === 'khan' ? 'khanAcademy' : type}" data-index="${newIndex}" style="width: 100%; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box;">
-                            <input type="url" placeholder="Resource URL" value="" data-field="url" data-type="${type === 'khan' ? 'khanAcademy' : type}" data-index="${newIndex}" style="width: 100%; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box;">
-                            <select data-field="type" data-type="${type === 'khan' ? 'khanAcademy' : type}" data-index="${newIndex}" style="width: 100%; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box;">
-                                ${(type === 'khanAcademy' || type === 'khan') ? 
+                            <input type="text" placeholder="Resource Title" value="" data-field="title" data-type="${standardizedType}" data-index="${newIndex}" style="width: 100%; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box;">
+                            <input type="url" placeholder="Resource URL" value="" data-field="url" data-type="${standardizedType}" data-index="${newIndex}" style="width: 100%; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box;">
+                            <select data-field="type" data-type="${standardizedType}" data-index="${newIndex}" style="width: 100%; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box;">
+                                ${standardizedType === 'khanAcademy' ? 
                                     `<option value="article">Article</option>
                                      <option value="video">Video</option>
                                      <option value="exercise">Exercise</option>
@@ -1703,13 +1707,13 @@
                                      <option value="video">Video</option>`
                                 }
                             </select>
-                            <textarea placeholder="Description" data-field="description" data-type="${type === 'khan' ? 'khanAcademy' : type}" data-index="${newIndex}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; min-height: 60px; box-sizing: border-box;"></textarea>
+                            <textarea placeholder="Description" data-field="description" data-type="${standardizedType}" data-index="${newIndex}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; min-height: 60px; box-sizing: border-box;"></textarea>
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 80px;">
-                        <button type="button" onclick="toggleResourceEdit('${type}', ${newIndex})" class="btn-secondary resource-edit-btn" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; white-space: nowrap;">Cancel</button>
-                        <button type="button" onclick="saveIndividualResource('${type}', ${newIndex})" class="btn-primary resource-save-btn" style="display: block; padding: 0.4rem 0.8rem; font-size: 0.75rem; white-space: nowrap;">Save</button>
-                        <button type="button" onclick="removeResource('${type}', ${newIndex})" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background: var(--danger-red); color: white; border-color: var(--danger-red);">Remove</button>
+                        <button type="button" onclick="toggleResourceEdit('${standardizedType}', ${newIndex})" class="btn-secondary resource-edit-btn" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; white-space: nowrap;">Cancel</button>
+                        <button type="button" onclick="saveIndividualResource('${standardizedType}', ${newIndex})" class="btn-primary resource-save-btn" style="display: block; padding: 0.4rem 0.8rem; font-size: 0.75rem; white-space: nowrap;">Save</button>
+                        <button type="button" onclick="removeResource('${standardizedType}', ${newIndex})" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background: var(--danger-red); color: white; border-color: var(--danger-red);">Remove</button>
                     </div>
                 </div>
             </div>
@@ -1749,9 +1753,12 @@
     }
 
     async function saveIndividualResource(type, index) {
-        const resourceItem = document.getElementById(`${type}-resource-${index}`);
+        // Standardize type name
+        const standardizedType = (type === 'khan' || type === 'khanAcademy') ? 'khanAcademy' : 'additional';
+        
+        const resourceItem = document.getElementById(`${standardizedType}-resource-${index}`);
         if (!resourceItem) {
-            console.error('Resource item not found:', `${type}-resource-${index}`);
+            console.error('Resource item not found:', `${standardizedType}-resource-${index}`);
             return;
         }
 
@@ -1769,7 +1776,12 @@
             return;
         }
 
-        const topicId = saveAllBtn.getAttribute('onclick').match(/saveTopicResources\('([^']+)'\)/)[1];
+        const match = saveAllBtn.getAttribute('onclick').match(/saveTopicResources\('([^']+)'\)/);
+        if (!match) {
+            console.error('Could not parse topic ID from button');
+            return;
+        }
+        const topicId = match[1];
 
         try {
             // Get current values from the form
@@ -1788,53 +1800,31 @@
                 return;
             }
 
-            // Collect all current resources to preserve them
+            // Collect all current resources from the UI to preserve them
             const khanResources = [];
             const additionalResources = [];
             
             // Collect Khan Academy resources
-            document.querySelectorAll('#khan-resources .resource-item').forEach((item, itemIndex) => {
-                if (item === resourceItem && (type === 'khan' || type === 'khanAcademy')) {
-                    // Use the updated values for the current item
-                    khanResources.push({ title, url, type: resourceType, description });
-                } else {
-                    // Get existing values for other items
-                    const existingTitle = item.querySelector('.resource-preview h5')?.textContent || item.querySelector('[data-field="title"]')?.value || '';
-                    const existingUrl = item.querySelector('.resource-preview p:nth-child(3)')?.textContent?.replace('URL: ', '') || item.querySelector('[data-field="url"]')?.value || '';
-                    const existingType = item.querySelector('.resource-preview p:nth-child(2)')?.textContent?.replace('Type: ', '') || item.querySelector('[data-field="type"]')?.value || 'article';
-                    const existingDesc = item.querySelector('.resource-preview p:last-child')?.textContent || item.querySelector('[data-field="description"]')?.value || '';
-                    
-                    if (existingTitle && existingUrl) {
-                        khanResources.push({
-                            title: existingTitle,
-                            url: existingUrl,
-                            type: existingType,
-                            description: existingDesc
-                        });
-                    }
+            document.querySelectorAll('#khan-resources .resource-item').forEach((item) => {
+                const itemTitle = item.querySelector('[data-field="title"]').value.trim();
+                const itemUrl = item.querySelector('[data-field="url"]').value.trim();
+                const itemType = item.querySelector('[data-field="type"]').value;
+                const itemDesc = item.querySelector('[data-field="description"]').value.trim();
+                
+                if (itemTitle && itemUrl) {
+                    khanResources.push({ title: itemTitle, url: itemUrl, type: itemType, description: itemDesc });
                 }
             });
             
             // Collect Additional resources
-            document.querySelectorAll('#additional-resources .resource-item').forEach((item, itemIndex) => {
-                if (item === resourceItem && type === 'additional') {
-                    // Use the updated values for the current item
-                    additionalResources.push({ title, url, type: resourceType, description });
-                } else {
-                    // Get existing values for other items
-                    const existingTitle = item.querySelector('.resource-preview h5')?.textContent || item.querySelector('[data-field="title"]')?.value || '';
-                    const existingUrl = item.querySelector('.resource-preview p:nth-child(3)')?.textContent?.replace('URL: ', '') || item.querySelector('[data-field="url"]')?.value || '';
-                    const existingType = item.querySelector('.resource-preview p:nth-child(2)')?.textContent?.replace('Type: ', '') || item.querySelector('[data-field="type"]')?.value || 'external';
-                    const existingDesc = item.querySelector('.resource-preview p:last-child')?.textContent || item.querySelector('[data-field="description"]')?.value || '';
-                    
-                    if (existingTitle && existingUrl) {
-                        additionalResources.push({
-                            title: existingTitle,
-                            url: existingUrl,
-                            type: existingType,
-                            description: existingDesc
-                        });
-                    }
+            document.querySelectorAll('#additional-resources .resource-item').forEach((item) => {
+                const itemTitle = item.querySelector('[data-field="title"]').value.trim();
+                const itemUrl = item.querySelector('[data-field="url"]').value.trim();
+                const itemType = item.querySelector('[data-field="type"]').value;
+                const itemDesc = item.querySelector('[data-field="description"]').value.trim();
+                
+                if (itemTitle && itemUrl) {
+                    additionalResources.push({ title: itemTitle, url: itemUrl, type: itemType, description: itemDesc });
                 }
             });
             
@@ -1848,8 +1838,7 @@
                 body: JSON.stringify({
                     resources: {
                         khanAcademy: khanResources,
-                        additional: additionalResources,
-                        customTeacherResources: [] // Keep existing teacher resources
+                        additional: additionalResources
                     }
                 })
             });
@@ -1873,7 +1862,7 @@
             previewDiv.querySelector('p:last-child').textContent = description || 'No description';
             
             // Switch back to preview mode
-            toggleResourceEdit(type, index);
+            toggleResourceEdit(standardizedType, index);
             
             showToast('Resource saved successfully!', 'success');
             
@@ -1890,25 +1879,39 @@
             
             // Collect Khan Academy resources
             document.querySelectorAll('#khan-resources .resource-item').forEach(item => {
-                const title = item.querySelector('[data-field="title"]').value.trim();
-                const url = item.querySelector('[data-field="url"]').value.trim();
-                const type = item.querySelector('[data-field="type"]').value;
-                const description = item.querySelector('[data-field="description"]').value.trim();
+                const titleInput = item.querySelector('[data-field="title"]');
+                const urlInput = item.querySelector('[data-field="url"]');
+                const typeSelect = item.querySelector('[data-field="type"]');
+                const descTextarea = item.querySelector('[data-field="description"]');
                 
-                if (title && url) {
-                    khanResources.push({ title, url, type, description });
+                if (titleInput && urlInput) {
+                    const title = titleInput.value.trim();
+                    const url = urlInput.value.trim();
+                    const type = typeSelect ? typeSelect.value : 'article';
+                    const description = descTextarea ? descTextarea.value.trim() : '';
+                    
+                    if (title && url) {
+                        khanResources.push({ title, url, type, description });
+                    }
                 }
             });
             
             // Collect Additional resources  
             document.querySelectorAll('#additional-resources .resource-item').forEach(item => {
-                const title = item.querySelector('[data-field="title"]').value.trim();
-                const url = item.querySelector('[data-field="url"]').value.trim();
-                const type = item.querySelector('[data-field="type"]').value;
-                const description = item.querySelector('[data-field="description"]').value.trim();
+                const titleInput = item.querySelector('[data-field="title"]');
+                const urlInput = item.querySelector('[data-field="url"]');
+                const typeSelect = item.querySelector('[data-field="type"]');
+                const descTextarea = item.querySelector('[data-field="description"]');
                 
-                if (title && url) {
-                    additionalResources.push({ title, url, type, description });
+                if (titleInput && urlInput) {
+                    const title = titleInput.value.trim();
+                    const url = urlInput.value.trim();
+                    const type = typeSelect ? typeSelect.value : 'external';
+                    const description = descTextarea ? descTextarea.value.trim() : '';
+                    
+                    if (title && url) {
+                        additionalResources.push({ title, url, type, description });
+                    }
                 }
             });
             
@@ -1922,8 +1925,7 @@
                 body: JSON.stringify({
                     resources: {
                         khanAcademy: khanResources,
-                        additional: additionalResources,
-                        customTeacherResources: [] // Keep existing teacher resources
+                        additional: additionalResources
                     }
                 })
             });
@@ -1935,6 +1937,9 @@
             
             showToast('Resources saved successfully!', 'success');
             closeResourcesModal();
+            
+            // Reload the resource management view to show updated data
+            loadResourceManagement();
             
         } catch (error) {
             console.error('Error saving resources:', error);
