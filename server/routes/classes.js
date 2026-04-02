@@ -81,8 +81,8 @@ router.post('/', verifyTeacher, async (req, res) => {
     }
 
     // Validate progressionMode
-    if (!['linear', 'unlocked'].includes(progressionMode)) {
-      return res.status(400).json({ error: 'Progression mode must be "linear" or "unlocked"' });
+    if (!['linear', 'unlocked', 'manual'].includes(progressionMode)) {
+      return res.status(400).json({ error: 'Progression mode must be "linear", "unlocked", or "manual"' });
     }
 
     // Generate unique class code
@@ -451,7 +451,8 @@ router.get('/:classId/matrix', verifyTeacher, verifyClassAccess, async (req, res
           progress[p.topicId] = {
             status: p.status,
             bestScore,
-            attemptCount: attempts.length
+            attemptCount: attempts.length,
+            retakeUnlocked: p.retakeUnlocked || false
           };
 
           if (p.status === 'passed') passedCount++;
@@ -488,7 +489,8 @@ router.get('/:classId/matrix', verifyTeacher, verifyClassAccess, async (req, res
       classInfo: {
         id: classId,
         name: classData.name,
-        code: classData.code
+        code: classData.code,
+        progressionMode: classData.progressionMode || 'linear'
       },
       bigIdeas,
       topics,

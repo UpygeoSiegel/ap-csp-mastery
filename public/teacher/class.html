@@ -277,23 +277,34 @@
             gap: 0.25rem;
         }
         .btn-reset-password {
-            background: none;
-            border: none;
-            color: var(--dim);
+            background: var(--bg);
+            border: 1px solid var(--border2);
+            color: var(--muted);
             cursor: pointer;
-            padding: 4px;
+            padding: 6px;
             margin-left: 8px;
-            border-radius: 4px;
+            border-radius: 6px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            opacity: 0.4;
+            box-shadow: var(--shadow-sm);
         }
         .btn-reset-password:hover {
             color: var(--accent);
-            background: rgba(59, 130, 246, 0.1);
-            opacity: 1;
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            background: var(--surface2);
+        }
+        .btn-reset-password.active {
+            color: var(--success);
+            border-color: var(--success);
+            background: rgba(78, 201, 123, 0.05);
+        }
+        .btn-reset-password:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
         .student-name {
             display: flex;
@@ -612,6 +623,134 @@
             padding: 3rem;
             color: var(--muted);
         }
+        /* Student Detail Modal Styles */
+        .student-detail-content {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .big-idea-section {
+            margin-bottom: 2rem;
+        }
+        .big-idea-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+        .big-idea-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text);
+            flex: 1;
+        }
+        .big-idea-progress {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+        .topic-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 1rem;
+            background: var(--surface2);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .topic-card:hover {
+            border-color: var(--border2);
+            background: var(--dim);
+        }
+        .topic-card.mastered {
+            border-left: 3px solid var(--success);
+        }
+        .topic-card.in-progress {
+            border-left: 3px solid var(--accent);
+        }
+        .topic-card.not-started {
+            border-left: 3px solid var(--border2);
+            opacity: 0.7;
+        }
+        .topic-name {
+            font-size: 0.9rem;
+            color: var(--text);
+            font-weight: 500;
+            flex: 1;
+            margin-right: 1rem;
+        }
+        .topic-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .topic-status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        .topic-status-icon.mastered {
+            background: rgba(78, 201, 123, 0.15);
+            color: var(--success);
+        }
+        .topic-status-icon.in-progress {
+            background: var(--dim);
+            color: var(--accent);
+        }
+        .topic-status-icon.not-started {
+            background: var(--bg);
+            color: var(--muted);
+        }
+        .student-summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--surface2);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .summary-stat {
+            text-align: center;
+        }
+        .summary-stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            font-family: 'Barlow Condensed', sans-serif;
+            line-height: 1;
+        }
+        .summary-stat-value.success { color: var(--success); }
+        .summary-stat-value.accent { color: var(--accent); }
+        .summary-stat-value.muted { color: var(--muted); }
+        .summary-stat-label {
+            font-size: 0.65rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+            margin-top: 0.5rem;
+        }
+        .student-name-link {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .student-name-link:hover {
+            color: var(--accent);
+        }
         .pseudocode-block {
             background: var(--surface2);
             border: 1px solid var(--border);
@@ -649,7 +788,19 @@
             <div class="class-header">
                 <div class="class-info">
                     <h2 id="class-name">Loading...</h2>
-                    <div class="class-code" id="class-code">---</div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="class-code" id="class-code">---</div>
+                        <div id="progression-mode-badge" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 4px; background: var(--surface2); color: var(--muted); border: 1px solid var(--border2);">
+                            ---
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="manual-mode-note" style="display: none; background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent); padding: 1rem; border-radius: 12px; margin-bottom: 2rem; color: var(--text); font-size: 0.9rem;">
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <span><strong>Manual Mode Active:</strong> Quizzes must be unlocked individually. Click on a Big Idea below to view and unlock specific topic quizzes for your students.</span>
                 </div>
             </div>
 
@@ -694,6 +845,22 @@
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body" id="modal-body">
+                <div class="no-attempts">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Detail Modal -->
+    <div id="student-detail-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 900px;">
+            <div class="modal-header">
+                <div>
+                    <h3 id="student-detail-title">Student Progress</h3>
+                    <p id="student-detail-subtitle">All Topics</p>
+                </div>
+                <button class="modal-close" onclick="closeStudentDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="student-detail-body">
                 <div class="no-attempts">Loading...</div>
             </div>
         </div>
@@ -765,6 +932,25 @@
                 document.getElementById('class-code').textContent = matrixData.classInfo.code;
                 document.title = `${matrixData.classInfo.name} - AP Mastery`;
 
+                // Update progression mode badge
+                const modeBadge = document.getElementById('progression-mode-badge');
+                const manualNote = document.getElementById('manual-mode-note');
+                const mode = matrixData.classInfo.progressionMode || 'linear';
+                
+                modeBadge.textContent = mode === 'manual' ? 'Manual Mode' : (mode === 'unlocked' ? 'Unlocked Mode' : 'Linear Mode');
+                
+                if (mode === 'manual') {
+                    modeBadge.style.color = 'var(--accent)';
+                    modeBadge.style.borderColor = 'var(--accent)';
+                    modeBadge.style.background = 'var(--dim)';
+                    manualNote.style.display = currentView === 'units' ? 'block' : 'none';
+                } else {
+                    modeBadge.style.color = 'var(--muted)';
+                    modeBadge.style.borderColor = 'var(--border2)';
+                    modeBadge.style.background = 'var(--surface2)';
+                    manualNote.style.display = 'none';
+                }
+
                 if (bigIdeaId) {
                     showTopicsView(bigIdeaId);
                 } else {
@@ -788,6 +974,11 @@
             currentView = 'units';
             selectedBigIdeaId = null;
             document.getElementById('section-header').style.display = 'none';
+            
+            const manualNote = document.getElementById('manual-mode-note');
+            if (matrixData.classInfo.progressionMode === 'manual') {
+                manualNote.style.display = 'block';
+            }
 
             const { classInfo, bigIdeas, students } = matrixData;
 
@@ -829,7 +1020,7 @@
             tbody.innerHTML = students.map(student => {
                 let cells = `
                     <td class="student-name">
-                        <span>${student.displayName || student.username}</span>
+                        <span class="student-name-link" onclick="openStudentDetailModal('${student.id}')">${student.displayName || student.username}</span>
                         <button class="btn-reset-password" onclick="event.stopPropagation(); resetStudentPassword('${student.id}', '${student.displayName || student.username}')" title="Reset Password">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"/></svg>
                         </button>
@@ -856,6 +1047,8 @@
         function showTopicsView(bigIdeaId) {
             currentView = 'topics';
             selectedBigIdeaId = bigIdeaId;
+            
+            document.getElementById('manual-mode-note').style.display = 'none';
 
             const bigIdea = matrixData.bigIdeas.find(bi => bi.id === bigIdeaId);
             document.getElementById('section-header').style.display = 'flex';
@@ -873,7 +1066,25 @@
             topics.forEach(topic => {
                 const th = document.createElement('th');
                 th.className = 'topic-header';
-                th.textContent = topic.name;
+                
+                let bulkHtml = '';
+                if (matrixData.classInfo.progressionMode === 'manual') {
+                    bulkHtml = `
+                        <div style="display: flex; justify-content: center; gap: 4px; margin-top: 8px;">
+                            <button class="btn-reset-password" style="padding: 2px; box-shadow: none;" onclick="handleBulkOverride('${topic.id}', '${topic.name}', 'unlock')" title="Unlock quiz for ALL students">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+                            </button>
+                            <button class="btn-reset-password" style="padding: 2px; box-shadow: none;" onclick="handleBulkOverride('${topic.id}', '${topic.name}', 'retake')" title="Allow ALL students to retake">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="23 4 23 10 19 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                th.innerHTML = `
+                    <div>${topic.name}</div>
+                    ${bulkHtml}
+                `;
                 th.title = topic.name;
                 headerRow.appendChild(th);
             });
@@ -900,7 +1111,7 @@
             tbody.innerHTML = students.map(student => {
                 let cells = `
                     <td class="student-name">
-                        <span>${student.displayName || student.username}</span>
+                        <span class="student-name-link" onclick="openStudentDetailModal('${student.id}')">${student.displayName || student.username}</span>
                         <button class="btn-reset-password" onclick="event.stopPropagation(); resetStudentPassword('${student.id}', '${student.displayName || student.username}')" title="Reset Password">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"/></svg>
                         </button>
@@ -937,10 +1148,36 @@
 
                     const attemptLabel = attemptCount > 0 ? `<span class="attempt-count">${attemptCount} attempt${attemptCount > 1 ? 's' : ''}</span>` : '';
 
+                    // Manual Unlock/Retake Actions
+                    let actionsHtml = '';
+                    if (matrixData.classInfo.progressionMode === 'manual') {
+                        if (!progress || progress.status === 'locked') {
+                            actionsHtml = `
+                                <button class="btn-reset-password" onclick="event.stopPropagation(); handleOverride('${student.id}', '${topic.id}', 'unlock')" title="Unlock quiz for student">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+                                </button>
+                            `;
+                        } else {
+                            // Already available or passed, allow manual retake unlock
+                            const isRetakeUnlocked = progress.retakeUnlocked;
+                            actionsHtml = `
+                                <button class="btn-reset-password ${isRetakeUnlocked ? 'active' : ''}" 
+                                        onclick="event.stopPropagation(); handleOverride('${student.id}', '${topic.id}', 'retake')" 
+                                        title="${isRetakeUnlocked ? 'Retake Already Unlocked' : 'Allow student to retake an exam'}"
+                                        ${isRetakeUnlocked ? 'disabled' : ''}>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="${isRetakeUnlocked ? 'color: var(--success)' : ''}"><polyline points="23 4 23 10 19 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                                </button>
+                            `;
+                        }
+                    }
+
                     cells += `
                         <td class="status-cell">
                             <div class="score-with-attempts">
-                                <span class="status-badge ${badgeClass} ${clickAttr}">${badgeText}</span>
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <span class="status-badge ${badgeClass} ${clickAttr}">${badgeText}</span>
+                                    ${actionsHtml}
+                                </div>
                                 ${attemptLabel}
                             </div>
                         </td>
@@ -979,10 +1216,11 @@
             }
         });
 
-        // Close modal on Escape key
+        // Close modals on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeModal();
+                closeStudentDetailModal();
             }
         });
 
@@ -1131,6 +1369,75 @@
             return escaped.replace(codeBlockRegex, (match, code) => `<div class="pseudocode-block">${code.trim()}</div>`);
         }
 
+        async function handleOverride(studentId, topicId, action) {
+            const actionLabel = action === 'retake' ? 'unlock a retake' : 'unlock this quiz';
+            if (!confirm(`Are you sure you want to ${actionLabel} for this student?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/progress/override`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        studentId,
+                        topicId,
+                        classId,
+                        action: action === 'retake' ? 'retake' : 'unlock'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message || 'Action successful!');
+                    loadMatrix(selectedBigIdeaId); // Reload the current view
+                } else {
+                    alert(data.error || 'Failed to perform action');
+                }
+            } catch (error) {
+                console.error('Error in handleOverride:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+
+        async function handleBulkOverride(topicId, topicName, action) {
+            const actionLabel = action === 'retake' ? 'allow ALL students to retake' : 'unlock this quiz for ALL students';
+            if (!confirm(`Are you sure you want to ${actionLabel} for the topic "${topicName}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/progress/override-bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        topicId,
+                        classId,
+                        action
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message || 'Bulk action successful!');
+                    loadMatrix(selectedBigIdeaId);
+                } else {
+                    alert(data.error || 'Failed to perform bulk action');
+                }
+            } catch (error) {
+                console.error('Error in handleBulkOverride:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+
         async function resetStudentPassword(studentId, studentName) {
             const newPassword = prompt(`Enter new password for ${studentName} (minimum 6 characters):`);
             if (!newPassword) return;
@@ -1166,6 +1473,144 @@
                 alert('An error occurred while resetting the password.');
             }
         }
+
+        // Student Detail Modal Functions
+        async function openStudentDetailModal(studentId) {
+            const modal = document.getElementById('student-detail-modal');
+            const body = document.getElementById('student-detail-body');
+
+            // Find student in current matrix data
+            const student = matrixData.students.find(s => s.id === studentId);
+            if (!student) {
+                alert('Student not found');
+                return;
+            }
+
+            document.getElementById('student-detail-title').textContent = student.displayName || student.username;
+            document.getElementById('student-detail-subtitle').textContent = 'Progress Across All Topics';
+            body.innerHTML = '<div class="no-attempts">Loading...</div>';
+            modal.classList.add('active');
+
+            // Fetch full topic data if we don't have it
+            // When in units view, we might not have all topics loaded
+            try {
+                const response = await fetch(`${apiBase}/classes/${classId}/matrix`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load data');
+
+                const fullData = await response.json();
+                renderStudentDetailModal(student, fullData);
+            } catch (error) {
+                console.error('Error loading student details:', error);
+                body.innerHTML = '<div class="no-attempts">Error loading student details</div>';
+            }
+        }
+
+        function renderStudentDetailModal(student, fullData) {
+            const body = document.getElementById('student-detail-body');
+            const { bigIdeas, topics } = fullData;
+
+            // Calculate summary stats
+            const totalTopics = topics.length;
+            const passedTopics = topics.filter(t => student.progress[t.id]?.status === 'passed').length;
+            const inProgressTopics = topics.filter(t => {
+                const p = student.progress[t.id];
+                return p && p.status === 'available' && p.attemptCount > 0;
+            }).length;
+            const notStartedTopics = totalTopics - passedTopics - inProgressTopics;
+
+            let html = `
+                <div class="student-summary-stats">
+                    <div class="summary-stat">
+                        <div class="summary-stat-value success">${passedTopics}</div>
+                        <div class="summary-stat-label">Mastered</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="summary-stat-value accent">${inProgressTopics}</div>
+                        <div class="summary-stat-label">In Progress</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="summary-stat-value muted">${notStartedTopics}</div>
+                        <div class="summary-stat-label">Not Started</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="summary-stat-value ${student.completionPercentage >= 80 ? 'success' : student.completionPercentage >= 40 ? 'accent' : 'muted'}">${student.completionPercentage}%</div>
+                        <div class="summary-stat-label">Overall</div>
+                    </div>
+                </div>
+                <div class="student-detail-content">
+            `;
+
+            // Group topics by Big Idea
+            bigIdeas.forEach(bigIdea => {
+                const biTopics = topics.filter(t => t.bigIdeaId === bigIdea.id);
+                if (biTopics.length === 0) return;
+
+                const biPassed = biTopics.filter(t => student.progress[t.id]?.status === 'passed').length;
+                const biPct = Math.round((biPassed / biTopics.length) * 100);
+                const pctClass = biPct >= 80 ? 'success' : biPct >= 40 ? 'accent' : 'muted';
+
+                html += `
+                    <div class="big-idea-section">
+                        <div class="big-idea-header">
+                            <span class="unit-indicator" style="background-color: ${bigIdea.color || '#3B82F6'}"></span>
+                            <h4>${bigIdea.name}</h4>
+                            <span class="big-idea-progress ${pctClass}">${biPassed}/${biTopics.length} (${biPct}%)</span>
+                        </div>
+                        <div class="topics-grid">
+                `;
+
+                biTopics.forEach(topic => {
+                    const progress = student.progress[topic.id];
+                    let statusClass = 'not-started';
+                    let statusIcon = '○';
+                    let statusText = 'Not Started';
+
+                    if (progress) {
+                        if (progress.status === 'passed') {
+                            statusClass = 'mastered';
+                            statusIcon = '✓';
+                            statusText = progress.bestScore !== null ? `${progress.bestScore}/5` : 'Passed';
+                        } else if (progress.attemptCount > 0) {
+                            statusClass = 'in-progress';
+                            statusIcon = '...';
+                            statusText = `${progress.attemptCount} attempt${progress.attemptCount > 1 ? 's' : ''}`;
+                        }
+                    }
+
+                    html += `
+                        <div class="topic-card ${statusClass}">
+                            <span class="topic-name">${topic.name}</span>
+                            <div class="topic-status">
+                                <span style="font-size: 0.75rem; color: var(--muted);">${statusText}</span>
+                                <span class="topic-status-icon ${statusClass}">${statusIcon}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            body.innerHTML = html;
+        }
+
+        function closeStudentDetailModal() {
+            document.getElementById('student-detail-modal').classList.remove('active');
+        }
+
+        // Close student detail modal on overlay click
+        document.getElementById('student-detail-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'student-detail-modal') {
+                closeStudentDetailModal();
+            }
+        });
 
         // Note: Initial load is handled by AuthHelper.checkAuth callback above
     </script>

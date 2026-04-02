@@ -171,6 +171,15 @@ router.post('/submit', async (req, res) => {
       return res.status(403).json({ error: 'You are not enrolled in this class' });
     }
 
+    // Get class settings
+    const classDoc = await db.collection('classes').doc(studentClassId).get();
+    if (!classDoc.exists) {
+      return res.status(404).json({ error: 'Class not found' });
+    }
+    const classData = classDoc.data();
+    const progressionMode = classData.progressionMode || 'linear';
+    const retakeWaitMinutes = classData.retakeWaitMinutes || 0;
+
     // Get topic
     const topicDoc = await db.collection('topics').doc(topicId).get();
     if (!topicDoc.exists) {
@@ -247,9 +256,17 @@ router.post('/submit', async (req, res) => {
       await progressDoc.ref.update(updateData);
     }
 
-    // If passed, unlock next topic
-    if (passed) {
+    // If passed, unlock next topic (unless in manual mode)
+    if (passed && progressionMode !== 'manual') {
       await unlockNextTopic(studentId, topicId, studentClassId);
+    }
+
+    // Reset retakeUnlocked flag if they take the quiz
+    if (progressQuery.docs.length > 0) {
+      await progressQuery.docs[0].ref.update({
+        retakeUnlocked: false,
+        updatedAt: new Date()
+      });
     }
 
     // Update question statistics for item analysis
@@ -282,7 +299,9 @@ router.post('/submit', async (req, res) => {
       totalQuestions: 5,
       results: detailedResults,
       studyResources,
-      message: passed ? 'Congratulations! You passed this topic!' : 'Keep practicing! You can retake this quiz.',
+      progressionMode,
+      retakeWaitMinutes,
+      message: passed ? 'Congratulations! You passed this topic!' : (progressionMode === 'manual' ? 'Quiz complete. Your teacher can unlock a retake for you.' : 'Keep practicing! You can retake this quiz.'),
       resourcesMessage: !passed ? 'Here are some resources to help you study:' : null
     });
 
@@ -326,9 +345,22 @@ async function checkTopicAvailability(studentId, topicId, classId, classData = n
     // Check wait time for retakes
     if (!progressDoc.empty) {
       const progress = progressDoc.docs[0].data();
+      const hasAttempts = progress.attempts && progress.attempts.length > 0;
 
-      // Check if there's a retake wait time requirement
-      if (retakeWaitMinutes > 0 && progress.attempts && progress.attempts.length > 0) {
+      // MANUAL MODE CHECK
+      if (progressionMode === 'manual') {
+        // In manual mode, if they have ANY attempts, they need retakeUnlocked
+        if (hasAttempts && !progress.retakeUnlocked) {
+          return { available: false, reason: 'A retake must be manually authorized by your teacher.' };
+        }
+        // If they have no attempts but are locked (not yet authorized for first attempt)
+        if (!hasAttempts && progress.status === 'locked') {
+           return { available: false, reason: 'This quiz must be manually unlocked by your teacher.' };
+        }
+      }
+
+      // Check if there's a retake wait time requirement (only for non-manual modes)
+      if (progressionMode !== 'manual' && retakeWaitMinutes > 0 && hasAttempts) {
         const lastAttempt = progress.attempts[progress.attempts.length - 1];
         const lastAttemptTime = lastAttempt.timestamp.toDate ? lastAttempt.timestamp.toDate() : new Date(lastAttempt.timestamp);
         const waitUntil = new Date(lastAttemptTime.getTime() + retakeWaitMinutes * 60 * 1000);
@@ -353,13 +385,30 @@ async function checkTopicAvailability(studentId, topicId, classId, classData = n
       }
     }
 
-    // If progression mode is 'unlocked', all topics are available
+    // If progression mode is 'unlocked', all topics are available (EXCEPT in manual mode)
     if (progressionMode === 'unlocked') {
       return { available: true };
     }
 
+    if (progressionMode === 'manual') {
+      // In manual mode, if no progress record exists and it wasn't caught above, it's locked
+      // BUT we also need to check for teacher overrides
+      const overrideDoc = await db.collection('teacherOverrides')
+        .where('classId', '==', classId)
+        .where('studentId', '==', studentId)
+        .where('topicId', '==', topicId)
+        .limit(1)
+        .get();
+
+      if (!overrideDoc.empty) {
+        return { available: true };
+      }
+
+      return { available: false, reason: 'This topic must be manually unlocked by your teacher.' };
+    }
+
     // Linear progression mode - check prerequisites
-    // For first topic (order 1), it's always available
+    // For first topic (order 1), it's always available (unless manual, which we handled above)
     if (topic.order === 1) {
       return { available: true };
     }

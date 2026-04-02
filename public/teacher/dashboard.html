@@ -499,6 +499,12 @@
             font-style: italic;
         }
 
+        select:disabled, input:disabled {
+            background-color: var(--surface2) !important;
+            color: var(--dim) !important;
+            cursor: not-allowed !important;
+        }
+
         .class-settings-badge {
             display: inline-flex;
             align-items: center;
@@ -578,8 +584,12 @@
                                     <input type="radio" name="progressionMode" value="unlocked">
                                     <span>All Unlocked</span>
                                 </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="progressionMode" value="manual">
+                                    <span>Manual</span>
+                                </label>
                             </div>
-                            <p class="settings-help">Linear: Students must pass each quiz to unlock the next. All Unlocked: All quizzes available immediately.</p>
+                            <p class="settings-help">Linear: Sequential. All Unlocked: Everything open. Manual: Teacher must manually unlock each quiz and retake.</p>
                         </div>
                     </div>
                 </form>
@@ -660,8 +670,12 @@
                             <input type="radio" name="settingsProgressionMode" value="unlocked">
                             <span>All Unlocked</span>
                         </label>
+                        <label class="radio-option">
+                            <input type="radio" name="settingsProgressionMode" value="manual">
+                            <span>Manual</span>
+                        </label>
                     </div>
-                    <p class="settings-help">Linear: Students must pass each quiz to unlock the next. All Unlocked: All quizzes available immediately.</p>
+                    <p class="settings-help">Linear: Sequential unlocking. All Unlocked: Everything open. Manual: You must manually unlock each quiz and retake for students.</p>
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="btn-modal-cancel" onclick="closeSettingsModal()">Cancel</button>
@@ -698,6 +712,55 @@
             // AuthHelper will redirect to login
         });
 
+        // Toggle wait time based on progression mode
+        function updateWaitTimeState(formType) {
+            const isSettings = formType === 'settings';
+            const name = isSettings ? 'settingsProgressionMode' : 'progressionMode';
+            const waitTimeId = isSettings ? 'settings-wait-time' : 'wait-time';
+            
+            const radios = document.getElementsByName(name);
+            let mode = 'linear';
+            for (const radio of radios) {
+                if (radio.checked) {
+                    mode = radio.value;
+                    break;
+                }
+            }
+            
+            const waitTimeDropdown = document.getElementById(waitTimeId);
+            if (!waitTimeDropdown) return;
+            
+            const group = waitTimeDropdown.closest('.form-group') || waitTimeDropdown.closest('.settings-group');
+            
+            if (mode === 'manual') {
+                waitTimeDropdown.disabled = true;
+                if (group) {
+                    group.style.opacity = '0.5';
+                    group.style.pointerEvents = 'none';
+                }
+            } else {
+                waitTimeDropdown.disabled = false;
+                if (group) {
+                    group.style.opacity = '1';
+                    group.style.pointerEvents = 'auto';
+                }
+            }
+        }
+
+        // Add listeners for both forms
+        function attachModeListeners() {
+            document.querySelectorAll('input[name="progressionMode"]').forEach(radio => {
+                radio.addEventListener('change', () => updateWaitTimeState('create'));
+            });
+            document.querySelectorAll('input[name="settingsProgressionMode"]').forEach(radio => {
+                radio.addEventListener('change', () => updateWaitTimeState('settings'));
+            });
+        }
+
+        // Initialize
+        attachModeListeners();
+        updateWaitTimeState('create');
+
         // Logout handler
         document.getElementById('logout-btn').addEventListener('click', () => {
             AuthHelper.signOut();
@@ -731,6 +794,7 @@
                     document.getElementById('class-name').value = '';
                     document.getElementById('wait-time').value = '0';
                     document.querySelector('input[name="progressionMode"][value="linear"]').checked = true;
+                    updateWaitTimeState('create'); // Reset visual state
                     loadClasses();
                 } else {
                     showToast(data.error || 'Failed to create class', 'error');
@@ -1031,9 +1095,19 @@
             document.getElementById('settings-class-id').value = classId;
             document.getElementById('settings-class-name').value = className;
             document.getElementById('settings-wait-time').value = waitMinutes.toString();
-            document.querySelector(`input[name="settingsProgressionMode"][value="${progressionMode}"]`).checked = true;
+            const radio = document.querySelector(`input[name="settingsProgressionMode"][value="${progressionMode}"]`);
+            if (radio) radio.checked = true;
+            
+            // Update wait time state after setting values
+            updateWaitTimeState('settings');
+            
             document.getElementById('settings-modal').classList.add('active');
         }
+
+        // Add listeners for settings form
+        document.querySelectorAll('input[name="settingsProgressionMode"]').forEach(radio => {
+            radio.addEventListener('change', () => updateWaitTimeState('settings'));
+        });
 
         function closeSettingsModal() {
             document.getElementById('settings-modal').classList.remove('active');

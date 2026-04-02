@@ -386,6 +386,10 @@
             AuthHelper.signOut();
         });
 
+        // State
+        let matrixData = null;
+        let classSettings = { progressionMode: 'linear' };
+
         async function loadBigIdea() {
             try {
                 const url = classId
@@ -403,6 +407,9 @@
                 }
 
                 const data = await response.json();
+                if (data.classSettings) {
+                    classSettings = data.classSettings;
+                }
                 renderBigIdea(data);
 
             } catch (error) {
@@ -455,6 +462,12 @@
             const isLocked = topic.status === 'locked';
             const isPassed = topic.status === 'passed';
             const hasWaitTime = topic.waitUntil && topic.remainingMinutes > 0;
+            const isManual = classSettings.progressionMode === 'manual';
+            const hasAttempts = topic.attemptCount > 0;
+            
+            // In manual mode, subsequent attempts (retakes) must be explicitly unlocked
+            // This applies whether they passed or failed previously
+            const retakeDisabled = isManual && hasAttempts && !topic.retakeUnlocked;
 
             // Format remaining wait time
             let waitTimeText = '';
@@ -472,7 +485,7 @@
             }
 
             return `
-                <div class="topic-card ${statusClass}">
+                <div class="topic-card ${statusClass} ${retakeDisabled ? 'locked' : ''}">
                     <div class="topic-number">${isPassed ? '&#10003;' : index + 1}</div>
                     <div class="topic-info" style="flex: 1;">
                         <h3>${topic.name}</h3>
@@ -480,6 +493,7 @@
                         ${topic.attemptCount > 0 ? `
                         <div class="topic-meta">
                             <span>${topic.attemptCount} attempt${topic.attemptCount > 1 ? 's' : ''}</span>
+                            ${isManual && topic.retakeUnlocked ? '<span style="color: var(--success-green); font-weight: 600; margin-left: 8px;">Retake Authorized</span>' : ''}
                         </div>
                         ` : ''}
                         <div class="topic-resources">
@@ -502,15 +516,15 @@
                             </div>
                         ` : ''}
                         <div style="text-align: center;">
-                            <span class="status-badge ${hasWaitTime ? 'wait' : statusClass}">
-                                ${hasWaitTime ? 'Wait' : (isPassed ? 'Passed' : (isLocked ? 'Locked' : 'Available'))}
+                            <span class="status-badge ${hasWaitTime ? 'wait' : (retakeDisabled ? 'locked' : statusClass)}">
+                                ${hasWaitTime ? 'Wait' : (retakeDisabled ? 'Locked' : (isPassed ? 'Passed' : (isLocked ? 'Locked' : 'Available')))}
                             </span>
                             ${hasWaitTime ? `<div class="wait-time">${waitTimeText}</div>` : ''}
                         </div>
                         <button class="btn-primary btn-start"
-                                ${isLocked || hasWaitTime ? 'disabled' : ''}
+                                ${isLocked || hasWaitTime || retakeDisabled ? 'disabled' : ''}
                                 onclick="startQuiz('${topic.id}')">
-                            ${hasWaitTime ? 'Wait' : (isPassed ? 'Retake' : (isLocked ? 'Locked' : 'Start Quiz'))}
+                            ${hasWaitTime ? 'Wait' : (retakeDisabled ? 'Locked' : (isPassed ? 'Retake' : (isLocked ? 'Locked' : 'Start Quiz')))}
                         </button>
                     </div>
                 </div>

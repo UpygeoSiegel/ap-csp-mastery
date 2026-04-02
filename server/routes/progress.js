@@ -248,15 +248,15 @@ router.get('/:studentId/:topicId', async (req, res) => {
 // Teacher override - unlock topic or mark as passed
 router.post('/override', verifyTeacher, async (req, res) => {
   try {
-    const { studentId, topicId, classId, action } = req.body; // action: 'unlock' or 'pass'
+    const { studentId, topicId, classId, action } = req.body; // action: 'unlock', 'pass', or 'retake'
     const teacherId = req.user.uid;
 
     if (!studentId || !topicId || !classId || !action) {
       return res.status(400).json({ error: 'Student ID, topic ID, class ID, and action are required' });
     }
 
-    if (!['unlock', 'pass'].includes(action)) {
-      return res.status(400).json({ error: 'Action must be "unlock" or "pass"' });
+    if (!['unlock', 'pass', 'retake'].includes(action)) {
+      return res.status(400).json({ error: 'Action must be "unlock", "pass", or "retake"' });
     }
 
     // Verify teacher owns the class
@@ -288,7 +288,7 @@ router.post('/override', verifyTeacher, async (req, res) => {
       action
     };
 
-    if (action === 'unlock') {
+    if (action === 'unlock' || action === 'retake') {
       if (progressQuery.empty) {
         // Create new progress document
         await db.collection('studentProgress').add({
@@ -296,6 +296,7 @@ router.post('/override', verifyTeacher, async (req, res) => {
           topicId,
           classId,
           status: 'available',
+          retakeUnlocked: action === 'retake',
           attempts: [],
           createdAt: new Date(),
           updatedAt: new Date()
@@ -305,12 +306,15 @@ router.post('/override', verifyTeacher, async (req, res) => {
         const progressDoc = progressQuery.docs[0];
         const existingProgress = progressDoc.data();
         
+        const updateData = { updatedAt: new Date() };
         if (existingProgress.status === 'locked') {
-          await progressDoc.ref.update({
-            status: 'available',
-            updatedAt: new Date()
-          });
+          updateData.status = 'available';
         }
+        if (action === 'retake') {
+          updateData.retakeUnlocked = true;
+        }
+
+        await progressDoc.ref.update(updateData);
       }
 
       // Record the override
@@ -327,7 +331,7 @@ router.post('/override', verifyTeacher, async (req, res) => {
         await existingOverrideQuery.docs[0].ref.update(overrideData);
       }
 
-      res.json({ message: 'Topic unlocked successfully' });
+      res.json({ message: action === 'retake' ? 'Retake unlocked successfully' : 'Topic unlocked successfully' });
 
     } else if (action === 'pass') {
       // Mark topic as passed
@@ -501,5 +505,99 @@ async function unlockNextTopicForStudent(studentId, currentTopicId, classId) {
     console.error('Unlock next topic error:', error);
   }
 }
+
+// Bulk teacher override - unlock topic or retake for all students in class
+router.post('/override-bulk', verifyTeacher, async (req, res) => {
+  try {
+    const { topicId, classId, action } = req.body; // action: 'unlock' or 'retake'
+    const teacherId = req.user.uid;
+
+    if (!topicId || !classId || !action) {
+      return res.status(400).json({ error: 'Topic ID, class ID, and action are required' });
+    }
+
+    if (!['unlock', 'retake'].includes(action)) {
+      return res.status(400).json({ error: 'Action must be "unlock" or "retake"' });
+    }
+
+    // Verify teacher owns the class
+    const classDoc = await db.collection('classes').doc(classId).get();
+    if (!classDoc.exists || classDoc.data().teacherId !== teacherId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const classData = classDoc.data();
+    const studentIds = classData.studentIds || [];
+
+    if (studentIds.length === 0) {
+      return res.json({ message: 'No students in class' });
+    }
+
+    const batch = db.batch();
+    const now = new Date();
+
+    for (const studentId of studentIds) {
+      const progressQuery = await db.collection('studentProgress')
+        .where('studentId', '==', studentId)
+        .where('topicId', '==', topicId)
+        .where('classId', '==', classId)
+        .limit(1)
+        .get();
+
+      if (progressQuery.empty) {
+        // Create new progress document
+        const newProgressRef = db.collection('studentProgress').doc();
+        batch.set(newProgressRef, {
+          studentId,
+          topicId,
+          classId,
+          status: 'available',
+          retakeUnlocked: action === 'retake',
+          attempts: [],
+          createdAt: now,
+          updatedAt: now
+        });
+      } else {
+        // Update existing progress
+        const progressDoc = progressQuery.docs[0];
+        const existingProgress = progressDoc.data();
+        
+        const updateData = { updatedAt: now };
+        if (existingProgress.status === 'locked') {
+          updateData.status = 'available';
+        }
+        if (action === 'retake') {
+          updateData.retakeUnlocked = true;
+        }
+
+        batch.update(progressDoc.ref, updateData);
+      }
+
+      // Record the override for each student
+      const overrideRef = db.collection('teacherOverrides').doc();
+      batch.set(overrideRef, {
+        classId,
+        studentId,
+        topicId,
+        unlockedBy: teacherId,
+        unlockedAt: now,
+        action,
+        isBulk: true
+      });
+    }
+
+    await batch.commit();
+
+    res.json({ 
+      message: action === 'retake' 
+        ? `Retakes unlocked for all ${studentIds.length} students` 
+        : `Topic unlocked for all ${studentIds.length} students` 
+    });
+
+  } catch (error) {
+    console.error('Bulk override error:', error);
+    res.status(500).json({ error: 'Failed to perform bulk action' });
+  }
+});
 
 module.exports = router;

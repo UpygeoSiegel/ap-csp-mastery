@@ -220,11 +220,22 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
                 remainingMinutes = Math.ceil((waitUntilDate.getTime() - now.getTime()) / (60 * 1000));
               }
             }
+
+            // Manual Mode Override: Even if passed or wait time is over, must be manually unlocked for retake
+            if (classSettings.progressionMode === 'manual' && !progress.retakeUnlocked && status === 'passed') {
+              // If already passed and not explicitly unlocked for retake, it's not "available" for quiz
+              // But we still want them to be able to see resources, so we keep status as 'passed'
+            }
           }
         } else if (classSettings.progressionMode === 'unlocked' || topic.order === 1) {
           // All topics available in unlocked mode, or first topic is always available
-          status = 'available';
-        } else {
+          // EXCEPT in manual mode, where even the first topic must be unlocked
+          if (classSettings.progressionMode === 'manual' && topic.order === 1) {
+             status = 'locked';
+          } else {
+             status = 'available';
+          }
+        } else if (classSettings.progressionMode === 'linear') {
           // Linear mode: check if previous topic is passed
           const prevTopicDoc = topicsSnapshot.docs[i - 1];
           if (prevTopicDoc) {
@@ -233,6 +244,9 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
               status = 'available';
             }
           }
+        } else if (classSettings.progressionMode === 'manual') {
+            // In manual mode, if no progress record exists, it's locked
+            status = 'locked';
         }
 
         // Check for teacher overrides
@@ -259,7 +273,8 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
         questionCount,
         status,
         bestScore,
-        attemptCount: attempts.length
+        attemptCount: attempts.length,
+        retakeUnlocked: (classId && progressMap[topic.id]?.retakeUnlocked) || false
       };
 
       // Include wait time info if applicable

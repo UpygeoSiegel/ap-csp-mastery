@@ -648,7 +648,7 @@
                     <p class="results-message">${results.message}</p>
                     <div style="display:flex; gap:1rem; justify-content:center;">
                         <a href="${topicsUrl}" class="btn-secondary" style="text-decoration:none;">Back to Topics</a>
-                        ${!results.passed ? `<button class="btn-primary" onclick="location.reload()">Try Again</button>` : ''}
+                        ${!results.passed && results.progressionMode !== 'manual' && (results.retakeWaitMinutes === 0 || !results.retakeWaitMinutes) ? `<button class="btn-primary" onclick="location.reload()">Try Again</button>` : ''}
                     </div>
                     ${renderStudyResources(results)}
                     <div class="results-details">
