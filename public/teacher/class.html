@@ -274,7 +274,32 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 0.25rem;
+        }
+        .btn-reset-password {
+            background: none;
+            border: none;
+            color: var(--dim);
+            cursor: pointer;
+            padding: 4px;
+            margin-left: 8px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            opacity: 0.4;
+        }
+        .btn-reset-password:hover {
+            color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+            opacity: 1;
+        }
+        .student-name {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 180px;
         }
         .attempt-count {
             font-size: 0.6rem;
@@ -802,7 +827,13 @@
             }
 
             tbody.innerHTML = students.map(student => {
-                let cells = `<td class="student-name">${student.displayName || student.username}</td>`;
+                let cells = `
+                    <td class="student-name">
+                        <span>${student.displayName || student.username}</span>
+                        <button class="btn-reset-password" onclick="event.stopPropagation(); resetStudentPassword('${student.id}', '${student.displayName || student.username}')" title="Reset Password">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"/></svg>
+                        </button>
+                    </td>`;
 
                 bigIdeas.forEach(bigIdea => {
                     const pct = student.bigIdeaProgress[bigIdea.id] || 0;
@@ -867,7 +898,13 @@
             }
 
             tbody.innerHTML = students.map(student => {
-                let cells = `<td class="student-name">${student.displayName || student.username}</td>`;
+                let cells = `
+                    <td class="student-name">
+                        <span>${student.displayName || student.username}</span>
+                        <button class="btn-reset-password" onclick="event.stopPropagation(); resetStudentPassword('${student.id}', '${student.displayName || student.username}')" title="Reset Password">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"/></svg>
+                        </button>
+                    </td>`;
                 let passedInUnit = 0;
 
                 topics.forEach(topic => {
@@ -1092,6 +1129,42 @@
             // Support both ``` and ''' as indicators for code blocks
             const codeBlockRegex = /(?:```|''')(?:[a-z]*\n)?([\s\S]*?)(?:```|''')/g;
             return escaped.replace(codeBlockRegex, (match, code) => `<div class="pseudocode-block">${code.trim()}</div>`);
+        }
+
+        async function resetStudentPassword(studentId, studentName) {
+            const newPassword = prompt(`Enter new password for ${studentName} (minimum 6 characters):`);
+            if (!newPassword) return;
+            
+            if (newPassword.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to change the password for ${studentName}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/classes/${classId}/students/${studentId}/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ newPassword })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Password reset successfully!');
+                } else {
+                    alert(data.error || 'Failed to reset password');
+                }
+            } catch (error) {
+                console.error('Error resetting password:', error);
+                alert('An error occurred while resetting the password.');
+            }
         }
 
         // Note: Initial load is handled by AuthHelper.checkAuth callback above

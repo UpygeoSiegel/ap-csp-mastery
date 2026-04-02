@@ -757,4 +757,27 @@ router.delete('/:classId', verifyTeacher, verifyClassAccess, async (req, res) =>
   }
 });
 
+// Reset student password (teachers only)
+router.post('/:classId/students/:studentId/reset-password', verifyTeacher, verifyClassAccess, async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters long' });
+    }
+
+    // Update password in Firebase Auth
+    await auth.updateUser(studentId, {
+      password: newPassword
+    });
+
+    res.json({ message: 'Student password reset successfully' });
+
+  } catch (error) {
+    console.error('Reset student password error:', error);
+    res.status(500).json({ error: 'Failed to reset student password' });
+  }
+});
+
 module.exports = router;

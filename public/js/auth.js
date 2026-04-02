@@ -463,20 +463,25 @@ class APMastery {
 
     // Handle password reset
     async handleForgotPassword(isTeacher) {
-        const inputLabel = isTeacher ? 'email' : 'username';
+        if (!isTeacher) {
+            alert('Students cannot reset passwords directly because they do not have linked emails. Please ask your teacher to reset your password for you from their dashboard.');
+            return;
+        }
+
+        const inputLabel = 'email';
         const value = prompt(`Please enter your ${inputLabel} to reset your password:`);
         
         if (!value) return;
 
         this.showLoading();
         try {
-            // First, call backend to get the email (for students) and validate
+            // First, call backend to get the email and validate
             const response = await fetch(`${this.apiBase}/auth/forgot-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    [inputLabel]: value,
-                    isTeacher
+                    email: value,
+                    isTeacher: true
                 })
             });
 
