@@ -12,11 +12,14 @@ router.get('/', async (req, res) => {
   try {
     const { subject = 'ap-csp' } = req.query;
 
-    // Get all Big Ideas for this subject
+    // Get all Big Ideas and filter in-memory
     const bigIdeasSnapshot = await db.collection('bigIdeas')
-      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
+
+    const bigIdeasFiltered = bigIdeasSnapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(bi => (bi.subject || 'ap-csp') === subject);
 
     // Get all topics
     const topicsSnapshot = await db.collection('topics')
@@ -26,9 +29,7 @@ router.get('/', async (req, res) => {
     // Organize topics by Big Idea
     const bigIdeasWithTopics = [];
     
-    for (const bigIdeaDoc of bigIdeasSnapshot.docs) {
-      const bigIdea = { id: bigIdeaDoc.id, ...bigIdeaDoc.data() };
-      
+    for (const bigIdea of bigIdeasFiltered) {
       // Get topics for this Big Idea
       const bigIdeaTopics = topicsSnapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
@@ -110,14 +111,15 @@ router.get('/big-ideas', async (req, res) => {
     const { subject = 'ap-csp' } = req.query;
 
     const bigIdeasSnapshot = await db.collection('bigIdeas')
-      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
 
-    const bigIdeas = bigIdeasSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const bigIdeas = bigIdeasSnapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .filter(bi => (bi.subject || 'ap-csp') === subject);
 
     res.json({ bigIdeas });
 
@@ -462,11 +464,14 @@ router.get('/stats/summary', async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    // Get all topics for this subject
+    // Get all topics and filter in-memory
     const topicsSnapshot = await db.collection('topics')
-      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
+
+    const topicsFiltered = topicsSnapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(t => (t.subject || 'ap-csp') === subject);
 
     // Get all questions to count per topic
     const allQuestionsSnapshot = await db.collection('questions').get();
@@ -491,9 +496,8 @@ router.get('/stats/summary', async (req, res) => {
       statsByTopic[data.topicId].push(data);
     });
 
-    const topicSummaries = topicsSnapshot.docs.map(doc => {
-      const topic = doc.data();
-      const topicId = doc.id;
+    const topicSummaries = topicsFiltered.map(topic => {
+      const topicId = topic.id;
       const questionStats = statsByTopic[topicId] || [];
 
       // Calculate aggregate stats

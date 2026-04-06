@@ -401,32 +401,29 @@ router.get('/:classId/matrix', verifyTeacher, verifyClassAccess, async (req, res
     const classData = req.classData;
     const subject = classData.subject || 'ap-csp';
 
-    // Get all Big Ideas for this subject
+    // Get all Big Ideas
     const bigIdeasSnapshot = await db.collection('bigIdeas')
-      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
 
-    const bigIdeas = bigIdeasSnapshot.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name,
-      shortName: doc.data().shortName,
-      color: doc.data().color,
-      order: doc.data().order
-    }));
+    const bigIdeas = bigIdeasSnapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .filter(bi => (bi.subject || 'ap-csp') === subject);
 
-    // Get all topics for this subject
+    // Get all topics
     const topicsSnapshot = await db.collection('topics')
-      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
 
-    const allTopics = topicsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name,
-      bigIdeaId: doc.data().bigIdeaId,
-      order: doc.data().order
-    }));
+    const allTopics = topicsSnapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .filter(t => (t.subject || 'ap-csp') === subject);
 
     // Group topics by Big Idea
     const topicsByBigIdea = {};
