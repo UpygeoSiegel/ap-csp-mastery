@@ -68,9 +68,6 @@ class APMastery {
 
         // Class code validation
         document.getElementById('student-class-code')?.addEventListener('input', (e) => this.handleClassCodeInput(e));
-
-        // Username availability checking
-        document.getElementById('student-username')?.addEventListener('blur', () => this.checkUsernameAvailability());
     }
 
     // Switch between teacher and student tabs
@@ -130,43 +127,6 @@ class APMastery {
             }
         } catch (error) {
             console.error('Class code validation error:', error);
-        }
-    }
-
-    // Check username availability (only on signup form)
-    async checkUsernameAvailability() {
-        // Only check if the student tab and signup form are both currently active
-        const studentForms = document.getElementById('student-forms');
-        const signupForm = document.getElementById('student-signup-form');
-
-        if (!studentForms || !studentForms.classList.contains('active')) {
-            return;
-        }
-        if (!signupForm || !signupForm.classList.contains('active')) {
-            return;
-        }
-
-        const usernameInput = document.getElementById('student-username');
-        const username = usernameInput?.value?.trim();
-
-        if (!username) return;
-
-        try {
-            const response = await fetch(`${this.apiBase}/auth/check-username`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                if (!data.available) {
-                    this.showToast('Username already taken. Please choose a different one.', 'warning');
-                }
-            }
-        } catch (error) {
-            console.error('Username check error:', error);
         }
     }
 
@@ -336,7 +296,7 @@ class APMastery {
                 body: JSON.stringify({
                     classCode: formData.get('classCode'),
                     displayName: formData.get('displayName'),
-                    username: formData.get('username'),
+                    email: formData.get('email'),
                     password: formData.get('password')
                 })
             });
@@ -348,7 +308,7 @@ class APMastery {
                 // Switch to login form
                 this.switchStudentForm('login');
                 // Pre-fill login form
-                document.getElementById('student-login-username').value = formData.get('username');
+                document.getElementById('student-login-username').value = formData.get('email');
             } else {
                 this.showToast(data.error, 'error');
             }
@@ -456,12 +416,7 @@ class APMastery {
 
     // Handle password reset
     async handleForgotPassword(isTeacher) {
-        if (!isTeacher) {
-            alert('Students cannot reset passwords directly because they do not have linked emails. Please ask your teacher to reset your password for you from their dashboard.');
-            return;
-        }
-
-        const inputLabel = 'email';
+        const inputLabel = isTeacher ? 'email' : 'email or username';
         const value = prompt(`Please enter your ${inputLabel} to reset your password:`);
         
         if (!value) return;
@@ -473,8 +428,9 @@ class APMastery {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    email: value,
-                    isTeacher: true
+                    email: isTeacher ? value : undefined,
+                    username: !isTeacher ? value : undefined,
+                    isTeacher: isTeacher
                 })
             });
 
