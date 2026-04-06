@@ -476,40 +476,6 @@ router.get('/teachers', async (req, res) => {
   }
 });
 
-router.post('/teachers/:uid/toggle-approval', async (req, res) => {
-  try {
-    const { uid } = req.params;
-
-    const userRef = db.collection('users').doc(uid);
-    const userDoc = await userRef.get();
-
-    if (!userDoc.exists) {
-      return res.status(404).json({ error: 'Teacher not found' });
-    }
-
-    const userData = userDoc.data();
-    if (userData.role !== 'teacher') {
-      return res.status(400).json({ error: 'User is not a teacher' });
-    }
-
-    const newApprovalStatus = !userData.isApproved;
-    await userRef.update({
-      isApproved: newApprovalStatus,
-      updatedAt: new Date()
-    });
-
-    res.json({
-      uid,
-      isApproved: newApprovalStatus,
-      message: newApprovalStatus ? 'Teacher approved' : 'Teacher approval revoked'
-    });
-
-  } catch (error) {
-    console.error('Admin toggle teacher approval error:', error);
-    res.status(500).json({ error: 'Failed to update teacher approval status' });
-  }
-});
-
 // Flag Management
 router.get('/flags', async (req, res) => {
   try {

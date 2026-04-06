@@ -1,5 +1,5 @@
 const express = require('express');
-const { db, generateUniqueClassCode } = require('../firebase');
+const { db, auth, generateUniqueClassCode } = require('../firebase');
 const { verifyToken, verifyTeacher, verifyClassAccess } = require('../middleware/verifyToken');
 const router = express.Router();
 

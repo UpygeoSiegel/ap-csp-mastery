@@ -399,13 +399,6 @@ class APMastery {
             const data = await response.json();
 
             if (response.ok) {
-                if (data.pendingApproval) {
-                    this.showToast(data.message, 'info');
-                    await window.firebaseAuth.signOut();
-                    this.hideLoading();
-                    return;
-                }
-
                 // Store auth data
                 localStorage.setItem('authToken', idToken);
                 localStorage.setItem('userData', JSON.stringify(data.user));

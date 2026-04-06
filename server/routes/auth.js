@@ -49,7 +49,7 @@ router.post('/teacher-signup', async (req, res) => {
       displayName,
       email,
       classIds: [],
-      isApproved: false, // Requires admin approval
+      isApproved: true,
       createdAt: new Date()
     });
 
@@ -217,11 +217,6 @@ router.post('/verify-login', async (req, res) => {
     if (isTeacher && userData.role !== 'teacher') {
       return res.status(403).json({ error: 'Not a teacher account' });
     }
-    
-    // Check if teacher is approved
-    if (userData.role === 'teacher' && !userData.isApproved) {
-      return res.status(403).json({ error: 'Account pending admin approval. Please contact an administrator.' });
-    }
 
     if (!isTeacher && !isAdmin && userData.role !== 'student') {
       return res.status(403).json({ error: 'Not a student account' });
@@ -308,19 +303,13 @@ router.post('/login', async (req, res) => {
     if (!isTeacher && userData.role !== 'student') {
       return res.status(401).json({ error: 'Invalid student credentials' });
     }
-    
-    // Check if teacher is approved
-    if (userData.role === 'teacher' && !userData.isApproved) {
-      return res.status(403).json({ error: 'Account pending admin approval. Please contact an administrator.' });
-    }
 
     res.json({
       message: 'Login validation successful',
       userId: userRecord.uid,
       email: loginEmail,
       role: userData.role,
-      displayName: userData.displayName,
-      isApproved: userData.role === 'teacher' ? userData.isApproved : true
+      displayName: userData.displayName
     });
 
   } catch (error) {
@@ -466,11 +455,6 @@ router.post('/google-login', async (req, res) => {
         return res.status(403).json({ error: 'This Google account is registered as a teacher account.' });
       }
 
-      // Check teacher approval status
-      if (userData.role === 'teacher' && !userData.isApproved) {
-        return res.status(403).json({ error: 'Account pending admin approval. Please contact an administrator.' });
-      }
-
       // Get all classes for students
       let classes = [];
       if (userData.role === 'student') {
@@ -494,13 +478,12 @@ router.post('/google-login', async (req, res) => {
 
     // New user signup
     if (isTeacher) {
-      // ... (teacher code) ...
       const newTeacherData = {
         role: 'teacher',
         displayName: displayName || name || email.split('@')[0],
         email: email,
         classIds: [],
-        isApproved: false, // Requires admin approval
+        isApproved: true,
         authProvider: 'google',
         createdAt: new Date()
       };
@@ -508,8 +491,14 @@ router.post('/google-login', async (req, res) => {
       await db.collection('users').doc(uid).set(newTeacherData);
 
       return res.status(201).json({
-        message: 'Teacher account created with Google successfully. Pending admin approval.',
-        pendingApproval: true
+        message: 'Teacher account created with Google successfully',
+        user: {
+          uid,
+          email: newTeacherData.email,
+          role: newTeacherData.role,
+          displayName: newTeacherData.displayName,
+          classIds: newTeacherData.classIds
+        }
       });
     }
 

@@ -521,8 +521,7 @@
                     <div id="system-sidebar" style="margin-bottom: 2rem;">
                         <h3>System</h3>
                         <div class="sidebar-item" id="sidebar-teachers" onclick="loadTeacherManagement()">
-                            <span>Teacher Approval</span>
-                            <span class="count" id="pending-teachers-count">0</span>
+                            <span>Teachers</span>
                         </div>
                         <div class="sidebar-item" id="sidebar-flags" onclick="loadFlaggedQuestions()">
                             <span>Flagged Questions</span>
@@ -665,19 +664,6 @@
     async function loadSidebar() {
         try {
             // Load pending teachers count
-            try {
-                const teacherRes = await fetch(`${apiBase}/admin/teachers`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (teacherRes.ok) {
-                    const teacherData = await teacherRes.json();
-                    const pendingCount = teacherData.teachers.filter(t => !t.isApproved).length;
-                    document.getElementById('pending-teachers-count').textContent = pendingCount;
-                }
-            } catch (err) {
-                console.error('Error loading pending count:', err);
-            }
-
             const response = await fetch(`${apiBase}/admin/big-ideas`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -1197,13 +1183,11 @@
             if (!response.ok) throw new Error(data.error);
             
             const teachers = data.teachers;
-            const pendingCount = teachers.filter(t => !t.isApproved).length;
-            document.getElementById('pending-teachers-count').textContent = pendingCount;
-            
+
             if (teachers.length === 0) {
                 mainContent.innerHTML = `
                     <div class="content-header">
-                        <h2>Teacher Management</h2>
+                        <h2>Teachers</h2>
                     </div>
                     <div class="empty-state">
                         <h3>No Teachers Found</h3>
@@ -1212,7 +1196,7 @@
                 `;
                 return;
             }
-            
+
             let teacherRows = teachers.map(teacher => `
                 <div class="question-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1221,24 +1205,15 @@
                             <p style="margin: 0.25rem 0; color: var(--muted); font-size: 0.9rem;">${teacher.email}</p>
                             <p style="margin: 0; font-size: 0.75rem; color: var(--dim);">Joined: ${new Date(teacher.createdAt).toLocaleDateString()}</p>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 1.5rem;">
-                            <span class="status-badge ${teacher.isApproved ? 'passed' : 'locked'}">
-                                ${teacher.isApproved ? 'Approved' : 'Pending'}
-                            </span>
-                            <button class="btn-primary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" 
-                                onclick="toggleTeacherApproval('${teacher.uid}', ${teacher.isApproved})">
-                                ${teacher.isApproved ? 'Revoke Approval' : 'Approve Teacher'}
-                            </button>
-                        </div>
                     </div>
                 </div>
             `).join('');
-            
+
             mainContent.innerHTML = `
                 <div class="content-header">
-                    <h2>Teacher Management</h2>
+                    <h2>Teachers</h2>
                     <p style="color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">
-                        ${teachers.length} total teachers · ${pendingCount} pending approval
+                        ${teachers.length} total teachers
                     </p>
                 </div>
                 <div class="question-list">
@@ -1249,34 +1224,6 @@
         } catch (error) {
             console.error('Error loading teachers:', error);
             showToast('Failed to load teachers', 'error');
-        }
-    }
-
-    async function toggleTeacherApproval(uid, currentStatus) {
-        if (currentStatus && !confirm('Are you sure you want to revoke approval for this teacher? They will lose access immediately.')) {
-            return;
-        }
-        
-        try {
-            const response = await fetch(`${apiBase}/admin/teachers/${uid}/toggle-approval`, {
-                method: 'POST',
-                headers: { 
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                showToast(data.message, 'success');
-                loadTeacherManagement();
-            } else {
-                showToast(data.error, 'error');
-            }
-        } catch (error) {
-            console.error('Error toggling approval:', error);
-            showToast('Failed to update approval status', 'error');
         }
     }
 
