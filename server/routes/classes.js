@@ -47,6 +47,7 @@ router.get('/', verifyTeacher, async (req, res) => {
         id: classId,
         name: classData.name,
         code: classData.code,
+        subject: classData.subject || 'ap-csp',
         studentCount,
         completionPercentage,
         createdAt: classData.createdAt,
@@ -67,11 +68,16 @@ router.get('/', verifyTeacher, async (req, res) => {
 // Create new class
 router.post('/', verifyTeacher, async (req, res) => {
   try {
-    const { name, retakeWaitMinutes = 0, progressionMode = 'linear' } = req.body;
+    const { name, retakeWaitMinutes = 0, progressionMode = 'linear', subject = 'ap-csp' } = req.body;
     const teacherId = req.user.uid;
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Class name is required' });
+    }
+
+    // Validate subject
+    if (!['ap-csp', 'ap-calculus-ab'].includes(subject)) {
+      return res.status(400).json({ error: 'Invalid subject. Must be "ap-csp" or "ap-calculus-ab"' });
     }
 
     // Validate retakeWaitMinutes (must be multiple of 30, max 480 = 8 hours)
@@ -92,6 +98,7 @@ router.post('/', verifyTeacher, async (req, res) => {
     const classData = {
       name: name.trim(),
       code: classCode,
+      subject,
       teacherId,
       teacherName: req.user.displayName,
       studentIds: [],
@@ -124,7 +131,7 @@ router.post('/', verifyTeacher, async (req, res) => {
 router.patch('/:classId/settings', verifyTeacher, verifyClassAccess, async (req, res) => {
   try {
     const { classId } = req.params;
-    const { name, retakeWaitMinutes, progressionMode } = req.body;
+    const { name, retakeWaitMinutes, progressionMode, subject } = req.body;
 
     const updateData = { updatedAt: new Date() };
 
@@ -134,6 +141,14 @@ router.patch('/:classId/settings', verifyTeacher, verifyClassAccess, async (req,
         return res.status(400).json({ error: 'Class name cannot be empty' });
       }
       updateData.name = name.trim();
+    }
+
+    // Update subject if provided
+    if (subject !== undefined) {
+      if (!['ap-csp', 'ap-calculus-ab'].includes(subject)) {
+        return res.status(400).json({ error: 'Invalid subject. Must be "ap-csp" or "ap-calculus-ab"' });
+      }
+      updateData.subject = subject;
     }
 
     // Update retakeWaitMinutes if provided
@@ -384,9 +399,11 @@ router.get('/:classId/matrix', verifyTeacher, verifyClassAccess, async (req, res
     const { classId } = req.params;
     const { bigIdeaId } = req.query;
     const classData = req.classData;
+    const subject = classData.subject || 'ap-csp';
 
-    // Get all Big Ideas
+    // Get all Big Ideas for this subject
     const bigIdeasSnapshot = await db.collection('bigIdeas')
+      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
 
@@ -398,8 +415,9 @@ router.get('/:classId/matrix', verifyTeacher, verifyClassAccess, async (req, res
       order: doc.data().order
     }));
 
-    // Get all topics ordered
+    // Get all topics for this subject
     const topicsSnapshot = await db.collection('topics')
+      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
 

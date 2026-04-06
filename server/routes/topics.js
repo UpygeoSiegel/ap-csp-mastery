@@ -10,8 +10,11 @@ router.use(verifyToken);
 // Get all topics organized by Big Ideas (for question management)
 router.get('/', async (req, res) => {
   try {
-    // Get all Big Ideas
+    const { subject = 'ap-csp' } = req.query;
+
+    // Get all Big Ideas for this subject
     const bigIdeasSnapshot = await db.collection('bigIdeas')
+      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
 
@@ -29,17 +32,17 @@ router.get('/', async (req, res) => {
       // Get topics for this Big Idea
       const bigIdeaTopics = topicsSnapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
-        .filter(topic => topic.bigIdea === bigIdea.order)
+        .filter(topic => topic.bigIdeaId === bigIdea.id)
         .map(topic => ({
           ...topic,
-          topicCode: topic.id.replace('topic-', ''), // Convert topic-3.1 to 3.1
-          title: getTopicTitle(topic.id) // Get proper title
+          topicCode: topic.id.replace('topic-', '').replace('calc-', ''), // Handle both prefix types
+          title: topicTitles[topic.id] || topic.name || topic.id.replace('topic-', '').replace('calc-', '').replace('-', '.')
         }));
 
       if (bigIdeaTopics.length > 0) {
         bigIdeasWithTopics.push({
           ...bigIdea,
-          name: bigIdea.name || `Big Idea ${bigIdea.order}`,
+          name: bigIdea.name || `Unit ${bigIdea.order}`,
           topics: bigIdeaTopics
         });
       }
@@ -54,57 +57,60 @@ router.get('/', async (req, res) => {
 });
 
 // Helper function to get topic titles
+const topicTitles = {
+  // Big Idea 1
+  'topic-1.1': 'Collaboration',
+  'topic-1.2': 'Program Function and Purpose',
+  'topic-1.3': 'Program Design and Development',
+  'topic-1.4': 'Identifying and Correcting Errors',
+  // Big Idea 2
+  'topic-2.1': 'Binary Numbers',
+  'topic-2.2': 'Data Compression',
+  'topic-2.3': 'Extracting Information from Data',
+  'topic-2.4': 'Using Programs with Data',
+  // Big Idea 3
+  'topic-3.1': 'Variables and Assignment',
+  'topic-3.2': 'Data Abstraction',
+  'topic-3.3': 'Mathematical Expressions',
+  'topic-3.4': 'Strings',
+  'topic-3.5': 'Boolean Expressions',
+  'topic-3.6': 'Conditionals',
+  'topic-3.7': 'Nested Conditionals',
+  'topic-3.8': 'Iteration',
+  'topic-3.9': 'Developing Algorithms',
+  'topic-3.10': 'Lists',
+  'topic-3.11': 'Binary Search',
+  'topic-3.12': 'Calling Procedures',
+  'topic-3.13': 'Developing Procedures',
+  'topic-3.14': 'Libraries',
+  'topic-3.15': 'Random Values',
+  'topic-3.16': 'Simulations',
+  'topic-3.17': 'Algorithmic Efficiency',
+  'topic-3.18': 'Undecidable Problems',
+  // Big Idea 4
+  'topic-4.1': 'The Internet',
+  'topic-4.2': 'Fault Tolerance',
+  'topic-4.3': 'Parallel and Distributed Computing',
+  // Big Idea 5
+  'topic-5.1': 'Beneficial and Harmful Effects',
+  'topic-5.2': 'Digital Divide',
+  'topic-5.3': 'Computing Bias',
+  'topic-5.4': 'Crowdsourcing',
+  'topic-5.5': 'Legal and Ethical Concerns',
+  'topic-5.6': 'Safe Computing'
+};
+
 function getTopicTitle(topicId) {
-  const topicTitles = {
-    // Big Idea 1
-    'topic-1.1': 'Collaboration',
-    'topic-1.2': 'Program Function and Purpose',
-    'topic-1.3': 'Program Design and Development',
-    'topic-1.4': 'Identifying and Correcting Errors',
-    // Big Idea 2
-    'topic-2.1': 'Binary Numbers',
-    'topic-2.2': 'Data Compression',
-    'topic-2.3': 'Extracting Information from Data',
-    'topic-2.4': 'Using Programs with Data',
-    // Big Idea 3
-    'topic-3.1': 'Variables and Assignment',
-    'topic-3.2': 'Data Abstraction',
-    'topic-3.3': 'Mathematical Expressions',
-    'topic-3.4': 'Strings',
-    'topic-3.5': 'Boolean Expressions',
-    'topic-3.6': 'Conditionals',
-    'topic-3.7': 'Nested Conditionals',
-    'topic-3.8': 'Iteration',
-    'topic-3.9': 'Developing Algorithms',
-    'topic-3.10': 'Lists',
-    'topic-3.11': 'Binary Search',
-    'topic-3.12': 'Calling Procedures',
-    'topic-3.13': 'Developing Procedures',
-    'topic-3.14': 'Libraries',
-    'topic-3.15': 'Random Values',
-    'topic-3.16': 'Simulations',
-    'topic-3.17': 'Algorithmic Efficiency',
-    'topic-3.18': 'Undecidable Problems',
-    // Big Idea 4
-    'topic-4.1': 'The Internet',
-    'topic-4.2': 'Fault Tolerance',
-    'topic-4.3': 'Parallel and Distributed Computing',
-    // Big Idea 5
-    'topic-5.1': 'Beneficial and Harmful Effects',
-    'topic-5.2': 'Digital Divide',
-    'topic-5.3': 'Computing Bias',
-    'topic-5.4': 'Crowdsourcing',
-    'topic-5.5': 'Legal and Ethical Concerns',
-    'topic-5.6': 'Safe Computing'
-  };
-  
-  return topicTitles[topicId] || topicId.replace('topic-', '').replace('-', '.');
+  return topicTitles[topicId] || topicId.replace('topic-', '').replace('calc-', '').replace('-', '.');
 }
 
 // Get all Big Ideas
 router.get('/big-ideas', async (req, res) => {
   try {
+    const { subject = 'ap-csp' } = req.query;
+
     const bigIdeasSnapshot = await db.collection('bigIdeas')
+      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
 
@@ -449,13 +455,16 @@ router.get('/:topicId/question-stats', async (req, res) => {
 // Get summary statistics for all topics (teachers only) - Overview
 router.get('/stats/summary', async (req, res) => {
   try {
+    const { subject = 'ap-csp' } = req.query;
+
     // Only teachers can view stats
     if (req.user.role !== 'teacher') {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    // Get all topics
+    // Get all topics for this subject
     const topicsSnapshot = await db.collection('topics')
+      .where('subject', '==', subject)
       .orderBy('order', 'asc')
       .get();
 

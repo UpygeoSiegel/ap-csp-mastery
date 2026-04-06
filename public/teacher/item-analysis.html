@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AP Mastery · AP CSP Mastery</title>
+    <title>AP Mastery</title>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
         /* Navbar styles */
@@ -426,6 +426,14 @@
             <div class="page-header">
                 <h2>Item Analysis</h2>
                 <p>Review question performance across all students to identify areas for improvement.</p>
+                
+                <div class="subject-selector" style="margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                    <label for="subjectSelect" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; color: var(--muted); font-size: 0.9rem;">Subject:</label>
+                    <select id="subjectSelect" onchange="loadSummary()" style="padding: 0.6rem 1rem; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); min-width: 200px; cursor: pointer;">
+                        <option value="ap-csp">AP CSP</option>
+                        <option value="ap-calculus-ab">AP Calculus AB</option>
+                    </select>
+                </div>
             </div>
 
             <div id="summary-stats" class="stats-grid">
@@ -477,7 +485,8 @@
 
         async function loadSummary() {
             try {
-                const response = await fetch(`${apiBase}/topics/stats/summary`, {
+                const subject = document.getElementById('subjectSelect').value;
+                const response = await fetch(`${apiBase}/topics/stats/summary?subject=${subject}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 

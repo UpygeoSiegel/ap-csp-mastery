@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AP Mastery · AP CSP Mastery</title>
+    <title>AP Mastery</title>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
         /* Navbar styles */
@@ -748,6 +748,12 @@
             <div>
                 <h1>Question Management</h1>
                 <div class="topic-selector">
+                    <label for="subjectSelect">Subject:</label>
+                    <select id="subjectSelect" onchange="loadTopics()">
+                        <option value="ap-csp">AP CSP</option>
+                        <option value="ap-calculus-ab">AP Calculus AB</option>
+                    </select>
+
                     <label for="topicSelect">Select Topic:</label>
                     <select id="topicSelect">
                         <option value="">Choose a topic...</option>
@@ -939,7 +945,8 @@
                     return;
                 }
 
-                const response = await fetch('/api/topics', {
+                const subject = document.getElementById('subjectSelect').value;
+                const response = await fetch(`/api/topics?subject=${subject}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -960,6 +967,9 @@
                 const data = await response.json();
                 const select = document.getElementById('topicSelect');
                 
+                // Clear existing options
+                select.innerHTML = '<option value="">Choose a topic...</option>';
+                
                 data.bigIdeas.forEach(bigIdea => {
                     const optgroup = document.createElement('optgroup');
                     optgroup.label = bigIdea.name;
@@ -974,7 +984,16 @@
                     select.appendChild(optgroup);
                 });
 
-                select.addEventListener('change', handleTopicChange);
+                // Clear current topic and hide stats/tabs if no topic selected
+                currentTopic = null;
+                document.getElementById('questionTabs').style.display = 'none';
+                document.getElementById('topicStats').style.display = 'none';
+
+                // Initial load might not have listener attached yet
+                if (!select.dataset.listenerAttached) {
+                    select.addEventListener('change', handleTopicChange);
+                    select.dataset.listenerAttached = 'true';
+                }
             } catch (error) {
                 console.error('Error loading topics:', error);
                 showError('Failed to load topics');

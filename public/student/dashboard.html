@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AP Mastery · AP CSP Mastery</title>
+    <title>AP Mastery</title>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
         .dashboard-container {
@@ -594,8 +594,11 @@
 
         async function loadProgress() {
             try {
-                // Load Big Ideas
-                const bigIdeasResponse = await fetch(`${apiBase}/topics/big-ideas`, {
+                const selectedClass = userClasses.find(c => c.id === currentClassId);
+                const subject = selectedClass ? selectedClass.subject : 'ap-csp';
+
+                // Load Big Ideas for this subject
+                const bigIdeasResponse = await fetch(`${apiBase}/topics/big-ideas?subject=${subject}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const bigIdeasData = await bigIdeasResponse.json();
