@@ -205,6 +205,7 @@ async function seedAPCalculusAB() {
         topicsBatch.set(ref, {
           ...topic,
           bigIdeaId,
+          subject: 'ap-calculus-ab', // Add subject field for filtering
           description: '', // Empty for now
           learningObjectives: [], // Empty for now
           questions: [], // Empty for now

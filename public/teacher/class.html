@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AP Mastery</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
     <style>
         /* Navbar styles */
         .navbar {
@@ -502,6 +505,32 @@
             color: var(--text);
             font-size: 0.9rem;
         }
+
+        .pseudocode-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            color: var(--text);
+        }
+
+        .math-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            color: var(--text);
+            font-size: 1.15rem;
+            display: flex;
+            justify-content: center;
+        }
         .attempt-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -888,6 +917,70 @@
         let matrixData = null;
         let currentView = 'units'; // 'units' or 'topics'
         let selectedBigIdeaId = null;
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatQuestionText(text) {
+            if (!text) return '';
+            
+            // 1. First, temporarily extract math and code blocks to protect them from HTML escaping
+            const blocks = [];
+            let formatted = text;
+            
+            // Block math $$ ... $$
+            formatted = formatted.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
+                const placeholder = `__BLOCK_MATH_${blocks.length}__`;
+                blocks.push({ type: 'block', formula: formula.trim(), original: match, placeholder });
+                return placeholder;
+            });
+            
+            // Inline math $ ... $
+            formatted = formatted.replace(/\$([^$]+?)\$/g, (match, formula) => {
+                const placeholder = `__INLINE_MATH_${blocks.length}__`;
+                blocks.push({ type: 'inline', formula: formula.trim(), original: match, placeholder });
+                return placeholder;
+            });
+            
+            // Code blocks ``` ... ```
+            formatted = formatted.replace(/(?:```|''')(?:[a-z]*\n)?([\s\S]*?)(?:```|''')/g, (match, code) => {
+                const placeholder = `__CODE_BLOCK_${blocks.length}__`;
+                blocks.push({ type: 'code', code: code.trim(), original: match, placeholder });
+                return placeholder;
+            });
+            
+            // 2. Escape HTML for the remaining text
+            formatted = escapeHtml(formatted);
+            
+            // 3. Re-insert the blocks with proper formatting
+            blocks.forEach((block) => {
+                let replacement = block.original;
+                try {
+                    if (typeof katex !== 'undefined') {
+                        if (block.type === 'block') {
+                            replacement = `<div class="math-block">${katex.renderToString(block.formula, { displayMode: true, throwOnError: false })}</div>`;
+                        } else if (block.type === 'inline') {
+                            replacement = katex.renderToString(block.formula, { displayMode: false, throwOnError: false });
+                        }
+                    }
+                    
+                    if (block.type === 'code') {
+                        replacement = `<div class="pseudocode-block">${escapeHtml(block.code)}</div>`;
+                    }
+                } catch (e) {
+                    console.error('Formatting error:', e);
+                }
+                
+                // Use split/join for literal replacement to avoid regex special char issues (like $)
+                formatted = formatted.split(block.placeholder).join(replacement);
+            });
+            
+            return formatted;
+        }
 
         // Check auth and get fresh token
         AuthHelper.checkAuth({ allowedRoles: ['teacher'] }).then(({ token: freshToken, userData: freshUserData }) => {
@@ -1321,13 +1414,13 @@
 
                                 <div class="answer-row student-answer">
                                     <span class="answer-label">Student's Answer:</span>
-                                    ${answer.selectedAnswerTexts ? answer.selectedAnswerTexts.join(', ') : answer.selectedAnswerIds.join(', ')}
+                                    ${answer.selectedAnswerTexts ? answer.selectedAnswerTexts.map(t => formatQuestionText(t)).join(', ') : answer.selectedAnswerIds.join(', ')}
                                 </div>
 
                                 ${!answer.correct ? `
                                     <div class="answer-row correct-answer">
                                         <span class="answer-label">Correct Answer:</span>
-                                        ${answer.correctAnswerTexts ? answer.correctAnswerTexts.join(', ') : answer.correctAnswerIds.join(', ')}
+                                        ${answer.correctAnswerTexts ? answer.correctAnswerTexts.map(t => formatQuestionText(t)).join(', ') : answer.correctAnswerIds.join(', ')}
                                     </div>
                                 ` : ''}
 
@@ -1361,12 +1454,59 @@
 
         function formatQuestionText(text) {
             if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            let escaped = div.innerHTML;
-            // Support both ``` and ''' as indicators for code blocks
-            const codeBlockRegex = /(?:```|''')(?:[a-z]*\n)?([\s\S]*?)(?:```|''')/g;
-            return escaped.replace(codeBlockRegex, (match, code) => `<div class="pseudocode-block">${code.trim()}</div>`);
+            
+            // 1. First, temporarily extract math and code blocks to protect them from HTML escaping
+            const blocks = [];
+            let formatted = text;
+            
+            // Block math $$ ... $$
+            formatted = formatted.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
+                const placeholder = `__BLOCK_MATH_${blocks.length}__`;
+                blocks.push({ type: 'block', formula: formula.trim(), original: match, placeholder });
+                return placeholder;
+            });
+            
+            // Inline math $ ... $
+            formatted = formatted.replace(/\$([^$]+?)\$/g, (match, formula) => {
+                const placeholder = `__INLINE_MATH_${blocks.length}__`;
+                blocks.push({ type: 'inline', formula: formula.trim(), original: match, placeholder });
+                return placeholder;
+            });
+            
+            // Code blocks ``` ... ```
+            formatted = formatted.replace(/(?:```|''')(?:[a-z]*\n)?([\s\S]*?)(?:```|''')/g, (match, code) => {
+                const placeholder = `__CODE_BLOCK_${blocks.length}__`;
+                blocks.push({ type: 'code', code: code.trim(), original: match, placeholder });
+                return placeholder;
+            });
+            
+            // 2. Escape HTML for the remaining text
+            formatted = escapeHtml(formatted);
+            
+            // 3. Re-insert the blocks with proper formatting
+            blocks.forEach((block) => {
+                let replacement = block.original;
+                try {
+                    if (typeof katex !== 'undefined') {
+                        if (block.type === 'block') {
+                            replacement = `<div class="math-block">${katex.renderToString(block.formula, { displayMode: true, throwOnError: false })}</div>`;
+                        } else if (block.type === 'inline') {
+                            replacement = katex.renderToString(block.formula, { displayMode: false, throwOnError: false });
+                        }
+                    }
+                    
+                    if (block.type === 'code') {
+                        replacement = `<div class="pseudocode-block">${escapeHtml(block.code)}</div>`;
+                    }
+                } catch (e) {
+                    console.error('Formatting error:', e);
+                }
+                
+                // Use split/join for literal replacement to avoid regex special char issues (like $)
+                formatted = formatted.split(block.placeholder).join(replacement);
+            });
+            
+            return formatted;
         }
 
         async function handleOverride(studentId, topicId, action) {

@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AP Mastery</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
     <style>
         .breadcrumb {
             display: flex;
@@ -308,6 +311,32 @@
             color: var(--gray-600);
             margin: 0;
         }
+
+        .pseudocode-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            color: var(--text);
+        }
+
+        .math-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            color: var(--text);
+            font-size: 1.15rem;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -390,6 +419,57 @@
         let matrixData = null;
         let classSettings = { progressionMode: 'linear' };
 
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function formatQuestionText(text) {
+            if (!text) return '';
+            
+            // 1. Escape HTML first
+            let formatted = escapeHtml(text);
+            
+            // 2. Handle LaTeX block math: $$ formula $$
+            const blockMathRegex = /\$\$([\s\S]*?)\$\$/g;
+            text.replace(blockMathRegex, (match, formula) => {
+                try {
+                    const html = typeof katex !== 'undefined' 
+                        ? `<div class="math-block">${katex.renderToString(formula.trim(), { displayMode: true, throwOnError: false })}</div>`
+                        : `<div class="math-block">${match}</div>`;
+                    const placeholder = escapeHtml(match);
+                    formatted = formatted.split(placeholder).join(html);
+                } catch (e) { console.error(e); }
+            });
+            
+            // 3. Handle LaTeX inline math: $ formula $
+            const inlineMathRegex = /\$([^$]+?)\$/g;
+            text.replace(inlineMathRegex, (match, formula) => {
+                try {
+                    const html = typeof katex !== 'undefined'
+                        ? katex.renderToString(formula.trim(), { displayMode: false, throwOnError: false })
+                        : match;
+                    const placeholder = escapeHtml(match);
+                    formatted = formatted.split(placeholder).join(html);
+                } catch (e) { console.error(e); }
+            });
+
+            // 4. Handle code blocks: ``` code ```
+            const codeBlockRegex = /(?:```|''')(?:[a-z]*\n)?([\s\S]*?)(?:```|''')/g;
+            text.replace(codeBlockRegex, (match, code) => {
+                const html = `<div class="pseudocode-block">${escapeHtml(code.trim())}</div>`;
+                const placeholder = escapeHtml(match);
+                formatted = formatted.split(placeholder).join(html);
+            });
+            
+            return formatted;
+        }
+
         async function loadBigIdea() {
             try {
                 const url = classId
@@ -439,7 +519,7 @@
             content.innerHTML = `
                 <div class="big-idea-header" style="border-left: 4px solid ${bigIdea.color || '#3B82F6'}">
                     <h2>${bigIdea.name}</h2>
-                    <p>${bigIdea.description}</p>
+                    <p>${formatQuestionText(bigIdea.description)}</p>
                     <div class="big-idea-progress">
                         <span style="color: var(--gray-600);">Progress:</span>
                         <div class="progress-bar">
@@ -489,7 +569,7 @@
                     <div class="topic-number">${isPassed ? '&#10003;' : index + 1}</div>
                     <div class="topic-info" style="flex: 1;">
                         <h3>${topic.name}</h3>
-                        ${topic.description ? `<p>${topic.description}</p>` : ''}
+                        ${topic.description ? `<p>${formatQuestionText(topic.description)}</p>` : ''}
                         ${topic.attemptCount > 0 ? `
                         <div class="topic-meta">
                             <span>${topic.attemptCount} attempt${topic.attemptCount > 1 ? 's' : ''}</span>
@@ -618,10 +698,10 @@
                                     <div class="resource-details">
                                         <h6 class="resource-title-compact">
                                             <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
-                                                ${resource.title}
+                                                ${formatQuestionText(resource.title)}
                                             </a>
                                         </h6>
-                                        <p class="resource-description-compact">${resource.description}</p>
+                                        <p class="resource-description-compact">${formatQuestionText(resource.description)}</p>
                                     </div>
                                 </div>
                             `).join('')}
@@ -642,10 +722,10 @@
                                     <div class="resource-details">
                                         <h6 class="resource-title-compact">
                                             <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
-                                                ${resource.title}
+                                                ${formatQuestionText(resource.title)}
                                             </a>
                                         </h6>
-                                        <p class="resource-description-compact">${resource.description}</p>
+                                        <p class="resource-description-compact">${formatQuestionText(resource.description)}</p>
                                     </div>
                                 </div>
                             `).join('')}
@@ -666,10 +746,10 @@
                                     <div class="resource-details">
                                         <h6 class="resource-title-compact">
                                             <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
-                                                ${resource.title}
+                                                ${formatQuestionText(resource.title)}
                                             </a>
                                         </h6>
-                                        <p class="resource-description-compact">${resource.description}</p>
+                                        <p class="resource-description-compact">${formatQuestionText(resource.description)}</p>
                                     </div>
                                 </div>
                             `).join('')}

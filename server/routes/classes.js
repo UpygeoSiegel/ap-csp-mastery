@@ -26,8 +26,11 @@ router.get('/', verifyTeacher, async (req, res) => {
       // Calculate completion percentage
       let completionPercentage = 0;
       if (studentCount > 0) {
-        // Get all topics to know total count
-        const topicsSnapshot = await db.collection('topics').get();
+        // Get topics for this class's subject
+        const classSubject = classData.subject || 'ap-csp';
+        const topicsSnapshot = await db.collection('topics')
+          .where('subject', '==', classSubject)
+          .get();
         const totalTopics = topicsSnapshot.size;
 
         if (totalTopics > 0) {
