@@ -224,14 +224,14 @@ class APMastery {
         this.showLoading();
 
         try {
-            const username = formData.get('username');
+            const identifier = formData.get('identifier');
             const password = formData.get('password');
 
             // First, get the email from backend by username
             const loginResponse = await fetch(`${this.apiBase}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, isTeacher: false })
+                body: JSON.stringify({ identifier, password, isTeacher: false })
             });
 
             const loginData = await loginResponse.json();

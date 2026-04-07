@@ -222,32 +222,55 @@ router.post('/verify-login', async (req, res) => {
 // Login endpoint - works for both teachers and students
 router.post('/login', async (req, res) => {
   try {
-    const { email, password, username, isTeacher } = req.body;
+    const { email, password, username, identifier, isTeacher } = req.body;
 
     let loginEmail = email;
 
     // For students, look up email by username OR the provided email string
     if (!isTeacher) {
-      const identifier = username || email;
-      if (!identifier) {
+      const studentIdentifier = identifier || username || email;
+      if (!studentIdentifier) {
         return res.status(400).json({ error: 'Email or username is required for students' });
       }
 
-      // Check if identifier is an email
-      const isEmail = identifier.includes('@');
+      // Check if identifier is an email format
+      const isEmailFormat = studentIdentifier.includes('@');
 
       let userQuery;
-      if (isEmail) {
-        // Try to find by email
+      
+      // We'll search by both email AND username in case of overlaps or confusion
+      // Priority 1: Search by email
+      if (isEmailFormat) {
         userQuery = await db.collection('users')
-          .where('email', '==', identifier.toLowerCase())
+          .where('email', '==', studentIdentifier.toLowerCase())
           .where('role', '==', 'student')
           .limit(1)
           .get();
-      } else {
-        // Try to find by username
+      }
+
+      // Priority 2: Search by username (case-insensitive and exact)
+      if (!userQuery || userQuery.empty) {
+        // Try lowercase username
         userQuery = await db.collection('users')
-          .where('username', '==', identifier)
+          .where('username', '==', studentIdentifier.toLowerCase())
+          .where('role', '==', 'student')
+          .limit(1)
+          .get();
+          
+        if (userQuery.empty) {
+          // Try original case username
+          userQuery = await db.collection('users')
+            .where('username', '==', studentIdentifier)
+            .where('role', '==', 'student')
+            .limit(1)
+            .get();
+        }
+      }
+
+      // Priority 3: If it looks like an email but wasn't found as one, try it as a username
+      if (userQuery.empty && isEmailFormat) {
+         userQuery = await db.collection('users')
+          .where('username', '==', studentIdentifier)
           .where('role', '==', 'student')
           .limit(1)
           .get();
@@ -383,11 +406,21 @@ router.post('/forgot-password', async (req, res) => {
           .limit(1)
           .get();
       } else {
+        // Try lowercase first
         userQuery = await db.collection('users')
-          .where('username', '==', identifier)
+          .where('username', '==', identifier.toLowerCase())
           .where('role', '==', 'student')
           .limit(1)
           .get();
+          
+        if (userQuery.empty) {
+          // Try original case as fallback
+          userQuery = await db.collection('users')
+            .where('username', '==', identifier)
+            .where('role', '==', 'student')
+            .limit(1)
+            .get();
+        }
       }
 
       if (userQuery.empty) {
