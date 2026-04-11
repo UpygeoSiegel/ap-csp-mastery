@@ -265,7 +265,30 @@ h1, h2, h3, h4, .brand-font {
     margin-bottom: 0.5rem;
 }
 
-.form-group input {
+.form-group select, .form-select, .settings-group select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+}
+
+.form-group select:focus, .form-select:focus, .settings-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(143, 166, 200, 0.1);
+}
+
+.form-group input, .settings-group input {
     width: 100%;
     background: var(--surface);
     border: 1px solid var(--border2);
@@ -277,7 +300,7 @@ h1, h2, h3, h4, .brand-font {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-group input:focus {
+.form-group input:focus, .settings-group input:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(143, 166, 200, 0.1);
