@@ -551,11 +551,18 @@
                 <h3>Create New Class</h3>
                 <form id="create-class-form">
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group" style="flex: 2;">
                             <label for="class-name">Class Name</label>
                             <input type="text" id="class-name" name="className" required placeholder="e.g., Period 1 AP CSP">
                         </div>
-                        <button type="submit" class="btn-primary">Create Class</button>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="subject">Course</label>
+                            <select id="subject" name="subject" required>
+                                <option value="ap-csp">AP Computer Science Principles</option>
+                                <option value="ap-calculus-ab">AP Calculus AB</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="align-self: flex-end; margin-bottom: 0.5rem;">Create Class</button>
                     </div>
                     <div class="settings-row">
                         <div class="settings-group">
@@ -770,6 +777,7 @@
         document.getElementById('create-class-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const className = document.getElementById('class-name').value;
+            const subject = document.getElementById('subject').value;
             const retakeWaitMinutes = parseInt(document.getElementById('wait-time').value) || 0;
             const progressionMode = document.querySelector('input[name="progressionMode"]:checked').value;
 
@@ -782,6 +790,7 @@
                     },
                     body: JSON.stringify({
                         name: className,
+                        subject,
                         retakeWaitMinutes,
                         progressionMode
                     })
@@ -924,6 +933,7 @@
                 // Format settings badges
                 const waitTimeText = formatWaitTime(cls.retakeWaitMinutes || 0);
                 const progressionText = cls.progressionMode === 'unlocked' ? 'Unlocked' : 'Linear';
+                const subjectText = cls.subject === 'ap-calculus-ab' ? 'AP Calculus AB' : 'AP CSP';
 
                 return `
                     <div class="class-card-wrapper">
@@ -932,6 +942,7 @@
                         <a href="/teacher/class.html?id=${cls.id}" class="class-card-link">
                             <div class="class-card ${isArchived ? 'archived' : ''}">
                                 <h3>${escapeHtml(cls.name)}</h3>
+                                <div style="margin-bottom: 0.5rem;"><span class="class-settings-badge" style="background: var(--dim); color: var(--accent); border-color: var(--accent);">${subjectText}</span></div>
                                 <div class="class-code">${cls.code}</div>
                                 <p style="color: var(--gray-500); font-size: 0.875rem;">
                                     Share this code with your students

@@ -594,8 +594,13 @@
 
         async function loadProgress() {
             try {
-                // Load Big Ideas
-                const bigIdeasResponse = await fetch(`${apiBase}/topics/big-ideas`, {
+                // Load Big Ideas filtered by class subject
+                let bigIdeasUrl = `${apiBase}/topics/big-ideas`;
+                if (currentClassId) {
+                    bigIdeasUrl += `?classId=${currentClassId}`;
+                }
+
+                const bigIdeasResponse = await fetch(bigIdeasUrl, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const bigIdeasData = await bigIdeasResponse.json();

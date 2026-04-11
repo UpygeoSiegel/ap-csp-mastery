@@ -13,12 +13,18 @@ router.get('/', verifyTeacher, async (req, res) => {
 
     const classesSnapshot = await db.collection('classes')
       .where('teacherId', '==', teacherId)
-      .orderBy('createdAt', 'desc')
       .get();
 
-    const classes = await Promise.all(classesSnapshot.docs.map(async (doc) => {
+    const classesDocs = classesSnapshot.docs.sort((a, b) => {
+      const dateA = a.data().createdAt?.toDate ? a.data().createdAt.toDate() : new Date(a.data().createdAt || 0);
+      const dateB = b.data().createdAt?.toDate ? b.data().createdAt.toDate() : new Date(b.data().createdAt || 0);
+      return dateB - dateA; // Descending
+    });
+
+    const classes = await Promise.all(classesDocs.map(async (doc) => {
       const classData = doc.data();
       const classId = doc.id;
+      const subject = classData.subject || 'ap-csp';
 
       // Get student count
       const studentCount = classData.studentIds ? classData.studentIds.length : 0;
@@ -26,9 +32,17 @@ router.get('/', verifyTeacher, async (req, res) => {
       // Calculate completion percentage
       let completionPercentage = 0;
       if (studentCount > 0) {
-        // Get all topics to know total count
+        // Get Big Ideas for this subject to identify relevant topics
+        const bigIdeasSnapshot = await db.collection('bigIdeas')
+          .where('subject', '==', subject)
+          .get();
+        const bigIdeaIds = bigIdeasSnapshot.docs.map(bi => bi.id);
+
+        // Get all topics for this subject
         const topicsSnapshot = await db.collection('topics').get();
-        const totalTopics = topicsSnapshot.size;
+        const totalTopics = topicsSnapshot.docs.filter(t => 
+          bigIdeaIds.includes(t.data().bigIdeaId)
+        ).length;
 
         if (totalTopics > 0) {
           // Get progress for all students in this class
@@ -47,6 +61,7 @@ router.get('/', verifyTeacher, async (req, res) => {
         id: classId,
         name: classData.name,
         code: classData.code,
+        subject,
         studentCount,
         completionPercentage,
         createdAt: classData.createdAt,
@@ -67,11 +82,17 @@ router.get('/', verifyTeacher, async (req, res) => {
 // Create new class
 router.post('/', verifyTeacher, async (req, res) => {
   try {
-    const { name, retakeWaitMinutes = 0, progressionMode = 'linear' } = req.body;
+    const { name, retakeWaitMinutes = 0, progressionMode = 'linear', subject = 'ap-csp' } = req.body;
     const teacherId = req.user.uid;
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Class name is required' });
+    }
+
+    // Validate subject
+    const validSubjects = ['ap-csp', 'ap-calculus-ab'];
+    if (!validSubjects.includes(subject)) {
+      return res.status(400).json({ error: 'Invalid subject selected' });
     }
 
     // Validate retakeWaitMinutes (must be multiple of 30, max 480 = 8 hours)
@@ -94,6 +115,7 @@ router.post('/', verifyTeacher, async (req, res) => {
       code: classCode,
       teacherId,
       teacherName: req.user.displayName,
+      subject,
       studentIds: [],
       retakeWaitMinutes: waitTime,
       progressionMode,
@@ -210,9 +232,18 @@ router.get('/:classId/students', verifyTeacher, verifyClassAccess, async (req, r
             }
           });
 
-          // Get total topics
+          // Get total topics for this subject
+          const bigIdeasSnapshot = await db.collection('bigIdeas')
+            .where('subject', '==', classData.subject || 'ap-csp')
+            .get();
+          const bigIdeaIds = bigIdeasSnapshot.docs.map(bi => bi.id);
+          
           const topicsSnapshot = await db.collection('topics').get();
-          const totalTopics = topicsSnapshot.size;
+          const relevantTopics = topicsSnapshot.docs.filter(t => 
+            bigIdeaIds.includes(t.data().bigIdeaId)
+          );
+          
+          const totalTopics = relevantTopics.length;
           const completionPercentage = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
 
           return {
@@ -306,6 +337,7 @@ router.delete('/:classId/students/:studentId', verifyTeacher, verifyClassAccess,
 router.get('/:classId/students/:studentId/details', verifyTeacher, verifyClassAccess, async (req, res) => {
   try {
     const { classId, studentId } = req.params;
+    const classData = req.classData;
 
     // Get student data
     const studentDoc = await db.collection('users').doc(studentId).get();
@@ -315,6 +347,12 @@ router.get('/:classId/students/:studentId/details', verifyTeacher, verifyClassAc
 
     const studentData = studentDoc.data();
 
+    // Get Big Ideas for this subject to filter topics
+    const bigIdeasSnapshot = await db.collection('bigIdeas')
+      .where('subject', '==', classData.subject || 'ap-csp')
+      .get();
+    const bigIdeaIds = bigIdeasSnapshot.docs.map(bi => bi.id);
+
     // Get all topics
     const topicsSnapshot = await db.collection('topics')
       .orderBy('order', 'asc')
@@ -323,7 +361,10 @@ router.get('/:classId/students/:studentId/details', verifyTeacher, verifyClassAc
     const topics = [];
 
     for (const topicDoc of topicsSnapshot.docs) {
-      const topic = { id: topicDoc.id, ...topicDoc.data() };
+      const topicData = topicDoc.data();
+      if (!bigIdeaIds.includes(topicData.bigIdeaId)) continue;
+      
+      const topic = { id: topicDoc.id, ...topicData };
 
       // Get progress for this topic
       const progressDoc = await db.collection('studentProgress')
@@ -384,10 +425,11 @@ router.get('/:classId/matrix', verifyTeacher, verifyClassAccess, async (req, res
     const { classId } = req.params;
     const { bigIdeaId } = req.query;
     const classData = req.classData;
+    const subject = classData.subject || 'ap-csp';
 
-    // Get all Big Ideas
+    // Get Big Ideas for this subject
     const bigIdeasSnapshot = await db.collection('bigIdeas')
-      .orderBy('order', 'asc')
+      .where('subject', '==', subject)
       .get();
 
     const bigIdeas = bigIdeasSnapshot.docs.map(doc => ({
@@ -396,19 +438,19 @@ router.get('/:classId/matrix', verifyTeacher, verifyClassAccess, async (req, res
       shortName: doc.data().shortName,
       color: doc.data().color,
       order: doc.data().order
-    }));
+    })).sort((a, b) => (a.order || 0) - (b.order || 0));
 
-    // Get all topics ordered
+    // Get topics for these Big Ideas
     const topicsSnapshot = await db.collection('topics')
       .orderBy('order', 'asc')
       .get();
 
-    const allTopics = topicsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name,
-      bigIdeaId: doc.data().bigIdeaId,
-      order: doc.data().order
-    }));
+    const allTopics = topicsSnapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .filter(topic => bigIdeas.some(bi => bi.id === topic.bigIdeaId));
 
     // Group topics by Big Idea
     const topicsByBigIdea = {};

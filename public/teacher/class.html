@@ -790,6 +790,10 @@
                     <h2 id="class-name">Loading...</h2>
                     <div style="display: flex; align-items: center; gap: 1rem;">
                         <div class="class-code" id="class-code">---</div>
+                        <div id="student-count-badge" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 4px; background: rgba(59, 130, 246, 0.1); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.2); display: flex; align-items: center; gap: 6px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <span id="student-count-text">0 Students</span>
+                        </div>
                         <div id="progression-mode-badge" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 4px; background: var(--surface2); color: var(--muted); border: 1px solid var(--border2);">
                             ---
                         </div>
@@ -888,6 +892,10 @@
         let matrixData = null;
         let currentView = 'units'; // 'units' or 'topics'
         let selectedBigIdeaId = null;
+        let sortState = {
+            column: 'name', // 'name', bigIdeaId, or topicId
+            direction: 'asc' // 'asc' or 'desc'
+        };
 
         // Check auth and get fresh token
         AuthHelper.checkAuth({ allowedRoles: ['teacher'] }).then(({ token: freshToken, userData: freshUserData }) => {
@@ -932,6 +940,10 @@
                 document.getElementById('class-code').textContent = matrixData.classInfo.code;
                 document.title = `${matrixData.classInfo.name} - AP Mastery`;
 
+                // Update student count
+                const studentCount = matrixData.students.length;
+                document.getElementById('student-count-text').textContent = `${studentCount} Student${studentCount !== 1 ? 's' : ''}`;
+
                 // Update progression mode badge
                 const modeBadge = document.getElementById('progression-mode-badge');
                 const manualNote = document.getElementById('manual-mode-note');
@@ -970,6 +982,56 @@
             }
         }
 
+        function handleSort(column) {
+            if (sortState.column === column) {
+                sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortState.column = column;
+                sortState.direction = column === 'name' ? 'asc' : 'desc'; // Default to desc for progress
+            }
+
+            if (currentView === 'units') {
+                showUnitsView();
+            } else {
+                showTopicsView(selectedBigIdeaId);
+            }
+        }
+
+        function getSortIndicator(column) {
+            if (sortState.column !== column) return '';
+            return sortState.direction === 'asc' ? ' ↑' : ' ↓';
+        }
+
+        function getSortedStudents(students, type) {
+            return [...students].sort((a, b) => {
+                let valA, valB;
+                
+                if (sortState.column === 'name') {
+                    valA = (a.displayName || a.username).toLowerCase();
+                    valB = (b.displayName || b.username).toLowerCase();
+                } else if (sortState.column === 'overall') {
+                    valA = a.completionPercentage || 0;
+                    valB = b.completionPercentage || 0;
+                } else if (sortState.column === 'topic-progress') {
+                    valA = a.unitProgress || 0;
+                    valB = b.unitProgress || 0;
+                } else if (type === 'units') {
+                    valA = a.bigIdeaProgress[sortState.column] || 0;
+                    valB = b.bigIdeaProgress[sortState.column] || 0;
+                } else if (type === 'topics') {
+                    const progA = a.progress[sortState.column];
+                    const progB = b.progress[sortState.column];
+                    // Sort by best score, then status, then attempt count
+                    valA = progA ? (progA.bestScore !== null ? progA.bestScore : (progA.status === 'passed' ? 5 : (progA.status === 'available' ? 0.1 : 0))) : 0;
+                    valB = progB ? (progB.bestScore !== null ? progB.bestScore : (progB.status === 'passed' ? 5 : (progB.status === 'available' ? 0.1 : 0))) : 0;
+                }
+
+                if (valA < valB) return sortState.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return sortState.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
         function showUnitsView() {
             currentView = 'units';
             selectedBigIdeaId = null;
@@ -984,22 +1046,26 @@
 
             // Build header row with Big Ideas
             const headerRow = document.getElementById('header-row');
-            headerRow.innerHTML = '<th>Student</th>';
+            headerRow.innerHTML = `<th class="clickable" onclick="handleSort('name')">Student${getSortIndicator('name')}</th>`;
 
             bigIdeas.forEach(bigIdea => {
                 const th = document.createElement('th');
-                th.className = 'topic-header clickable';
+                th.className = 'topic-header';
                 th.innerHTML = `
-                    <span class="unit-indicator" style="background-color: ${bigIdea.color || '#3B82F6'}"></span>
-                    ${bigIdea.shortName || bigIdea.name}
+                    <div>
+                        <span class="unit-indicator" style="background-color: ${bigIdea.color || '#3B82F6'}"></span>
+                        ${bigIdea.shortName || bigIdea.name}
+                    </div>
+                    <div style="font-size: 0.6rem; margin-top: 4px; color: var(--accent); cursor: pointer;" onclick="selectBigIdea('${bigIdea.id}')">VIEW TOPICS →</div>
                 `;
-                th.title = `Click to view ${bigIdea.name} topics`;
-                th.onclick = () => selectBigIdea(bigIdea.id);
+                th.title = `Click VIEW TOPICS to see ${bigIdea.name} details`;
                 headerRow.appendChild(th);
             });
 
             const progressTh = document.createElement('th');
-            progressTh.textContent = 'Overall';
+            progressTh.className = 'clickable';
+            progressTh.innerHTML = `Overall${getSortIndicator('overall')}`;
+            progressTh.onclick = () => handleSort('overall');
             headerRow.appendChild(progressTh);
 
             // Build body
@@ -1017,13 +1083,22 @@
                 return;
             }
 
-            tbody.innerHTML = students.map(student => {
+            const sortedStudents = getSortedStudents(students, 'units');
+
+            tbody.innerHTML = sortedStudents.map(student => {
                 let cells = `
                     <td class="student-name">
-                        <span class="student-name-link" onclick="openStudentDetailModal('${student.id}')">${student.displayName || student.username}</span>
-                        <button class="btn-reset-password" onclick="event.stopPropagation(); resetStudentPassword('${student.id}', '${student.displayName || student.username}')" title="Reset Password">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"/></svg>
-                        </button>
+                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                            <span class="student-name-link" onclick="openStudentDetailModal('${student.id}')">${student.displayName || student.username}</span>
+                            <div style="display: flex; gap: 4px;">
+                                <button class="btn-reset-password" onclick="event.stopPropagation(); resetStudentPassword('${student.id}', '${student.displayName || student.username}')" title="Reset Password">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"/></svg>
+                                </button>
+                                <button class="btn-reset-password" style="color: var(--danger);" onclick="event.stopPropagation(); removeStudentFromClass('${student.id}', '${student.displayName || student.username}')" title="Remove student from class">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                        </div>
                     </td>`;
 
                 bigIdeas.forEach(bigIdea => {
@@ -1041,6 +1116,11 @@
 
         function selectBigIdea(bigIdeaId) {
             selectedBigIdeaId = bigIdeaId;
+            // Reset sort if it was on a bigIdeaId
+            if (sortState.column !== 'name' && sortState.column !== 'overall') {
+                sortState.column = 'name';
+                sortState.direction = 'asc';
+            }
             loadMatrix(bigIdeaId);
         }
 
@@ -1059,9 +1139,20 @@
 
             const { classInfo, topics, students } = matrixData;
 
+            // Pre-calculate unit progress for sorting
+            students.forEach(student => {
+                let passedInUnit = 0;
+                topics.forEach(topic => {
+                    if (student.progress[topic.id]?.status === 'passed') {
+                        passedInUnit++;
+                    }
+                });
+                student.unitProgress = topics.length > 0 ? Math.round((passedInUnit / topics.length) * 100) : 0;
+            });
+
             // Build header row with topics
             const headerRow = document.getElementById('header-row');
-            headerRow.innerHTML = '<th>Student</th>';
+            headerRow.innerHTML = `<th class="clickable" onclick="handleSort('name')">Student${getSortIndicator('name')}</th>`;
 
             topics.forEach(topic => {
                 const th = document.createElement('th');
@@ -1071,10 +1162,10 @@
                 if (matrixData.classInfo.progressionMode === 'manual') {
                     bulkHtml = `
                         <div style="display: flex; justify-content: center; gap: 4px; margin-top: 8px;">
-                            <button class="btn-reset-password" style="padding: 2px; box-shadow: none;" onclick="handleBulkOverride('${topic.id}', '${topic.name}', 'unlock')" title="Unlock quiz for ALL students">
+                            <button class="btn-reset-password" style="padding: 2px; box-shadow: none;" onclick="event.stopPropagation(); handleBulkOverride('${topic.id}', '${topic.name}', 'unlock')" title="Unlock quiz for ALL students">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
                             </button>
-                            <button class="btn-reset-password" style="padding: 2px; box-shadow: none;" onclick="handleBulkOverride('${topic.id}', '${topic.name}', 'retake')" title="Allow ALL students to retake">
+                            <button class="btn-reset-password" style="padding: 2px; box-shadow: none;" onclick="event.stopPropagation(); handleBulkOverride('${topic.id}', '${topic.name}', 'retake')" title="Allow ALL students to retake">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="23 4 23 10 19 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                             </button>
                         </div>
@@ -1082,7 +1173,9 @@
                 }
 
                 th.innerHTML = `
-                    <div>${topic.name}</div>
+                    <div>
+                        <div>${topic.name}</div>
+                    </div>
                     ${bulkHtml}
                 `;
                 th.title = topic.name;
@@ -1090,7 +1183,9 @@
             });
 
             const progressTh = document.createElement('th');
-            progressTh.textContent = 'Progress';
+            progressTh.className = 'clickable';
+            progressTh.innerHTML = `Progress${getSortIndicator('topic-progress')}`;
+            progressTh.onclick = () => handleSort('topic-progress');
             headerRow.appendChild(progressTh);
 
             // Build body
@@ -1108,15 +1203,23 @@
                 return;
             }
 
-            tbody.innerHTML = students.map(student => {
+            const sortedStudents = getSortedStudents(students, 'topics');
+
+            tbody.innerHTML = sortedStudents.map(student => {
                 let cells = `
                     <td class="student-name">
-                        <span class="student-name-link" onclick="openStudentDetailModal('${student.id}')">${student.displayName || student.username}</span>
-                        <button class="btn-reset-password" onclick="event.stopPropagation(); resetStudentPassword('${student.id}', '${student.displayName || student.username}')" title="Reset Password">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"/></svg>
-                        </button>
+                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                            <span class="student-name-link" onclick="openStudentDetailModal('${student.id}')">${student.displayName || student.username}</span>
+                            <div style="display: flex; gap: 4px;">
+                                <button class="btn-reset-password" onclick="event.stopPropagation(); resetStudentPassword('${student.id}', '${student.displayName || student.username}')" title="Reset Password">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"/></svg>
+                                </button>
+                                <button class="btn-reset-password" style="color: var(--danger);" onclick="event.stopPropagation(); removeStudentFromClass('${student.id}', '${student.displayName || student.username}')" title="Remove student from class">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                        </div>
                     </td>`;
-                let passedInUnit = 0;
 
                 topics.forEach(topic => {
                     const progress = student.progress[topic.id];
@@ -1129,7 +1232,6 @@
                         badgeClass = progress.status;
                         attemptCount = progress.attemptCount || 0;
                         if (progress.status === 'passed') {
-                            passedInUnit++;
                             isClickable = true;
                             if (progress.bestScore !== null) {
                                 badgeText = `${progress.bestScore}/5`;
@@ -1184,9 +1286,8 @@
                     `;
                 });
 
-                const unitPct = topics.length > 0 ? Math.round((passedInUnit / topics.length) * 100) : 0;
-                const colorClass = unitPct >= 80 ? 'high' : (unitPct >= 40 ? 'medium' : 'low');
-                cells += `<td class="progress-cell ${colorClass}">${unitPct}%</td>`;
+                const colorClass = student.unitProgress >= 80 ? 'high' : (student.unitProgress >= 40 ? 'medium' : 'low');
+                cells += `<td class="progress-cell ${colorClass}">${student.unitProgress}%</td>`;
 
                 return `<tr>${cells}</tr>`;
             }).join('');
@@ -1441,7 +1542,7 @@
         async function resetStudentPassword(studentId, studentName) {
             const newPassword = prompt(`Enter new password for ${studentName} (minimum 6 characters):`);
             if (!newPassword) return;
-            
+
             if (newPassword.length < 6) {
                 alert('Password must be at least 6 characters long.');
                 return;
@@ -1474,6 +1575,32 @@
             }
         }
 
+        async function removeStudentFromClass(studentId, studentName) {
+            if (!confirm(`Are you sure you want to REMOVE ${studentName} from this class? This will also delete their progress in this specific class. This action CANNOT be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/classes/${classId}/students/${studentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Student removed successfully');
+                    loadMatrix(selectedBigIdeaId);
+                } else {
+                    alert(data.error || 'Failed to remove student');
+                }
+            } catch (error) {
+                console.error('Error removing student:', error);
+                alert('An error occurred while removing the student.');
+            }
+        }
         // Student Detail Modal Functions
         async function openStudentDetailModal(studentId) {
             const modal = document.getElementById('student-detail-modal');

@@ -424,8 +424,19 @@
 
         <main class="main">
             <div class="page-header">
-                <h2>Item Analysis</h2>
-                <p>Review question performance across all students to identify areas for improvement.</p>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
+                    <div>
+                        <h2>Item Analysis</h2>
+                        <p>Review question performance across all students to identify areas for improvement.</p>
+                    </div>
+                    <div class="topic-selector">
+                        <label for="subjectSelect">Course:</label>
+                        <select id="subjectSelect" onchange="loadSummary()">
+                            <option value="ap-csp">AP Computer Science Principles</option>
+                            <option value="ap-calculus-ab">AP Calculus AB</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <div id="summary-stats" class="stats-grid">
@@ -477,7 +488,8 @@
 
         async function loadSummary() {
             try {
-                const response = await fetch(`${apiBase}/topics/stats/summary`, {
+                const subject = document.getElementById('subjectSelect').value;
+                const response = await fetch(`${apiBase}/topics/stats/summary?subject=${subject}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 

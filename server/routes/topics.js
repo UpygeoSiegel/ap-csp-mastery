@@ -10,10 +10,14 @@ router.use(verifyToken);
 // Get all topics organized by Big Ideas (for question management)
 router.get('/', async (req, res) => {
   try {
-    // Get all Big Ideas
-    const bigIdeasSnapshot = await db.collection('bigIdeas')
-      .orderBy('order', 'asc')
-      .get();
+    const { subject } = req.query;
+
+    // Get Big Ideas
+    let bigIdeasQuery = db.collection('bigIdeas').orderBy('order', 'asc');
+    if (subject) {
+      bigIdeasQuery = bigIdeasQuery.where('subject', '==', subject);
+    }
+    const bigIdeasSnapshot = await bigIdeasQuery.get();
 
     // Get all topics
     const topicsSnapshot = await db.collection('topics')
@@ -104,14 +108,34 @@ function getTopicTitle(topicId) {
 // Get all Big Ideas
 router.get('/big-ideas', async (req, res) => {
   try {
-    const bigIdeasSnapshot = await db.collection('bigIdeas')
-      .orderBy('order', 'asc')
-      .get();
+    const { classId } = req.query;
+    
+    let query = db.collection('bigIdeas');
+    let shouldSort = true;
+    
+    // If classId is provided, filter by the class's subject
+    if (classId) {
+      const classDoc = await db.collection('classes').doc(classId).get();
+      if (classDoc.exists) {
+        const classData = classDoc.data();
+        const subject = classData.subject || 'ap-csp'; // Default to ap-csp for legacy
+        query = query.where('subject', '==', subject);
+      }
+    } else {
+      query = query.orderBy('order', 'asc');
+      shouldSort = false;
+    }
 
-    const bigIdeas = bigIdeasSnapshot.docs.map(doc => ({
+    const bigIdeasSnapshot = await query.get();
+
+    let bigIdeas = bigIdeasSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
+
+    if (shouldSort) {
+      bigIdeas.sort((a, b) => (a.order || 0) - (b.order || 0));
+    }
 
     res.json({ bigIdeas });
 
@@ -166,15 +190,15 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
     // Get topics for this Big Idea
     const topicsSnapshot = await db.collection('topics')
       .where('bigIdeaId', '==', bigIdeaId)
-      .orderBy('order', 'asc')
       .get();
 
+    const topicsDocs = topicsSnapshot.docs.sort((a, b) => (a.data().order || 0) - (b.data().order || 0));
     const topics = [];
 
     // First pass: collect all progress data
     const progressMap = {};
     if (classId && req.user.role === 'student') {
-      for (const topicDoc of topicsSnapshot.docs) {
+      for (const topicDoc of topicsDocs) {
         const progressQuery = await db.collection('studentProgress')
           .where('studentId', '==', studentId)
           .where('topicId', '==', topicDoc.id)
@@ -188,8 +212,8 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
       }
     }
 
-    for (let i = 0; i < topicsSnapshot.docs.length; i++) {
-      const topicDoc = topicsSnapshot.docs[i];
+    for (let i = 0; i < topicsDocs.length; i++) {
+      const topicDoc = topicsDocs[i];
       const topic = { id: topicDoc.id, ...topicDoc.data() };
 
       // Get progress for this topic if classId provided
@@ -449,9 +473,20 @@ router.get('/:topicId/question-stats', async (req, res) => {
 // Get summary statistics for all topics (teachers only) - Overview
 router.get('/stats/summary', async (req, res) => {
   try {
+    const { subject } = req.query;
+
     // Only teachers can view stats
     if (req.user.role !== 'teacher') {
       return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Get Big Ideas for filtering if subject provided
+    let allowedBigIdeaIds = null;
+    if (subject) {
+      const bigIdeasSnapshot = await db.collection('bigIdeas')
+        .where('subject', '==', subject)
+        .get();
+      allowedBigIdeaIds = bigIdeasSnapshot.docs.map(doc => doc.id);
     }
 
     // Get all topics
@@ -482,35 +517,37 @@ router.get('/stats/summary', async (req, res) => {
       statsByTopic[data.topicId].push(data);
     });
 
-    const topicSummaries = topicsSnapshot.docs.map(doc => {
-      const topic = doc.data();
-      const topicId = doc.id;
-      const questionStats = statsByTopic[topicId] || [];
+    const topicSummaries = topicsSnapshot.docs
+      .filter(doc => !allowedBigIdeaIds || allowedBigIdeaIds.includes(doc.data().bigIdeaId))
+      .map(doc => {
+        const topic = doc.data();
+        const topicId = doc.id;
+        const questionStats = statsByTopic[topicId] || [];
 
-      // Calculate aggregate stats
-      let totalAttempts = 0;
-      let totalCorrect = 0;
-      let totalTimeMs = 0;
+        // Calculate aggregate stats
+        let totalAttempts = 0;
+        let totalCorrect = 0;
+        let totalTimeMs = 0;
 
-      questionStats.forEach(qs => {
-        totalAttempts += qs.totalAttempts || 0;
-        totalCorrect += qs.correctCount || 0;
-        totalTimeMs += qs.totalTimeSpentMs || 0;
-      });
+        questionStats.forEach(qs => {
+          totalAttempts += qs.totalAttempts || 0;
+          totalCorrect += qs.correctCount || 0;
+          totalTimeMs += qs.totalTimeSpentMs || 0;
+        });
 
-      const overallCorrectPercentage = totalAttempts > 0
-        ? Math.round((totalCorrect / totalAttempts) * 100)
-        : null;
+        const overallCorrectPercentage = totalAttempts > 0
+          ? Math.round((totalCorrect / totalAttempts) * 100)
+          : null;
 
-      const avgTimePerQuestion = totalAttempts > 0
-        ? Math.round(totalTimeMs / totalAttempts)
-        : null;
+        const avgTimePerQuestion = totalAttempts > 0
+          ? Math.round(totalTimeMs / totalAttempts)
+          : null;
 
-      // Find hardest and easiest questions
-      let hardestQuestion = null;
-      let easiestQuestion = null;
-      let lowestCorrectPct = 100;
-      let highestCorrectPct = 0;
+        // Find hardest and easiest questions
+        let hardestQuestion = null;
+        let easiestQuestion = null;
+        let lowestCorrectPct = 100;
+        let highestCorrectPct = 0;
 
       questionStats.forEach(qs => {
         if (qs.totalAttempts >= 5) { // Only consider questions with enough data
