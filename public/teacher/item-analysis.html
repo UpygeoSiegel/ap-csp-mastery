@@ -400,6 +400,75 @@
             letter-spacing: 0.1em;
             border: 1px solid var(--border);
         }
+        .top-missed-section {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .top-missed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .top-missed-header h4 {
+            margin: 0;
+            font-family: 'Barlow Condensed', sans-serif;
+            color: var(--danger);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .top-missed-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .top-missed-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--surface);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        .top-missed-rank {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            color: var(--danger);
+            min-width: 20px;
+        }
+        .top-missed-text {
+            flex: 1;
+            font-weight: 500;
+        }
+        .top-missed-pct {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+        .unit-header {
+            background: var(--surface2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0 1rem 0;
+            border-left: 4px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .unit-header h3 {
+            margin: 0;
+            font-family: 'Barlow Condensed', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
     </style>
 </head>
 <body>
@@ -427,15 +496,9 @@
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
                     <div>
                         <h2>Item Analysis</h2>
-                        <p>Review question performance across all students to identify areas for improvement.</p>
+                        <p>Review the top 10 most missed questions across all students to identify areas for improvement.</p>
                     </div>
-                    <div class="topic-selector">
-                        <label for="subjectSelect">Course:</label>
-                        <select id="subjectSelect" onchange="loadSummary()">
-                            <option value="ap-csp">AP Computer Science Principles</option>
-                            <option value="ap-calculus-ab">AP Calculus AB</option>
-                        </select>
-                    </div>
+                    <input type="hidden" id="subjectSelect" value="ap-csp">
                 </div>
             </div>
 
@@ -512,19 +575,23 @@
         }
 
         function renderSummary() {
-            const { topics } = topicsData;
+            const { bigIdeas } = topicsData;
 
             // Calculate overall stats
             let totalAttempts = 0;
             let totalCorrect = 0;
+            let totalTopics = 0;
             let topicsWithData = 0;
 
-            topics.forEach(topic => {
-                if (topic.stats.totalQuestionAttempts > 0) {
-                    totalAttempts += topic.stats.totalQuestionAttempts;
-                    totalCorrect += Math.round(topic.stats.totalQuestionAttempts * (topic.stats.overallCorrectPercentage || 0) / 100);
-                    topicsWithData++;
-                }
+            bigIdeas.forEach(bi => {
+                bi.topics.forEach(topic => {
+                    totalTopics++;
+                    if (topic.stats.totalQuestionAttempts > 0) {
+                        totalAttempts += topic.stats.totalQuestionAttempts;
+                        totalCorrect += Math.round(topic.stats.totalQuestionAttempts * (topic.stats.overallCorrectPercentage || 0) / 100);
+                        topicsWithData++;
+                    }
+                });
             });
 
             const overallCorrectPct = totalAttempts > 0
@@ -536,7 +603,7 @@
 
             document.getElementById('summary-stats').innerHTML = `
                 <div class="stat-card">
-                    <div class="stat-value">${topics.length}</div>
+                    <div class="stat-value">${totalTopics}</div>
                     <div class="stat-label">Total Topics</div>
                 </div>
                 <div class="stat-card">
@@ -555,44 +622,123 @@
         }
 
         function renderTopics() {
-            const { topics } = topicsData;
+            const { bigIdeas } = topicsData;
             const container = document.getElementById('topics-container');
 
-            if (topics.length === 0) {
-                container.innerHTML = '<div class="no-data">No topics found.</div>';
+            if (bigIdeas.length === 0) {
+                container.innerHTML = '<div class="no-data">No data found.</div>';
                 return;
             }
 
-            container.innerHTML = topics.map(topic => {
-                const pct = topic.stats.overallCorrectPercentage;
-                const pctClass = pct === null ? '' : (pct >= 70 ? 'high' : (pct >= 50 ? 'medium' : 'low'));
-                const avgTime = topic.stats.avgTimePerQuestionMs
-                    ? formatTime(topic.stats.avgTimePerQuestionMs)
-                    : 'N/A';
+            container.innerHTML = bigIdeas.map(bi => {
+                const topicsHtml = bi.topics.map(topic => {
+                    const pct = topic.stats.overallCorrectPercentage;
+                    const pctClass = pct === null ? '' : (pct >= 70 ? 'high' : (pct >= 50 ? 'medium' : 'low'));
+                    const avgTime = topic.stats.avgTimePerQuestionMs
+                        ? formatTime(topic.stats.avgTimePerQuestionMs)
+                        : 'N/A';
 
-                return `
-                    <div class="topic-card">
-                        <div class="topic-header" onclick="toggleTopic('${topic.id}')">
-                            <h3>${topic.name}</h3>
-                            <div class="topic-meta">
-                                <span>${topic.questionCount} questions</span>
-                                <span>${topic.stats.totalQuestionAttempts} attempts</span>
-                                <span class="percentage ${pctClass}">${pct !== null ? pct + '% correct' : 'No data'}</span>
-                                <span>Avg: ${avgTime}</span>
-                                <svg class="expand-icon" id="icon-${topic.id}" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M6 9l6 6 6-6"/>
-                                </svg>
+                    return `
+                        <div class="topic-card" style="margin-bottom: 1rem;">
+                            <div class="topic-header" onclick="toggleTopic('${topic.id}')">
+                                <h3>${topic.name}</h3>
+                                <div class="topic-meta">
+                                    <span>${topic.stats.totalQuestionAttempts} attempts</span>
+                                    <span class="percentage ${pctClass}">${pct !== null ? pct + '% correct' : 'No data'}</span>
+                                    <span>Avg: ${avgTime}</span>
+                                    <svg class="expand-icon" id="icon-${topic.id}" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M6 9l6 6 6-6"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="topic-body" id="body-${topic.id}">
+                                <div id="top-missed-${topic.id}">
+                                    ${renderTopMissed(topic.stats.topMissedQuestions, `Top 10 Most Missed in ${topic.name}`)}
+                                </div>
                             </div>
                         </div>
-                        <div class="topic-body" id="body-${topic.id}">
-                            <div class="loading-state">Loading questions...</div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="unit-section">
+                        <div class="unit-header" style="border-left-color: ${bi.color || 'var(--accent)'}">
+                            <h3>${bi.name}</h3>
+                            <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">
+                                ${bi.topics.length} Topics
+                            </div>
+                        </div>
+                        
+                        ${renderTopMissed(bi.topMissedQuestions, `Top 10 Most Missed Questions in ${bi.shortName || bi.name}`)}
+                        
+                        <div class="topics-list">
+                            ${topicsHtml}
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        async function toggleTopic(topicId) {
+        function renderTopMissed(questions, title) {
+            if (!questions || questions.length === 0) {
+                return `
+                    <div class="top-missed-section">
+                        <div class="top-missed-header">
+                            <h4>${title}</h4>
+                        </div>
+                        <p style="color: var(--muted); font-size: 0.9rem; margin: 0;">No question data available for this section yet.</p>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="top-missed-section">
+                    <div class="top-missed-header">
+                        <h4>${title}</h4>
+                    </div>
+                    <div class="top-missed-list">
+                        ${questions.map((q, i) => `
+                            <div class="top-missed-item" style="flex-direction: column; align-items: stretch; gap: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span class="top-missed-rank">#${i + 1}</span>
+                                    <div style="flex: 1;">
+                                        <div class="top-missed-text">${formatQuestionText(q.text)}</div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                                        <span class="top-missed-pct">${q.correctPercentage}% Correct</span>
+                                        <span style="font-size: 0.7rem; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase;">${q.totalAttempts} attempts</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="options-breakdown" style="padding: 0; margin-top: 0.5rem; border-top: 1px solid var(--border2); padding-top: 1rem;">
+                                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        ${q.optionStats.map(opt => {
+                                            const isPopularWrong = !opt.isCorrect && opt.selectionPercentage > 25;
+                                            const barClass = opt.isCorrect ? 'correct' : (isPopularWrong ? 'incorrect-popular' : '');
+                                            
+                                            return `
+                                                <div class="option-bar" style="margin-bottom: 0.25rem;">
+                                                    <span class="option-text ${opt.isCorrect ? 'correct' : ''}" style="font-size: 0.8rem;">
+                                                        <span style="font-weight: 800; font-family: 'Barlow Condensed', sans-serif; margin-right: 0.5rem;">${opt.id}.</span>
+                                                        ${opt.text}
+                                                    </span>
+                                                    <div class="option-bar-container" style="width: 120px; height: 8px;">
+                                                        <div class="option-bar-fill ${barClass}" style="width: ${opt.selectionPercentage}%"></div>
+                                                    </div>
+                                                    <span class="option-percentage" style="width: 35px; font-size: 0.8rem;">${opt.selectionPercentage}%</span>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleTopic(topicId) {
             const body = document.getElementById(`body-${topicId}`);
             const icon = document.getElementById(`icon-${topicId}`);
 
@@ -602,93 +748,7 @@
             } else {
                 body.classList.add('open');
                 icon.classList.add('open');
-
-                // Load question stats if not already loaded
-                if (!loadedTopicStats[topicId]) {
-                    await loadTopicQuestionStats(topicId);
-                }
             }
-        }
-
-        async function loadTopicQuestionStats(topicId) {
-            try {
-                const response = await fetch(`${apiBase}/topics/${topicId}/question-stats`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to load question stats');
-                }
-
-                const data = await response.json();
-                loadedTopicStats[topicId] = data;
-                renderTopicQuestions(topicId, data);
-
-            } catch (error) {
-                console.error('Error loading question stats:', error);
-                document.getElementById(`body-${topicId}`).innerHTML = `
-                    <div class="no-data">Error loading question statistics.</div>
-                `;
-            }
-        }
-
-        function renderTopicQuestions(topicId, data) {
-            const body = document.getElementById(`body-${topicId}`);
-            const { questions } = data;
-
-            if (!questions || questions.length === 0) {
-                body.innerHTML = '<div class="no-data">No questions in this topic.</div>';
-                return;
-            }
-
-            body.innerHTML = questions.map((q, i) => {
-                const stats = q.stats;
-                const correctPct = stats.correctPercentage;
-                const pctClass = correctPct === null ? '' : (correctPct >= 70 ? 'high' : (correctPct >= 50 ? 'medium' : 'low'));
-                const avgTime = stats.avgTimeMs ? formatTime(stats.avgTimeMs) : 'N/A';
-
-                return `
-                    <div class="question-item ${q.deactivated ? 'deactivated' : ''}">
-                        <div class="question-header">
-                            <div class="question-text">
-                                ${i + 1}. ${formatQuestionText(q.text)}
-                                ${q.deactivated ? '<span class="deactivated-badge">Deactivated</span>' : ''}
-                            </div>
-                            <div class="question-stats">
-                                <div class="stat">
-                                    <div class="stat-num">${stats.totalAttempts}</div>
-                                    <div class="stat-lbl">Attempts</div>
-                                </div>
-                                <div class="stat">
-                                    <div class="stat-num ${pctClass}">${correctPct !== null ? correctPct + '%' : 'N/A'}</div>
-                                    <div class="stat-lbl">Correct</div>
-                                </div>
-                                <div class="stat">
-                                    <div class="stat-num">${avgTime}</div>
-                                    <div class="stat-lbl">Avg Time</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="options-breakdown">
-                            <h4>Answer Distribution</h4>
-                            ${stats.optionStats.map(opt => {
-                                const isPopularWrong = !opt.isCorrect && opt.selectionPercentage > 30;
-                                const barClass = opt.isCorrect ? 'correct' : (isPopularWrong ? 'incorrect-popular' : '');
-
-                                return `
-                                    <div class="option-bar">
-                                        <span class="option-text ${opt.isCorrect ? 'correct' : ''}">${opt.text}</span>
-                                        <div class="option-bar-container">
-                                            <div class="option-bar-fill ${barClass}" style="width: ${opt.selectionPercentage}%"></div>
-                                        </div>
-                                        <span class="option-percentage">${opt.selectionPercentage}%</span>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
         }
 
         function formatTime(ms) {

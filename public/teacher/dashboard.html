@@ -554,13 +554,7 @@
                         <div class="form-group" style="flex: 2;">
                             <label for="class-name">Class Name</label>
                             <input type="text" id="class-name" name="className" required placeholder="e.g., Period 1 AP CSP">
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label for="subject">Course</label>
-                            <select id="subject" name="subject" required>
-                                <option value="ap-csp">AP Computer Science Principles</option>
-                                <option value="ap-calculus-ab">AP Calculus AB</option>
-                            </select>
+                            <input type="hidden" id="subject" name="subject" value="ap-csp">
                         </div>
                         <button type="submit" class="btn-primary" style="align-self: flex-end; margin-bottom: 0.5rem;">Create Class</button>
                     </div>
@@ -866,9 +860,11 @@
 
         function renderClasses() {
             const container = document.getElementById('classes-container');
-            const filteredClasses = allClasses.filter(cls =>
-                currentView === 'archived' ? cls.archived : !cls.archived
-            );
+            const filteredClasses = allClasses.filter(cls => {
+                const matchesView = currentView === 'archived' ? cls.archived : !cls.archived;
+                const isNotCalculus = cls.subject !== 'ap-calculus-ab';
+                return matchesView && isNotCalculus;
+            });
 
             if (filteredClasses.length === 0) {
                 const message = currentView === 'archived'
@@ -933,7 +929,7 @@
                 // Format settings badges
                 const waitTimeText = formatWaitTime(cls.retakeWaitMinutes || 0);
                 const progressionText = cls.progressionMode === 'unlocked' ? 'Unlocked' : 'Linear';
-                const subjectText = cls.subject === 'ap-calculus-ab' ? 'AP Calculus AB' : 'AP CSP';
+                const subjectText = 'AP CSP';
 
                 return `
                     <div class="class-card-wrapper">

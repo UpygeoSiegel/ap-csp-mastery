@@ -90,7 +90,7 @@ router.post('/', verifyTeacher, async (req, res) => {
     }
 
     // Validate subject
-    const validSubjects = ['ap-csp', 'ap-calculus-ab'];
+    const validSubjects = ['ap-csp'];
     if (!validSubjects.includes(subject)) {
       return res.status(400).json({ error: 'Invalid subject selected' });
     }

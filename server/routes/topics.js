@@ -415,22 +415,27 @@ router.get('/:topicId/question-stats', async (req, res) => {
         totalTimeSpentMs: 0
       };
 
+      // Ensure optionSelections exists
+      const optionSelections = stats.optionSelections || {};
+
       // Calculate percentages
-      const correctPercentage = stats.totalAttempts > 0
-        ? Math.round((stats.correctCount / stats.totalAttempts) * 100)
+      const totalAttempts = stats.totalAttempts || 0;
+      const correctPercentage = totalAttempts > 0
+        ? Math.round(((stats.correctCount || 0) / totalAttempts) * 100)
         : null;
 
-      const avgTimeMs = stats.totalAttempts > 0
-        ? Math.round(stats.totalTimeSpentMs / stats.totalAttempts)
+      const avgTimeMs = totalAttempts > 0
+        ? Math.round((stats.totalTimeSpentMs || 0) / totalAttempts)
         : null;
 
       // Calculate option selection percentages
+      const correctAnswers = question.correctAnswers || [];
       const optionStats = (question.options || []).map(option => {
-        const selectionCount = stats.optionSelections[option.id] || 0;
-        const selectionPercentage = stats.totalAttempts > 0
-          ? Math.round((selectionCount / stats.totalAttempts) * 100)
+        const selectionCount = optionSelections[option.id] || 0;
+        const selectionPercentage = totalAttempts > 0
+          ? Math.round((selectionCount / totalAttempts) * 100)
           : 0;
-        const isCorrect = question.correctAnswers.includes(option.id);
+        const isCorrect = correctAnswers.includes(option.id);
 
         return {
           id: option.id,
@@ -446,11 +451,11 @@ router.get('/:topicId/question-stats', async (req, res) => {
         text: question.text,
         type: question.type,
         deactivated: question.deactivated || false,
-        correctAnswers: question.correctAnswers,
+        correctAnswers: correctAnswers,
         stats: {
-          totalAttempts: stats.totalAttempts,
-          correctCount: stats.correctCount,
-          incorrectCount: stats.incorrectCount,
+          totalAttempts: totalAttempts,
+          correctCount: stats.correctCount || 0,
+          incorrectCount: stats.incorrectCount || 0,
           correctPercentage,
           avgTimeMs,
           optionStats
@@ -480,48 +485,47 @@ router.get('/stats/summary', async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    // Get Big Ideas for filtering if subject provided
-    let allowedBigIdeaIds = null;
+    // Get Big Ideas
+    let bigIdeasQuery = db.collection('bigIdeas');
     if (subject) {
-      const bigIdeasSnapshot = await db.collection('bigIdeas')
-        .where('subject', '==', subject)
-        .get();
-      allowedBigIdeaIds = bigIdeasSnapshot.docs.map(doc => doc.id);
+      bigIdeasQuery = bigIdeasQuery.where('subject', '==', subject);
     }
+    
+    const bigIdeasSnapshot = await bigIdeasQuery.get();
+    const bigIdeas = bigIdeasSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      topics: [],
+      topMissedQuestions: []
+    })).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    const allowedBigIdeaIds = bigIdeas.map(bi => bi.id);
 
     // Get all topics
-    const topicsSnapshot = await db.collection('topics')
-      .orderBy('order', 'asc')
-      .get();
-
-    // Get all questions to count per topic
-    const allQuestionsSnapshot = await db.collection('questions').get();
-    const questionCountByTopic = {};
-    allQuestionsSnapshot.docs.forEach(doc => {
-      const data = doc.data();
-      if (!data.deactivated) {
-        questionCountByTopic[data.topicId] = (questionCountByTopic[data.topicId] || 0) + 1;
-      }
-    });
+    const topicsSnapshot = await db.collection('topics').get();
+    const sortedTopics = topicsSnapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
 
     // Get all question stats
     const allStatsSnapshot = await db.collection('questionStats').get();
 
     // Group stats by topic
     const statsByTopic = {};
+    const allQuestionStats = [];
     allStatsSnapshot.docs.forEach(doc => {
       const data = doc.data();
+      allQuestionStats.push(data);
       if (!statsByTopic[data.topicId]) {
         statsByTopic[data.topicId] = [];
       }
       statsByTopic[data.topicId].push(data);
     });
 
-    const topicSummaries = topicsSnapshot.docs
-      .filter(doc => !allowedBigIdeaIds || allowedBigIdeaIds.includes(doc.data().bigIdeaId))
-      .map(doc => {
-        const topic = doc.data();
-        const topicId = doc.id;
+    const topicSummaries = sortedTopics
+      .filter(topic => allowedBigIdeaIds.includes(topic.bigIdeaId))
+      .map(topic => {
+        const topicId = topic.id;
         const questionStats = statsByTopic[topicId] || [];
 
         // Calculate aggregate stats
@@ -539,55 +543,90 @@ router.get('/stats/summary', async (req, res) => {
           ? Math.round((totalCorrect / totalAttempts) * 100)
           : null;
 
-        const avgTimePerQuestion = totalAttempts > 0
+        const avgTimePerQuestionMs = totalAttempts > 0
           ? Math.round(totalTimeMs / totalAttempts)
           : null;
 
-        // Find hardest and easiest questions
-        let hardestQuestion = null;
-        let easiestQuestion = null;
-        let lowestCorrectPct = 100;
-        let highestCorrectPct = 0;
+        // Get Top 10 missed for this topic
+        const topMissed = questionStats
+          .filter(qs => (qs.totalAttempts || 0) >= 3)
+          .map(qs => {
+            const total = qs.totalAttempts || 1;
+            const optionSelections = qs.optionSelections || {};
+            const options = qs.options || [];
+            const correctIds = qs.correctAnswerIds || [];
 
-      questionStats.forEach(qs => {
-        if (qs.totalAttempts >= 5) { // Only consider questions with enough data
-          const correctPct = (qs.correctCount / qs.totalAttempts) * 100;
-          if (correctPct < lowestCorrectPct) {
-            lowestCorrectPct = correctPct;
-            hardestQuestion = {
+            const optionStats = options.map(opt => ({
+              id: opt.id,
+              text: opt.text,
+              isCorrect: correctIds.includes(opt.id),
+              selectionPercentage: Math.round(((optionSelections[opt.id] || 0) / total) * 100)
+            }));
+
+            return {
               id: qs.questionId,
               text: qs.questionText,
-              correctPercentage: Math.round(correctPct)
+              correctPercentage: Math.round(((qs.correctCount || 0) / total) * 100),
+              totalAttempts: qs.totalAttempts,
+              optionStats
             };
+          })
+          .sort((a, b) => a.correctPercentage - b.correctPercentage)
+          .slice(0, 10);
+
+        return {
+          id: topicId,
+          name: topic.name,
+          bigIdeaId: topic.bigIdeaId,
+          order: topic.order,
+          stats: {
+            totalQuestionAttempts: totalAttempts,
+            overallCorrectPercentage,
+            avgTimePerQuestionMs,
+            topMissedQuestions: topMissed
           }
-          if (correctPct > highestCorrectPct) {
-            highestCorrectPct = correctPct;
-            easiestQuestion = {
-              id: qs.questionId,
-              text: qs.questionText,
-              correctPercentage: Math.round(correctPct)
-            };
-          }
-        }
+        };
       });
 
-      return {
-        id: topicId,
-        name: topic.name,
-        bigIdeaId: topic.bigIdeaId,
-        order: topic.order,
-        questionCount: questionCountByTopic[topicId] || 0,
-        stats: {
-          totalQuestionAttempts: totalAttempts,
-          overallCorrectPercentage,
-          avgTimePerQuestionMs: avgTimePerQuestion,
-          hardestQuestion,
-          easiestQuestion
-        }
-      };
+    // Nest topics into Big Ideas and calculate Big Idea level Top 10
+    bigIdeas.forEach(bi => {
+      bi.topics = topicSummaries.filter(t => t.bigIdeaId === bi.id);
+      
+      // Calculate Top 10 for the entire Big Idea
+      const biQuestionStats = allQuestionStats.filter(qs => {
+        const topic = topicSummaries.find(t => t.id === qs.topicId);
+        return topic && topic.bigIdeaId === bi.id;
+      });
+
+      bi.topMissedQuestions = biQuestionStats
+        .filter(qs => (qs.totalAttempts || 0) >= 5)
+        .map(qs => {
+          const total = qs.totalAttempts || 1;
+          const optionSelections = qs.optionSelections || {};
+          const options = qs.options || [];
+          const correctIds = qs.correctAnswerIds || [];
+
+          const optionStats = options.map(opt => ({
+            id: opt.id,
+            text: opt.text,
+            isCorrect: correctIds.includes(opt.id),
+            selectionPercentage: Math.round(((optionSelections[opt.id] || 0) / total) * 100)
+          }));
+
+          return {
+            id: qs.questionId,
+            text: qs.questionText,
+            correctPercentage: Math.round(((qs.correctCount || 0) / total) * 100),
+            totalAttempts: qs.totalAttempts,
+            topicId: qs.topicId,
+            optionStats
+          };
+        })
+        .sort((a, b) => a.correctPercentage - b.correctPercentage)
+        .slice(0, 10);
     });
 
-    res.json({ topics: topicSummaries });
+    res.json({ bigIdeas });
 
   } catch (error) {
     console.error('Get stats summary error:', error);
