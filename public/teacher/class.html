@@ -927,12 +927,31 @@
 
     <!-- Confirmation Modal -->
     <div id="confirm-modal" class="modal-overlay">
-        <div class="modal">
-            <h3 id="confirm-modal-title">Confirm Action</h3>
-            <p id="confirm-modal-message">Are you sure?</p>
-            <div class="modal-buttons">
-                <button class="btn-modal-cancel" onclick="closeConfirmModal()">Cancel</button>
-                <button class="btn-modal-confirm" id="confirm-modal-btn">Confirm</button>
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-body" style="padding: 2.5rem;">
+                <h3 id="confirm-modal-title" style="margin-top: 0;">Confirm Action</h3>
+                <p id="confirm-modal-message" style="margin-bottom: 2rem; line-height: 1.5;">Are you sure?</p>
+                <div class="modal-buttons" style="margin-top: 0;">
+                    <button class="btn-modal-cancel" onclick="closeConfirmModal()">Cancel</button>
+                    <button class="btn-modal-confirm" id="confirm-modal-btn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prompt Modal -->
+    <div id="prompt-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-body" style="padding: 2.5rem;">
+                <h3 id="prompt-modal-title" style="margin-top: 0;">Input Required</h3>
+                <p id="prompt-modal-message" style="margin-bottom: 1.5rem; line-height: 1.5;">Please enter a value:</p>
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <input type="text" id="prompt-modal-input" style="width: 100%; padding: 0.85rem; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg); color: var(--text); font-size: 1rem;">
+                </div>
+                <div class="modal-buttons" style="margin-top: 0;">
+                    <button class="btn-modal-cancel" onclick="closePromptModal()">Cancel</button>
+                    <button class="btn-primary" id="prompt-modal-btn" style="width: auto; padding: 0.75rem 2rem;">Submit</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1611,6 +1630,36 @@
             document.getElementById('confirm-modal').classList.remove('active');
         }
 
+        function showPromptModal({ title, message, placeholder, defaultValue, onConfirm }) {
+            const modal = document.getElementById('prompt-modal');
+            const titleEl = document.getElementById('prompt-modal-title');
+            const messageEl = document.getElementById('prompt-modal-message');
+            const input = document.getElementById('prompt-modal-input');
+            const btn = document.getElementById('prompt-modal-btn');
+
+            titleEl.textContent = title || 'Input Required';
+            messageEl.textContent = message || 'Please enter a value:';
+            input.placeholder = placeholder || '';
+            input.value = defaultValue || '';
+            
+            // Clear previous listeners and add new one
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', () => {
+                const value = input.value.trim();
+                if (onConfirm) onConfirm(value);
+                closePromptModal();
+            });
+
+            modal.classList.add('active');
+            setTimeout(() => input.focus(), 100);
+        }
+
+        function closePromptModal() {
+            document.getElementById('prompt-modal').classList.remove('active');
+        }
+
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
@@ -1622,6 +1671,7 @@
         // Close modals on overlay click
         document.addEventListener('click', (e) => {
             if (e.target.id === 'confirm-modal') closeConfirmModal();
+            if (e.target.id === 'prompt-modal') closePromptModal();
             if (e.target.id === 'attempt-modal') closeModal();
             if (e.target.id === 'student-detail-modal') closeStudentDetailModal();
         });
@@ -1630,6 +1680,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeConfirmModal();
+                closePromptModal();
                 closeModal();
                 closeStudentDetailModal();
             }
@@ -1713,70 +1764,83 @@
         }
 
         async function assignPracticeTest() {
-            const title = prompt('Enter a title for this practice test:', 'Full AP CSP Practice Exam');
-            if (title === null) return; // Cancelled
+            showPromptModal({
+                title: 'Assign Practice Test',
+                message: 'Enter a title for this practice test. This 50-question exam will be assigned to all students in this class.',
+                defaultValue: 'Full AP CSP Practice Exam',
+                placeholder: 'e.g. Midterm Mock Exam',
+                onConfirm: async (title) => {
+                    if (!title) return;
 
-            try {
-                const response = await fetch(`${apiBase}/practice-tests/assign`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        classId,
-                        title
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    showToast('Practice test assigned to all students in this class!', 'success');
-                } else {
-                    showToast(data.error || 'Failed to assign practice test', 'error');
-                }
-            } catch (error) {
-                console.error('Error assigning practice test:', error);
-                showToast('An error occurred. Please try again.', 'error');
-            }
-        }
-
-        async function resetStudentPassword(studentId, studentName) {
-            const newPassword = prompt(`Enter new password for ${studentName} (minimum 6 characters):`);
-            if (!newPassword) return;
-
-            if (newPassword.length < 6) {
-                showToast('Password must be at least 6 characters long.', 'warning');
-                return;
-            }
-
-            showConfirmModal({
-                title: 'Reset Password',
-                message: `Are you sure you want to change the password for ${studentName}?`,
-                confirmText: 'Reset Password',
-                onConfirm: async () => {
                     try {
-                        const response = await fetch(`${apiBase}/classes/${classId}/students/${studentId}/reset-password`, {
+                        const response = await fetch(`${apiBase}/practice-tests/assign`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${token}`
                             },
-                            body: JSON.stringify({ newPassword })
+                            body: JSON.stringify({
+                                classId,
+                                title
+                            })
                         });
 
                         const data = await response.json();
 
                         if (response.ok) {
-                            showToast('Password reset successfully!', 'success');
+                            showToast('Practice test assigned to all students in this class!', 'success');
                         } else {
-                            showToast(data.error || 'Failed to reset password', 'error');
+                            showToast(data.error || 'Failed to assign practice test', 'error');
                         }
                     } catch (error) {
-                        console.error('Error resetting password:', error);
-                        showToast('An error occurred while resetting the password.', 'error');
+                        console.error('Error assigning practice test:', error);
+                        showToast('An error occurred. Please try again.', 'error');
                     }
+                }
+            });
+        }
+
+        async function resetStudentPassword(studentId, studentName) {
+            showPromptModal({
+                title: 'Reset Student Password',
+                message: `Enter new password for ${studentName}:`,
+                placeholder: 'Minimum 6 characters',
+                onConfirm: async (newPassword) => {
+                    if (!newPassword) return;
+
+                    if (newPassword.length < 6) {
+                        showToast('Password must be at least 6 characters long.', 'warning');
+                        return;
+                    }
+
+                    showConfirmModal({
+                        title: 'Confirm Password Change',
+                        message: `Are you sure you want to change the password for ${studentName}?`,
+                        confirmText: 'Reset Password',
+                        onConfirm: async () => {
+                            try {
+                                const response = await fetch(`${apiBase}/classes/${classId}/students/${studentId}/reset-password`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({ newPassword })
+                                });
+
+                                const data = await response.json();
+
+                                if (response.ok) {
+                                    showToast('Password reset successfully!', 'success');
+                                } else {
+                                    showToast(data.error || 'Failed to reset password', 'error');
+                                }
+                            } catch (error) {
+                                console.error('Error resetting password:', error);
+                                showToast('An error occurred while resetting the password.', 'error');
+                            }
+                        }
+                    });
                 }
             });
         }

@@ -50,6 +50,17 @@ class APMastery {
         document.getElementById('teacher-google-login')?.addEventListener('click', () => this.handleGoogleAuth(false, true));
         document.getElementById('teacher-google-signup')?.addEventListener('click', () => this.handleGoogleAuth(true, true));
 
+        // Close prompt modal on overlay click
+        document.getElementById('prompt-modal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'prompt-modal') this.closePromptModal();
+        });
+        document.getElementById('prompt-modal-cancel')?.addEventListener('click', () => this.closePromptModal());
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.closePromptModal();
+        });
+
         // Form submissions
         document.getElementById('teacher-login-form')?.addEventListener('submit', (e) => this.handleTeacherLogin(e));
         document.getElementById('teacher-signup-form')?.addEventListener('submit', (e) => this.handleTeacherSignup(e));
@@ -370,12 +381,18 @@ class APMastery {
             } else if (response.status === 404 && data.needsSignup && !isTeacher) {
                 // Account doesn't exist, prompt for class code if we don't have one
                 this.hideLoading();
-                const code = prompt(`Welcome ${data.name}! Please enter your 6-character Class Code to join:`);
-                if (code && code.trim().length === 6) {
-                    await this.handleGoogleAuthWithCode(idToken, code.toUpperCase().trim(), data.name);
-                } else if (code) {
-                    this.showToast('Please enter a valid 6-character class code', 'error');
-                }
+                this.showPromptModal({
+                    title: `Welcome ${data.name}!`,
+                    message: 'Please enter your 6-character Class Code to join:',
+                    placeholder: 'e.g. ABC123',
+                    onConfirm: async (code) => {
+                        if (code && code.trim().length === 6) {
+                            await this.handleGoogleAuthWithCode(idToken, code.toUpperCase().trim(), data.name);
+                        } else if (code) {
+                            this.showToast('Please enter a valid 6-character class code', 'error');
+                        }
+                    }
+                });
             } else {
                 this.showToast(data.error || 'Google auth failed', 'error');
                 this.hideLoading();
@@ -417,41 +434,47 @@ class APMastery {
     // Handle password reset
     async handleForgotPassword(isTeacher) {
         const inputLabel = isTeacher ? 'email' : 'email or username';
-        const value = prompt(`Please enter your ${inputLabel} to reset your password:`);
         
-        if (!value) return;
+        this.showPromptModal({
+            title: 'Reset Password',
+            message: `Please enter your ${inputLabel} to reset your password:`,
+            placeholder: isTeacher ? 'teacher@school.edu' : 'Username or Email',
+            onConfirm: async (value) => {
+                if (!value) return;
 
-        this.showLoading();
-        try {
-            // First, call backend to get the email and validate
-            const response = await fetch(`${this.apiBase}/auth/forgot-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: isTeacher ? value : undefined,
-                    username: !isTeacher ? value : undefined,
-                    isTeacher: isTeacher
-                })
-            });
+                this.showLoading();
+                try {
+                    // First, call backend to get the email and validate
+                    const response = await fetch(`${this.apiBase}/auth/forgot-password`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: isTeacher ? value : undefined,
+                            username: !isTeacher ? value : undefined,
+                            isTeacher: isTeacher
+                        })
+                    });
 
-            const data = await response.json();
+                    const data = await response.json();
 
-            if (response.ok && data.email) {
-                // Now trigger Firebase password reset email
-                await window.firebaseAuth.sendPasswordResetEmail(data.email);
-                this.showToast(data.message || 'Password reset email sent!', 'success');
-            } else if (response.ok) {
-                // If it was a mock success for security
-                this.showToast(data.message, 'info');
-            } else {
-                this.showToast(data.error || 'Failed to process request', 'error');
+                    if (response.ok && data.email) {
+                        // Now trigger Firebase password reset email
+                        await window.firebaseAuth.sendPasswordResetEmail(data.email);
+                        this.showToast(data.message || 'Password reset email sent!', 'success');
+                    } else if (response.ok) {
+                        // If it was a mock success for security
+                        this.showToast(data.message, 'info');
+                    } else {
+                        this.showToast(data.error || 'Failed to process request', 'error');
+                    }
+                } catch (error) {
+                    console.error('Forgot password error:', error);
+                    this.showToast('Failed to send reset email. Please try again.', 'error');
+                } finally {
+                    this.hideLoading();
+                }
             }
-        } catch (error) {
-            console.error('Forgot password error:', error);
-            this.showToast('Failed to send reset email. Please try again.', 'error');
-        } finally {
-            this.hideLoading();
-        }
+        });
     }
 
     // Show loading overlay
@@ -477,6 +500,43 @@ class APMastery {
         setTimeout(() => {
             toast.remove();
         }, 4000);
+    }
+
+    // Modal Helper Methods
+    showPromptModal({ title, message, placeholder, defaultValue, onConfirm }) {
+        const modal = document.getElementById('prompt-modal');
+        if (!modal) return;
+
+        const titleEl = document.getElementById('prompt-modal-title');
+        const messageEl = document.getElementById('prompt-modal-message');
+        const input = document.getElementById('prompt-modal-input');
+        const btn = document.getElementById('prompt-modal-btn');
+
+        if (titleEl) titleEl.textContent = title || 'Input Required';
+        if (messageEl) messageEl.textContent = message || 'Please enter a value:';
+        if (input) {
+            input.placeholder = placeholder || '';
+            input.value = defaultValue || '';
+        }
+        
+        if (btn) {
+            // Clear previous listeners and add new one
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', () => {
+                const value = input.value.trim();
+                if (onConfirm) onConfirm(value);
+                this.closePromptModal();
+            });
+        }
+
+        modal.classList.add('active');
+        if (input) setTimeout(() => input.focus(), 100);
+    }
+
+    closePromptModal() {
+        document.getElementById('prompt-modal')?.classList.remove('active');
     }
 
     // Utility method for making authenticated requests (for future use)
