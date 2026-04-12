@@ -42,27 +42,46 @@ router.get('/:studentId', async (req, res) => {
     }
 
     // Determine which class to show progress for
+    const studentClassIds = student.classIds || [];
     let studentClassId = classId;
     if (!studentClassId) {
       // Default to first class
-      studentClassId = student.classIds && student.classIds.length > 0 ? student.classIds[0] : null;
+      studentClassId = studentClassIds.length > 0 ? studentClassIds[0] : null;
     }
 
     // Verify student is in this class
-    if (studentClassId && student.classIds && !student.classIds.includes(studentClassId)) {
+    if (studentClassId && !studentClassIds.includes(studentClassId)) {
       return res.status(403).json({ error: 'Student is not in this class' });
     }
 
-    // Get all topics ordered by their sequence
-    const topicsSnapshot = await db.collection('topics')
-      .orderBy('order', 'asc')
+    // Get class info to determine subject
+    let subject = 'ap-csp';
+    if (studentClassId) {
+      const classDoc = await db.collection('classes').doc(studentClassId).get();
+      if (classDoc.exists) {
+        subject = classDoc.data().subject || 'ap-csp';
+      }
+    }
+
+    // Get Big Ideas for this subject
+    const bigIdeasSnapshot = await db.collection('bigIdeas')
+      .where('subject', '==', subject)
       .get();
+    const bigIdeaIds = bigIdeasSnapshot.docs.map(doc => doc.id);
+
+    // Get all topics for these Big Ideas ordered by their sequence
+    const topicsSnapshot = await db.collection('topics')
+      .where('bigIdeaId', 'in', bigIdeaIds)
+      .get();
+
+    // Sort topics by order in memory since we are filtering
+    const sortedTopics = topicsSnapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
 
     const topicsProgress = [];
 
-    for (const topicDoc of topicsSnapshot.docs) {
-      const topic = { id: topicDoc.id, ...topicDoc.data() };
-
+    for (const topic of sortedTopics) {
       // Get progress for this topic
       const progressQuery = await db.collection('studentProgress')
         .where('studentId', '==', studentId)
@@ -103,13 +122,14 @@ router.get('/:studentId', async (req, res) => {
         id: topic.id,
         name: topic.name,
         unit: topic.unit,
+        bigIdeaId: topic.bigIdeaId,
         order: topic.order,
         status,
         progress,
         override,
         attempts: progress ? progress.attempts || [] : [],
-        bestScore: progress && progress.attempts ? 
-          Math.max(...progress.attempts.map(a => a.score)) : null
+        bestScore: progress && progress.attempts && progress.attempts.length > 0 ? 
+          Math.max(...progress.attempts.map(a => a.score || 0)) : null
       });
     }
 
@@ -118,6 +138,33 @@ router.get('/:studentId', async (req, res) => {
     const passedTopics = topicsProgress.filter(t => t.status === 'passed').length;
     const availableTopics = topicsProgress.filter(t => t.status === 'available').length;
     const completionPercentage = totalTopics > 0 ? Math.round((passedTopics / totalTopics) * 100) : 0;
+
+    // Calculate Total Time Spent
+    let totalTimeSpentMs = 0;
+    topicsProgress.forEach(t => {
+      t.attempts.forEach(a => {
+        totalTimeSpentMs += a.totalTimeMs || 0;
+      });
+    });
+
+    // Calculate Mastery Streak
+    // Logic: Count consecutive topics passed from the most recently passed topic backwards
+    const sortedByOrder = [...topicsProgress].sort((a, b) => b.order - a.order);
+    let masteryStreak = 0;
+    let foundCurrentStreak = false;
+    
+    for (const t of sortedByOrder) {
+      if (t.status === 'passed') {
+        masteryStreak++;
+        foundCurrentStreak = true;
+      } else if (foundCurrentStreak) {
+        // Break the streak if we find a non-passed topic AFTER having found passed ones
+        break;
+      }
+    }
+
+    // Find "What's Next" Topic
+    const nextTopic = topicsProgress.find(t => t.status === 'available' || t.status === 'locked');
 
     res.json({
       studentId,
@@ -128,7 +175,14 @@ router.get('/:studentId', async (req, res) => {
         availableTopics,
         lockedTopics: totalTopics - passedTopics - availableTopics,
         completionPercentage,
-        isTestReady: completionPercentage === 100
+        isTestReady: completionPercentage === 100,
+        totalTimeSpentMs,
+        masteryStreak,
+        nextTopic: nextTopic ? {
+          id: nextTopic.id,
+          name: nextTopic.name,
+          bigIdeaId: nextTopic.bigIdeaId || nextTopic.bigIdeaId // Ensure consistent field name
+        } : null
       }
     });
 
@@ -179,13 +233,12 @@ router.get('/:studentId/:topicId', async (req, res) => {
     const topic = topicDoc.data();
 
     // Get student's class
-    let studentClassId;
-    if (requestingUser.role === 'student') {
+    const studentClassIds = student.classIds || [];
+    let studentClassId = studentClassIds.length > 0 ? studentClassIds[0] : null;
+    
+    // If requesting user is student, we can also check their context
+    if (requestingUser.role === 'student' && requestingUser.classIds && requestingUser.classIds.length > 0) {
       studentClassId = requestingUser.classIds[0];
-    } else {
-      const studentDoc = await db.collection('users').doc(studentId).get();
-      const student = studentDoc.data();
-      studentClassId = student.classIds[0];
     }
 
     // Get progress
@@ -200,18 +253,29 @@ router.get('/:studentId/:topicId', async (req, res) => {
     if (!progressQuery.empty) {
       progress = progressQuery.docs[0].data();
       
+      // Fetch questions for this topic to add details to answers
+      const questionsSnapshot = await db.collection('questions')
+        .where('topicId', '==', topicId)
+        .get();
+      
+      const questions = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
       // Sort attempts by timestamp and add detailed question information
       if (progress.attempts) {
         progress.attempts = progress.attempts
-          .sort((a, b) => a.timestamp.toDate() - b.timestamp.toDate())
+          .sort((a, b) => {
+            const dateA = a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp);
+            const dateB = b.timestamp.toDate ? b.timestamp.toDate() : new Date(b.timestamp);
+            return dateA - dateB;
+          })
           .map(attempt => {
             // Add question details to each answer
-            const detailedAnswers = attempt.answers.map(answer => {
-              const question = topic.questions.find(q => q.id === answer.questionId);
+            const detailedAnswers = (attempt.answers || []).map(answer => {
+              const question = questions.find(q => q.id === answer.questionId);
               return {
                 ...answer,
                 question: question ? {
-                  text: question.text,
+                  text: question.text || question.question || '',
                   type: question.type,
                   options: question.options,
                   explanation: question.explanation
@@ -222,7 +286,7 @@ router.get('/:studentId/:topicId', async (req, res) => {
             return {
               ...attempt,
               answers: detailedAnswers,
-              timestamp: attempt.timestamp.toDate()
+              timestamp: attempt.timestamp.toDate ? attempt.timestamp.toDate() : new Date(attempt.timestamp)
             };
           });
       }
@@ -597,6 +661,61 @@ router.post('/override-bulk', verifyTeacher, async (req, res) => {
   } catch (error) {
     console.error('Bulk override error:', error);
     res.status(500).json({ error: 'Failed to perform bulk action' });
+  }
+});
+
+// Get questions previously missed by student (for review mode)
+router.get('/:studentId/weak-points', async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const requestingUser = req.user;
+
+    if (requestingUser.uid !== studentId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Get all progress documents for this student
+    const progressSnapshot = await db.collection('studentProgress')
+      .where('studentId', '==', studentId)
+      .get();
+
+    const missedQuestionIds = new Set();
+
+    progressSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      const attempts = data.attempts || [];
+      
+      attempts.forEach(attempt => {
+        const answers = attempt.answers || [];
+        answers.forEach(answer => {
+          if (!answer.correct) {
+            missedQuestionIds.add(answer.questionId);
+          }
+        });
+      });
+    });
+
+    if (missedQuestionIds.size === 0) {
+      return res.json({ questions: [] });
+    }
+
+    // Convert Set to Array and limit to 10 for a focused session
+    const idsToFetch = Array.from(missedQuestionIds).slice(0, 10);
+    
+    // Fetch question details
+    const questions = [];
+    for (const id of idsToFetch) {
+      const qDoc = await db.collection('questions').doc(id).get();
+      if (qDoc.exists) {
+        questions.push({ id: qDoc.id, ...qDoc.data() });
+      }
+    }
+
+    res.json({ questions });
+
+  } catch (error) {
+    console.error('Get weak points error:', error);
+    res.status(500).json({ error: 'Failed to fetch review questions' });
   }
 });
 

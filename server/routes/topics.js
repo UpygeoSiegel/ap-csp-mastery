@@ -145,19 +145,6 @@ router.get('/big-ideas', async (req, res) => {
   }
 });
 
-// Helper function to get question count for a topic from questions collection
-async function getQuestionCount(topicId) {
-  const questionsSnapshot = await db.collection('questions')
-    .where('topicId', '==', topicId)
-    .get();
-  // Filter out deactivated questions (handle both false and undefined/missing)
-  const activeQuestions = questionsSnapshot.docs.filter(doc => {
-    const data = doc.data();
-    return !data.deactivated;
-  });
-  return activeQuestions.length;
-}
-
 // Get a specific Big Idea with its topics
 router.get('/big-ideas/:bigIdeaId', async (req, res) => {
   try {
@@ -195,28 +182,58 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
     const topicsDocs = topicsSnapshot.docs.sort((a, b) => (a.data().order || 0) - (b.data().order || 0));
     const topics = [];
 
-    // First pass: collect all progress data
+    // First pass: collect all progress data for this student in this class
     const progressMap = {};
     if (classId && req.user.role === 'student') {
-      for (const topicDoc of topicsDocs) {
-        const progressQuery = await db.collection('studentProgress')
-          .where('studentId', '==', studentId)
-          .where('topicId', '==', topicDoc.id)
-          .where('classId', '==', classId)
-          .limit(1)
-          .get();
-
-        if (!progressQuery.empty) {
-          progressMap[topicDoc.id] = progressQuery.docs[0].data();
-        }
-      }
+      const progressSnapshot = await db.collection('studentProgress')
+        .where('studentId', '==', studentId)
+        .where('classId', '==', classId)
+        .get();
+      
+      progressSnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        progressMap[data.topicId] = data;
+      });
     }
+
+    // Pre-fetch all question stats for these topics to calculate global averages
+    const topicIds = topicsDocs.map(d => d.id);
+    const globalStatsByTopic = {};
+    
+    if (topicIds.length > 0) {
+      // Fetch all question stats for these topics
+      const statsSnapshot = await db.collection('questionStats')
+        .where('topicId', 'in', topicIds)
+        .get();
+      
+      statsSnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        if (!globalStatsByTopic[data.topicId]) {
+          globalStatsByTopic[data.topicId] = { totalAttempts: 0, correctCount: 0 };
+        }
+        globalStatsByTopic[data.topicId].totalAttempts += data.totalAttempts || 0;
+        globalStatsByTopic[data.topicId].correctCount += data.correctCount || 0;
+      });
+    }
+
+    // Pre-fetch question counts for all topics to avoid N queries in loop
+    const questionsSnapshot = await db.collection('questions')
+      .where('topicId', 'in', topicIds)
+      .get();
+    
+    const questionCountByTopic = {};
+    questionsSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      if (!data.deactivated) {
+        questionCountByTopic[data.topicId] = (questionCountByTopic[data.topicId] || 0) + 1;
+      }
+    });
 
     for (let i = 0; i < topicsDocs.length; i++) {
       const topicDoc = topicsDocs[i];
       const topic = { id: topicDoc.id, ...topicDoc.data() };
 
-      // Get progress for this topic if classId provided
+      // Get progress for this topic
       let status = 'locked';
       let bestScore = null;
       let attempts = [];
@@ -244,24 +261,15 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
                 remainingMinutes = Math.ceil((waitUntilDate.getTime() - now.getTime()) / (60 * 1000));
               }
             }
-
-            // Manual Mode Override: Even if passed or wait time is over, must be manually unlocked for retake
-            if (classSettings.progressionMode === 'manual' && !progress.retakeUnlocked && status === 'passed') {
-              // If already passed and not explicitly unlocked for retake, it's not "available" for quiz
-              // But we still want them to be able to see resources, so we keep status as 'passed'
-            }
           }
         } else if (classSettings.progressionMode === 'unlocked' || topic.order === 1) {
-          // All topics available in unlocked mode, or first topic is always available
-          // EXCEPT in manual mode, where even the first topic must be unlocked
           if (classSettings.progressionMode === 'manual' && topic.order === 1) {
              status = 'locked';
           } else {
              status = 'available';
           }
         } else if (classSettings.progressionMode === 'linear') {
-          // Linear mode: check if previous topic is passed
-          const prevTopicDoc = topicsSnapshot.docs[i - 1];
+          const prevTopicDoc = topicsDocs[i - 1];
           if (prevTopicDoc) {
             const prevProgress = progressMap[prevTopicDoc.id];
             if (prevProgress && prevProgress.status === 'passed') {
@@ -269,11 +277,12 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
             }
           }
         } else if (classSettings.progressionMode === 'manual') {
-            // In manual mode, if no progress record exists, it's locked
             status = 'locked';
         }
 
         // Check for teacher overrides
+        // We can't easily pre-fetch overrides without knowing all possible topic IDs,
+        // but since teacherOverrides is usually small, we could query by classId + studentId.
         const overrideQuery = await db.collection('teacherOverrides')
           .where('classId', '==', classId)
           .where('studentId', '==', studentId)
@@ -286,11 +295,18 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
         }
       }
 
-      // Remove embedded questions array if present (legacy)
-      const { questions, ...topicData } = topic;
+      // Calculate global average for benchmarking
+      const globalStats = globalStatsByTopic[topic.id];
+      let globalAveragePercentage = null;
+      if (globalStats && globalStats.totalAttempts > 0) {
+        globalAveragePercentage = Math.round((globalStats.correctCount / globalStats.totalAttempts) * 100);
+      }
 
-      // Get question count from questions collection
-      const questionCount = await getQuestionCount(topic.id);
+      // Remove embedded questions array if present (legacy)
+      const { questions: topicQuestions, ...topicData } = topic;
+
+      // Get question count from pre-fetched map
+      const questionCount = questionCountByTopic[topic.id] || 0;
 
       const topicResult = {
         ...topicData,
@@ -298,7 +314,8 @@ router.get('/big-ideas/:bigIdeaId', async (req, res) => {
         status,
         bestScore,
         attemptCount: attempts.length,
-        retakeUnlocked: (classId && progressMap[topic.id]?.retakeUnlocked) || false
+        retakeUnlocked: (classId && progressMap[topic.id]?.retakeUnlocked) || false,
+        globalAveragePercentage
       };
 
       // Include wait time info if applicable

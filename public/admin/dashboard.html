@@ -628,6 +628,23 @@
             </div>
         </div>
     </div>
+
+    <!-- Generic Confirmation Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="confirm-modal-title">Confirm Action</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-modal-message">Are you sure?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+                <button class="btn-primary" id="confirm-modal-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Client SDK for persistent auth -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -1670,33 +1687,68 @@
         button.insertAdjacentHTML('beforebegin', newResourceHTML);
     }
 
+    // Modal Helper Functions
+    function showConfirmModal({ title, message, confirmText, onConfirm, isDanger }) {
+        const modal = document.getElementById('confirm-modal');
+        const titleEl = document.getElementById('confirm-modal-title');
+        const messageEl = document.getElementById('confirm-modal-message');
+        const btn = document.getElementById('confirm-modal-btn');
+
+        titleEl.textContent = title || 'Confirm Action';
+        messageEl.textContent = message || 'Are you sure?';
+        btn.textContent = confirmText || 'Confirm';
+        
+        btn.style.background = isDanger ? 'var(--danger-red)' : '';
+
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener('click', () => {
+            closeConfirmModal();
+            if (onConfirm) onConfirm();
+        });
+
+        modal.classList.add('active');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirm-modal').classList.remove('active');
+    }
+
     function removeResource(type, index) {
         const container = (type === 'khanAcademy' || type === 'khan') ? document.getElementById('khan-resources') : document.getElementById('additional-resources');
         const items = container.querySelectorAll('.resource-item');
-        if (confirm('Are you sure you want to remove this resource?')) {
-            items[index].remove();
-            // Update indices and IDs for remaining items
-            container.querySelectorAll('.resource-item').forEach((item, newIndex) => {
-                // Update item ID
-                item.id = `${type}-resource-${newIndex}`;
-                
-                // Update data-index attributes
-                item.querySelectorAll('[data-index]').forEach(input => {
-                    input.dataset.index = newIndex;
+        
+        showConfirmModal({
+            title: 'Remove Resource',
+            message: 'Are you sure you want to remove this resource?',
+            confirmText: 'Remove',
+            isDanger: true,
+            onConfirm: () => {
+                items[index].remove();
+                // Update indices and IDs for remaining items
+                container.querySelectorAll('.resource-item').forEach((item, newIndex) => {
+                    // Update item ID
+                    item.id = `${type}-resource-${newIndex}`;
+                    
+                    // Update data-index attributes
+                    item.querySelectorAll('[data-index]').forEach(input => {
+                        input.dataset.index = newIndex;
+                    });
+                    
+                    // Update button onclick attributes
+                    const editBtn = item.querySelector('button[onclick*="toggleResourceEdit"]');
+                    if (editBtn) {
+                        editBtn.setAttribute('onclick', `toggleResourceEdit('${type}', ${newIndex})`);
+                    }
+                    
+                    const removeBtn = item.querySelector('button[onclick*="removeResource"]');
+                    if (removeBtn) {
+                        removeBtn.setAttribute('onclick', `removeResource('${type}', ${newIndex})`);
+                    }
                 });
-                
-                // Update button onclick attributes
-                const editBtn = item.querySelector('button[onclick*="toggleResourceEdit"]');
-                if (editBtn) {
-                    editBtn.setAttribute('onclick', `toggleResourceEdit('${type}', ${newIndex})`);
-                }
-                
-                const removeBtn = item.querySelector('button[onclick*="removeResource"]');
-                if (removeBtn) {
-                    removeBtn.setAttribute('onclick', `removeResource('${type}', ${newIndex})`);
-                }
-            });
-        }
+            }
+        });
     }
 
     async function saveIndividualResource(type, index) {

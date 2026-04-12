@@ -387,6 +387,81 @@
             gap: 1rem;
         }
 
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            background: var(--surface2);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border2);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text);
+            font-family: 'Barlow Condensed', sans-serif;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+        }
+
+        .next-topic-card {
+            background: var(--surface);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .next-label {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--dim);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .test-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: var(--surface2);
+            color: var(--muted);
+            border: 1px solid var(--border2);
+        }
+
+        .test-badge.completed {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
@@ -450,6 +525,46 @@
                     Dashboard
                 </span>
             </nav>
+
+            <div id="stats-bar" class="stats-bar" style="display: none; margin-bottom: 2rem;">
+                <div class="stat-item">
+                    <div id="streak-value" class="stat-value">0</div>
+                    <div class="stat-label">Mastery Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div id="total-time-value" class="stat-value">0m</div>
+                    <div class="stat-label">Total Study Time</div>
+                </div>
+                <div class="stat-item">
+                    <div id="mastered-count" class="stat-value">0</div>
+                    <div class="stat-label">Topics Mastered</div>
+                </div>
+            </div>
+
+            <div id="next-topic-section" class="next-topic-card" style="display: none; margin-bottom: 2rem;">
+                <div style="flex: 1;">
+                    <span class="next-label">WHAT'S NEXT?</span>
+                    <h3 id="next-topic-name">---</h3>
+                    <p id="next-topic-desc" style="color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem;">Pick up where you left off to maintain your streak!</p>
+                </div>
+                <button id="btn-resume" class="btn-primary" style="width: auto; padding: 0.85rem 2rem;">RESUME LEARNING</button>
+            </div>
+
+            <div id="review-section" class="next-topic-card" style="display: none; margin-bottom: 2rem; background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2);">
+                <div style="flex: 1;">
+                    <span class="next-label" style="color: var(--danger); border-color: var(--danger);">NEEDS REVIEW</span>
+                    <h3>Weak Point Practice</h3>
+                    <p style="color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem;">Practice 10 questions you've missed in the past to reinforce your mastery.</p>
+                </div>
+                <button id="btn-review" class="btn-primary" style="width: auto; padding: 0.85rem 2rem; background: var(--danger);">START REVIEW</button>
+            </div>
+
+            <div id="practice-tests-section" style="display: none; margin-bottom: 2.5rem;">
+                <h3 style="margin-bottom: 1rem; font-size: 1.25rem;">Assigned Practice Tests</h3>
+                <div id="practice-tests-list" class="topics-grid">
+                    <!-- Practice tests will be loaded here -->
+                </div>
+            </div>
 
             <div class="progress-overview">
                 <h3 id="progress-class-name">Progress</h3>
@@ -618,13 +733,114 @@
                     if (progressResponse.ok) {
                         const progressData = await progressResponse.json();
                         const stats = progressData.statistics || {};
+                        
+                        // Update Overall Progress
                         const overallProgress = stats.completionPercentage || 0;
                         document.getElementById('overall-progress-fill').style.width = `${overallProgress}%`;
                         document.getElementById('overall-percentage').textContent = `${Math.round(overallProgress)}%`;
+
+                        // Update Stats Bar
+                        document.getElementById('stats-bar').style.display = 'grid';
+                        document.getElementById('streak-value').textContent = stats.masteryStreak || 0;
+                        document.getElementById('mastered-count').textContent = stats.passedTopics || 0;
+                        
+                        // Format and set total time
+                        const totalMs = stats.totalTimeSpentMs || 0;
+                        const totalMins = Math.floor(totalMs / 60000);
+                        const totalHours = Math.floor(totalMins / 60);
+                        const displayTime = totalHours > 0 
+                            ? `${totalHours}h ${totalMins % 60}m` 
+                            : `${totalMins}m`;
+                        document.getElementById('total-time-value').textContent = displayTime;
+
+                        // Update "What's Next"
+                        const nextTopicSection = document.getElementById('next-topic-section');
+                        if (stats.nextTopic) {
+                            nextTopicSection.style.display = 'flex';
+                            document.getElementById('next-topic-name').textContent = stats.nextTopic.name;
+                            document.getElementById('btn-resume').onclick = () => {
+                                window.location.href = `/student/big-idea.html?id=${stats.nextTopic.bigIdeaId}&classId=${currentClassId}&topicId=${stats.nextTopic.id}`;
+                            };
+                        } else {
+                            nextTopicSection.style.display = 'none';
+                        }
+
+                        // Check for Weak Points
+                        loadWeakPoints();
+                        // Load Practice Tests
+                        loadPracticeTests();
                     }
                 }
             } catch (error) {
                 console.error('Failed to load:', error);
+            }
+        }
+
+        async function loadPracticeTests() {
+            try {
+                const response = await fetch(`${apiBase}/practice-tests/student?classId=${currentClassId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const section = document.getElementById('practice-tests-section');
+                    const list = document.getElementById('practice-tests-list');
+                    
+                    if (data.tests && data.tests.length > 0) {
+                        section.style.display = 'block';
+                        list.innerHTML = data.tests.map(test => {
+                            const date = new Date(test.createdAt._seconds * 1000).toLocaleDateString();
+                            const statusHtml = test.completed 
+                                ? `<span class="test-badge completed">Score: ${test.score}/50</span>`
+                                : `<span class="test-badge">Assigned ${date}</span>`;
+                            
+                            return `
+                                <div class="topic-card" onclick="${test.completed ? '' : `startPracticeTest('${test.id}')`}" style="${test.completed ? 'cursor: default; opacity: 0.8;' : ''}">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                                        <h4 style="margin: 0;">${test.title}</h4>
+                                        ${statusHtml}
+                                    </div>
+                                    <p style="margin-bottom: 1.5rem;">A full 50-question representative practice exam covering all AP CSP Big Ideas.</p>
+                                    ${test.completed ? '' : '<button class="btn-primary btn-start">Start Exam</button>'}
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        section.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load practice tests:', error);
+            }
+        }
+
+        function startPracticeTest(testId) {
+            window.location.href = `/student/quiz.html?mode=practice&testId=${testId}&classId=${currentClassId}`;
+        }
+
+        async function loadWeakPoints() {
+            try {
+                const response = await fetch(`${apiBase}/progress/${userData.uid}/weak-points`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const reviewSection = document.getElementById('review-section');
+                    
+                    if (data.questions && data.questions.length > 0) {
+                        reviewSection.style.display = 'flex';
+                        document.getElementById('btn-review').onclick = () => {
+                            // Redirect to a specialized review quiz
+                            window.location.href = `/student/quiz.html?mode=review&classId=${currentClassId}`;
+                        };
+                    } else {
+                        reviewSection.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load weak points:', error);
             }
         }
 

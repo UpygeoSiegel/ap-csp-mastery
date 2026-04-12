@@ -14,6 +14,7 @@ const quizRoutes = require('./routes/quizzes');
 const questionRoutes = require('./routes/questions');
 const topicRoutes = require('./routes/topics');
 const adminRoutes = require('./routes/admin');
+const practiceTestRoutes = require('./routes/practice-tests');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -37,6 +38,7 @@ app.use('/api/quizzes', quizRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/topics', topicRoutes);
+app.use('/api/practice-tests', practiceTestRoutes);
 
 // Static files
 app.use(express.static(path.join(__dirname, '../public')));

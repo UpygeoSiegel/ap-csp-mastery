@@ -485,6 +485,7 @@
                     <a href="/teacher/question-management.html" class="nav-link">Questions</a>
                 </div>
                 <div class="user-section">
+                    <button class="btn-logout" style="border-color: var(--accent); color: var(--accent);" onclick="startOnboarding()">Show Tutorial</button>
                     <span id="user-name">Loading...</span>
                     <button id="logout-btn" class="btn-logout">Logout</button>
                 </div>
@@ -534,6 +535,10 @@
         // State
         let topicsData = null;
         let loadedTopicStats = {};
+
+        function startOnboarding() {
+            window.location.href = '/teacher/dashboard.html?showTutorial=true';
+        }
 
         // Check auth and get fresh token
         AuthHelper.checkAuth({ allowedRoles: ['teacher'] }).then(({ token: freshToken, userData: freshUserData }) => {

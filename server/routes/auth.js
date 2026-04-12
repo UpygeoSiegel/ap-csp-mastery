@@ -1,5 +1,6 @@
 const express = require('express');
 const { auth, db, generateUniqueClassCode } = require('../firebase');
+const { verifyToken } = require('../middleware/verifyToken');
 const router = express.Router();
 
 // Helper to get student classes details
@@ -50,12 +51,14 @@ router.post('/teacher-signup', async (req, res) => {
       email,
       classIds: [],
       isApproved: true,
+      hasCompletedOnboarding: false,
       createdAt: new Date()
     });
 
     res.status(201).json({ 
       message: 'Teacher account created successfully',
-      userId: userRecord.uid 
+      userId: userRecord.uid,
+      hasCompletedOnboarding: false
     });
 
   } catch (error) {
@@ -209,7 +212,8 @@ router.post('/verify-login', async (req, res) => {
         displayName: userData.displayName,
         username: userData.username,
         classes,
-        classIds: userData.classIds
+        classIds: userData.classIds,
+        hasCompletedOnboarding: userData.hasCompletedOnboarding
       }
     });
 
@@ -318,7 +322,8 @@ router.post('/login', async (req, res) => {
       userId: userRecord.uid,
       email: loginEmail,
       role: userData.role,
-      displayName: userData.displayName
+      displayName: userData.displayName,
+      hasCompletedOnboarding: userData.hasCompletedOnboarding
     });
 
   } catch (error) {
@@ -500,7 +505,8 @@ router.post('/google-login', async (req, res) => {
           displayName: userData.displayName,
           username: userData.username,
           classes,
-          classIds: userData.classIds
+          classIds: userData.classIds,
+          hasCompletedOnboarding: userData.hasCompletedOnboarding
         }
       });
     }
@@ -514,6 +520,7 @@ router.post('/google-login', async (req, res) => {
         classIds: [],
         isApproved: true,
         authProvider: 'google',
+        hasCompletedOnboarding: false,
         createdAt: new Date()
       };
 
@@ -526,7 +533,8 @@ router.post('/google-login', async (req, res) => {
           email: newTeacherData.email,
           role: newTeacherData.role,
           displayName: newTeacherData.displayName,
-          classIds: newTeacherData.classIds
+          classIds: newTeacherData.classIds,
+          hasCompletedOnboarding: false
         }
       });
     }
@@ -665,6 +673,21 @@ router.post('/join-class', async (req, res) => {
   } catch (error) {
     console.error('Join class error:', error);
     res.status(500).json({ error: 'Failed to join class' });
+  }
+});
+
+// Mark onboarding as complete
+router.post('/complete-onboarding', verifyToken, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    await db.collection('users').doc(uid).update({
+      hasCompletedOnboarding: true,
+      updatedAt: new Date()
+    });
+    res.json({ message: 'Onboarding marked as complete' });
+  } catch (error) {
+    console.error('Complete onboarding error:', error);
+    res.status(500).json({ error: 'Failed to update onboarding status' });
   }
 });
 

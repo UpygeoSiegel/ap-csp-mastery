@@ -482,10 +482,17 @@ router.get('/:classId/matrix', verifyTeacher, verifyClassAccess, async (req, res
         // Build progress map
         const progress = {};
         let passedCount = 0;
+        let totalTimeSpentMs = 0;
 
         progressSnapshot.docs.forEach(doc => {
           const p = doc.data();
           const attempts = p.attempts || [];
+          
+          // Sum up time from all attempts
+          attempts.forEach(a => {
+            totalTimeSpentMs += a.totalTimeMs || 0;
+          });
+
           const bestScore = attempts.length > 0
             ? Math.max(...attempts.map(a => a.score || 0))
             : null;
@@ -522,7 +529,8 @@ router.get('/:classId/matrix', verifyTeacher, verifyClassAccess, async (req, res
           username: student.username,
           progress,
           completionPercentage,
-          bigIdeaProgress
+          bigIdeaProgress,
+          totalTimeSpentMs
         });
       }
     }

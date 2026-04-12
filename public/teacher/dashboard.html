@@ -524,6 +524,35 @@
         .settings-modal-content {
             max-width: 550px;
         }
+
+        /* Onboarding Styles */
+        .onboarding-step {
+            display: none;
+        }
+        .onboarding-step.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .step-indicator {
+            display: flex;
+            gap: 8px;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border2);
+            transition: all 0.3s;
+        }
+        .dot.active {
+            background: var(--accent);
+            width: 24px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -540,6 +569,7 @@
                     <a href="/teacher/question-management.html" class="nav-link">Questions</a>
                 </div>
                 <div class="user-section">
+                    <button class="btn-logout" style="border-color: var(--accent); color: var(--accent);" onclick="startOnboarding()">Show Tutorial</button>
                     <span id="user-name">Loading...</span>
                     <button id="logout-btn" class="btn-logout">Logout</button>
                 </div>
@@ -637,52 +667,107 @@
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal-overlay">
-        <div class="modal settings-modal-content">
-            <h3>Class Settings</h3>
-            <form id="settings-form">
-                <input type="hidden" id="settings-class-id">
-                <div class="form-group">
-                    <label for="settings-class-name">Class Name</label>
-                    <input type="text" id="settings-class-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="settings-wait-time">Retake Wait Time</label>
-                    <select id="settings-wait-time">
-                        <option value="0">No wait (immediate retake)</option>
-                        <option value="30">30 minutes</option>
-                        <option value="60">1 hour</option>
-                        <option value="90">1.5 hours</option>
-                        <option value="120">2 hours</option>
-                        <option value="180">3 hours</option>
-                        <option value="240">4 hours</option>
-                        <option value="360">6 hours</option>
-                        <option value="480">8 hours</option>
-                    </select>
-                    <p class="settings-help">Time students must wait before retaking a quiz</p>
-                </div>
-                <div class="form-group">
-                    <label>Quiz Progression</label>
-                    <div class="radio-group">
-                        <label class="radio-option">
-                            <input type="radio" name="settingsProgressionMode" value="linear">
-                            <span>Linear</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="settingsProgressionMode" value="unlocked">
-                            <span>All Unlocked</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="settingsProgressionMode" value="manual">
-                            <span>Manual</span>
-                        </label>
+        <!-- ... existing content ... -->
+    </div>
+
+    <!-- Orientation Modal -->
+    <div id="onboarding-modal" class="modal-overlay">
+        <div class="modal onboarding-modal-content" style="max-width: 650px;">
+            <div class="onboarding-steps">
+                <div class="onboarding-step active" data-step="1">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🎓</div>
+                        <h2 style="font-family: 'Barlow Condensed', sans-serif; font-size: 2.5rem; text-transform: uppercase;">Welcome to AP Mastery</h2>
+                        <p style="font-size: 1.1rem; color: var(--text);">The ultimate mastery-based learning platform for AP Computer Science Principles.</p>
                     </div>
-                    <p class="settings-help">Linear: Sequential unlocking. All Unlocked: Everything open. Manual: You must manually unlock each quiz and retake for students.</p>
+                    <div style="background: var(--surface2); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                        <h4 style="font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--accent);">Our Philosophy</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">AP Mastery focuses on <strong>granular mastery</strong>. Instead of one big test, students master individual topics through bite-sized, data-driven quizzes. They can't move forward until they prove they've mastered the basics.</p>
+                    </div>
                 </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn-modal-cancel" onclick="closeSettingsModal()">Cancel</button>
-                    <button type="submit" class="btn-primary" style="padding: 0.5rem 1rem;">Save Settings</button>
+
+                <div class="onboarding-step" data-step="2">
+                    <div style="display: flex; gap: 2rem; align-items: center;">
+                        <div style="flex: 1;">
+                            <h3 style="font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; text-transform: uppercase; color: var(--accent);">1. Create Your Class</h3>
+                            <p style="line-height: 1.6;">Start by creating a class. You'll get a unique <strong>6-character Join Code</strong> to share with your students.</p>
+                            <ul style="margin-top: 1rem; padding-left: 1.5rem; line-height: 1.8;">
+                                <li>Set a <strong>Retake Wait Time</strong> to encourage studying between attempts.</li>
+                                <li>Choose your <strong>Progression Mode</strong> (Linear, Unlocked, or Manual).</li>
+                            </ul>
+                        </div>
+                        <div style="font-size: 6rem; opacity: 0.2;">🏫</div>
+                    </div>
                 </div>
-            </form>
+
+                <div class="onboarding-step" data-step="3">
+                    <div style="display: flex; gap: 2rem; align-items: center;">
+                        <div style="font-size: 6rem; opacity: 0.2;">📊</div>
+                        <div style="flex: 1;">
+                            <h3 style="font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; text-transform: uppercase; color: var(--accent);">2. The Live Matrix</h3>
+                            <p style="line-height: 1.6;">Click on any class to see the <strong>Progress Matrix</strong>. It's a real-time grid showing every student's status across the entire curriculum.</p>
+                            <ul style="margin-top: 1rem; padding-left: 1.5rem; line-height: 1.8;">
+                                <li><strong>Colors tell the story:</strong> Green is mastery, Yellow is in-progress, Red needs help.</li>
+                                <li>Click a student's name for a deep-dive report.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="onboarding-step" data-step="4">
+                    <div style="display: flex; gap: 2rem; align-items: center;">
+                        <div style="flex: 1;">
+                            <h3 style="font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; text-transform: uppercase; color: var(--accent);">3. Item Analysis</h3>
+                            <p style="line-height: 1.6;">Our powerful analytics show you the <strong>Top 10 Most Missed Questions</strong> for every unit and topic.</p>
+                            <ul style="margin-top: 1rem; padding-left: 1.5rem; line-height: 1.8;">
+                                <li>See exactly which answer choices are confusing your students.</li>
+                                <li>Identify common misconceptions across your whole class in seconds.</li>
+                            </ul>
+                        </div>
+                        <div style="font-size: 6rem; opacity: 0.2;">🧠</div>
+                    </div>
+                </div>
+
+                <div class="onboarding-step" data-step="5">
+                    <div style="display: flex; gap: 2rem; align-items: center;">
+                        <div style="font-size: 6rem; opacity: 0.2;">📝</div>
+                        <div style="flex: 1;">
+                            <h3 style="font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; text-transform: uppercase; color: var(--accent);">4. Practice Exams</h3>
+                            <p style="line-height: 1.6;">Ready for the big day? Use the <strong>Practice Test</strong> feature to assign a 50-question mock exam.</p>
+                            <ul style="margin-top: 1rem; padding-left: 1.5rem; line-height: 1.8;">
+                                <li>Questions are randomly drawn from every topic.</li>
+                                <li>Proportions strictly follow the <strong>official AP CSP weighting</strong>.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="onboarding-step" data-step="6">
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🚀</div>
+                        <h2 style="font-family: 'Barlow Condensed', sans-serif; font-size: 2.5rem; text-transform: uppercase;">You're Ready!</h2>
+                        <p style="font-size: 1.1rem; color: var(--text); margin-bottom: 2rem;">Explore the dashboard and start mastering AP Computer Science Principles.</p>
+                        <div style="background: var(--surface2); padding: 1.5rem; border-radius: 12px; text-align: left;">
+                            <p style="font-size: 0.9rem; font-style: italic; color: var(--muted);">Pro Tip: Use "Manual Mode" if you want to keep students from getting ahead of your current lesson plan!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-buttons" style="margin-top: 3rem; justify-content: space-between; align-items: center;">
+                <div class="step-indicator">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn-modal-cancel" id="btn-onboarding-prev" style="display: none;">Back</button>
+                    <button class="btn-primary" id="btn-onboarding-next" style="width: auto; padding: 0.75rem 2rem;">Next Step</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -702,16 +787,84 @@
         let allClasses = [];
         let currentView = 'active'; // 'active' or 'archived'
         let pendingAction = null; // { type: 'delete' | 'archive' | 'unarchive', classId, className }
+        let currentOnboardingStep = 1;
+        const totalOnboardingSteps = 6;
 
         // Check auth and get fresh token
-        AuthHelper.checkAuth({ allowedRoles: ['teacher'] }).then(({ token: freshToken, userData: freshUserData }) => {
+        AuthHelper.checkAuth({ allowedRoles: ['teacher'], fresh: true }).then(({ token: freshToken, userData: freshUserData }) => {
             token = freshToken;
             if (freshUserData) userData = freshUserData;
             document.getElementById('user-name').textContent = userData.displayName || userData.email || 'Teacher';
             loadClasses();
+
+            // Trigger onboarding if not completed OR manually requested via URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceTutorial = urlParams.get('showTutorial') === 'true';
+
+            // Show if it's not explicitly true (handles false and undefined for new/legacy users)
+            if (userData.hasCompletedOnboarding !== true || forceTutorial) {
+                setTimeout(startOnboarding, 1000);
+            }
         }).catch(() => {
             // AuthHelper will redirect to login
         });
+
+        // Onboarding Functions
+        function startOnboarding() {
+            currentOnboardingStep = 1;
+            showOnboardingStep(1);
+            document.getElementById('onboarding-modal').classList.add('active');
+        }
+
+        function showOnboardingStep(step) {
+            document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.onboarding-step[data-step="${step}"]`).classList.add('active');
+            
+            // Update dots
+            const dots = document.querySelectorAll('.step-indicator .dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === step - 1);
+            });
+
+            // Update buttons
+            document.getElementById('btn-onboarding-prev').style.display = step === 1 ? 'none' : 'block';
+            const nextBtn = document.getElementById('btn-onboarding-next');
+            nextBtn.textContent = step === totalOnboardingSteps ? 'Get Started' : 'Next Step';
+        }
+
+        document.getElementById('btn-onboarding-next').addEventListener('click', () => {
+            if (currentOnboardingStep < totalOnboardingSteps) {
+                currentOnboardingStep++;
+                showOnboardingStep(currentOnboardingStep);
+            } else {
+                completeOnboarding();
+            }
+        });
+
+        document.getElementById('btn-onboarding-prev').addEventListener('click', () => {
+            if (currentOnboardingStep > 1) {
+                currentOnboardingStep--;
+                showOnboardingStep(currentOnboardingStep);
+            }
+        });
+
+        async function completeOnboarding() {
+            document.getElementById('onboarding-modal').classList.remove('active');
+            
+            try {
+                const response = await fetch(`${apiBase}/auth/complete-onboarding`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    userData.hasCompletedOnboarding = true;
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                }
+            } catch (error) {
+                console.error('Failed to save onboarding status:', error);
+            }
+        }
 
         // Toggle wait time based on progression mode
         function updateWaitTimeState(formType) {

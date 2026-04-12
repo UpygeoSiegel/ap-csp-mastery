@@ -13,21 +13,32 @@ router.post('/start', async (req, res) => {
     const { topicId, classId } = req.body;
     const studentId = req.user.uid;
 
+    console.log(`[QUIZ_START] Topic: ${topicId}, Class: ${classId}, Student: ${studentId}`);
+
     if (!topicId) {
       return res.status(400).json({ error: 'Topic ID is required' });
     }
 
     // Get student's class - use provided classId or default to first class
-    const studentClassId = classId || req.user.classIds[0];
+    const userClassIds = req.user.classIds || [];
+    const studentClassId = classId || userClassIds[0];
+
+    console.log(`[QUIZ_START] Resolved Class ID: ${studentClassId}`);
+
+    if (!studentClassId) {
+      return res.status(400).json({ error: 'No class selected or enrolled' });
+    }
 
     // Verify student is in this class
-    if (!req.user.classIds.includes(studentClassId)) {
+    if (!userClassIds.includes(studentClassId)) {
+      console.warn(`[QUIZ_START] Student ${studentId} not in class ${studentClassId}. Enrolled in: ${userClassIds.join(', ')}`);
       return res.status(403).json({ error: 'You are not enrolled in this class' });
     }
 
     // Get topic
     const topicDoc = await db.collection('topics').doc(topicId).get();
     if (!topicDoc.exists) {
+      console.error(`[QUIZ_START] Topic not found: ${topicId}`);
       return res.status(404).json({ error: 'Topic not found' });
     }
 
@@ -47,6 +58,7 @@ router.post('/start', async (req, res) => {
     const isTopicAvailable = await checkTopicAvailability(studentId, topicId, studentClassId);
 
     if (!isTopicAvailable.available) {
+      console.log(`[QUIZ_START] Topic unavailable: ${isTopicAvailable.reason}`);
       const errorResponse = { error: isTopicAvailable.reason };
 
       // Include wait time info if applicable
@@ -82,21 +94,28 @@ router.post('/start', async (req, res) => {
     // Get class information to find the teacher
     const classDoc = await db.collection('classes').doc(studentClassId).get();
     if (!classDoc.exists) {
+      console.error(`[QUIZ_START] Class doc not found: ${studentClassId}`);
       return res.status(404).json({ error: 'Class not found' });
     }
     
     const classInfo = classDoc.data();
     const teacherId = classInfo.teacherId;
 
+    if (!teacherId) {
+      console.error(`[QUIZ_START] Class ${studentClassId} has no teacherId`);
+      return res.status(500).json({ error: 'Class configuration error: No teacher assigned' });
+    }
+
     // Get all questions for this topic
     const questionsSnapshot = await db.collection('questions')
       .where('topicId', '==', topicId)
       .get();
 
-    const allQuestions = questionsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const allQuestions = questionsSnapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(q => !q.deactivated); // Important: only active questions
+
+    console.log(`[QUIZ_START] Found ${allQuestions.length} active questions for topic`);
 
     // Get teacher's question preferences
     const teacherPrefsSnapshot = await db.collection('teacherQuestionPreferences')
@@ -117,39 +136,77 @@ router.post('/start', async (req, res) => {
       return teacherPref?.isActive ?? !question.isTeacherMade;
     });
 
+    console.log(`[QUIZ_START] Found ${activeQuestions.length} active questions after teacher filtering`);
+
     if (activeQuestions.length < 5) {
+      console.warn(`[QUIZ_START] Not enough questions for topic ${topicId}. Needed 5, found ${activeQuestions.length}`);
       return res.status(400).json({ error: 'Not enough active questions for this topic' });
     }
 
     // Select 5 questions, prioritizing unused ones
     const selectedQuestions = selectQuizQuestions(activeQuestions, usedQuestionIds, 5);
+    console.log(`[QUIZ_START] Selected ${selectedQuestions.length} questions`);
 
     // Generate attempt ID
     const attemptId = crypto.randomUUID();
 
     // Prepare questions for quiz (without correct answers)
-    const quizQuestions = selectedQuestions.map(q => ({
-      id: q.id,
-      text: q.text || q.question || '',
-      type: q.type,
-      options: q.options.map((opt, idx) => ({
-        id: opt.id || idx.toString(),
-        text: typeof opt === 'string' ? opt : opt.text
-      }))
-    }));
-
-    res.json({
-      attemptId,
-      topicId,
-      topicName: topic.name,
-      bigIdeaName,
-      questions: quizQuestions,
-      questionIds: selectedQuestions.map(q => q.id)
+    const quizQuestions = selectedQuestions.map((q, qIdx) => {
+      try {
+        return {
+          id: q.id,
+          text: q.text || q.question || '',
+          type: q.type,
+          options: (q.options || []).map((opt, idx) => {
+            try {
+              return {
+                id: opt.id || idx.toString(),
+                text: typeof opt === 'string' ? opt : opt.text
+              };
+            } catch (optErr) {
+              console.error(`[QUIZ_START] Error mapping option ${idx} for question ${q.id}:`, optErr);
+              return { id: idx.toString(), text: 'Error loading option' };
+            }
+          })
+        };
+      } catch (qErr) {
+        console.error(`[QUIZ_START] Error mapping question ${qIdx} (ID: ${q?.id}):`, qErr);
+        throw qErr;
+      }
     });
 
+    console.log(`[QUIZ_START] Successfully mapped ${quizQuestions.length} questions`);
+
+    const responseData = {
+      attemptId,
+      topicId,
+      topicName: String(topic.name || 'Unknown Topic'),
+      bigIdeaName: String(bigIdeaName || ''),
+      questions: quizQuestions,
+      questionIds: selectedQuestions.map(q => String(q.id))
+    };
+
+    console.log(`[QUIZ_START] Preparing to send response for attempt ${attemptId}`);
+    
+    try {
+      // Test serialization
+      const testJson = JSON.stringify(responseData);
+      console.log(`[QUIZ_START] Serialization successful, length: ${testJson.length}`);
+      
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(200).send(testJson);
+    } catch (jsonErr) {
+      console.error('[QUIZ_START] Serialization FAILED:', jsonErr);
+      return res.status(500).json({ error: 'Failed to serialize quiz data', details: jsonErr.message });
+    }
+
   } catch (error) {
-    console.error('Start quiz error:', error);
-    res.status(500).json({ error: 'Failed to start quiz' });
+    console.error('[QUIZ_START_ERROR]', error);
+    res.status(500).json({ 
+      error: 'Internal server error starting quiz', 
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
@@ -164,10 +221,15 @@ router.post('/submit', async (req, res) => {
     }
 
     // Get student's class - use provided classId or default to first class
-    const studentClassId = classId || req.user.classIds[0];
+    const userClassIds = req.user.classIds || [];
+    const studentClassId = classId || userClassIds[0];
+
+    if (!studentClassId) {
+      return res.status(400).json({ error: 'No class selected or enrolled' });
+    }
 
     // Verify student is in this class
-    if (!req.user.classIds.includes(studentClassId)) {
+    if (!userClassIds.includes(studentClassId)) {
       return res.status(403).json({ error: 'You are not enrolled in this class' });
     }
 
@@ -409,14 +471,19 @@ async function checkTopicAvailability(studentId, topicId, classId, classData = n
 
     // Linear progression mode - check prerequisites
     // For first topic (order 1), it's always available (unless manual, which we handled above)
-    if (topic.order === 1) {
+    if (topic.order === 1 || !topic.order || isNaN(topic.order)) {
       return { available: true };
     }
 
     // Check if previous topic is completed
+    const prevOrder = parseInt(topic.order) - 1;
+    if (isNaN(prevOrder) || prevOrder < 1) {
+      return { available: true };
+    }
+
     const previousTopicSnapshot = await db.collection('topics')
-      .where('bigIdeaId', '==', topic.bigIdeaId)
-      .where('order', '==', topic.order - 1)
+      .where('bigIdeaId', '==', topic.bigIdeaId || '')
+      .where('order', '==', prevOrder)
       .limit(1)
       .get();
 
@@ -704,6 +771,45 @@ router.post('/flag', async (req, res) => {
   } catch (error) {
     console.error('Flag question error:', error);
     res.status(500).json({ error: 'Failed to flag question' });
+  }
+});
+
+// Submit review quiz answers
+router.post('/submit-review', async (req, res) => {
+  try {
+    const { attemptId, answers } = req.body;
+    const studentId = req.user.uid;
+
+    if (!attemptId || !answers) {
+      return res.status(400).json({ error: 'Attempt ID and answers are required' });
+    }
+
+    // Fetch all questions being reviewed
+    const questionIds = answers.map(a => a.questionId);
+    const questions = [];
+    
+    for (const id of questionIds) {
+      const qDoc = await db.collection('questions').doc(id).get();
+      if (qDoc.exists) {
+        questions.push({ id: qDoc.id, ...qDoc.data() });
+      }
+    }
+
+    // Validate and score answers
+    const { score, results } = scoreQuizAnswers(questions, answers);
+
+    res.json({
+      attemptId,
+      score,
+      totalQuestions: questions.length,
+      passed: true, // Always "passed" in review mode
+      message: `Review completed! You got ${score} out of ${questions.length} correct.`,
+      results
+    });
+
+  } catch (error) {
+    console.error('Submit review error:', error);
+    res.status(500).json({ error: 'Failed to submit review' });
   }
 });
 

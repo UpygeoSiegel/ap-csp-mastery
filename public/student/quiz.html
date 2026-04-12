@@ -430,6 +430,8 @@
         const topicId = urlParams.get('topicId');
         const classId = urlParams.get('classId');
         const bigIdeaId = urlParams.get('bigIdeaId');
+        const mode = urlParams.get('mode'); // 'review', 'practice' or null
+        const testId = urlParams.get('testId');
         const topicsUrl = bigIdeaId ? `/student/big-idea.html?id=${bigIdeaId}&classId=${classId}` : '/student/dashboard.html';
 
         // Check auth
@@ -437,68 +439,17 @@
             token = freshToken;
             userData = freshUserData;
             document.getElementById('breadcrumb-bigidea').href = topicsUrl;
-            startQuiz();
+            
+            if (mode === 'review') {
+                startReviewQuiz();
+            } else if (mode === 'practice') {
+                startPracticeQuiz();
+            } else {
+                startQuiz();
+            }
         }).catch(err => console.error('Auth failed:', err));
 
-        // Flag Functions
-        function openFlagModal() {
-            if (!localStorage.getItem('hasSeenFlagOnboarding')) {
-                document.getElementById('flag-onboarding-modal').classList.add('active');
-                return;
-            }
-            const question = quizData.questions[currentQuestionIndex];
-            if (flaggedQuestions.has(question.id)) {
-                showToast('You already flagged this question.', 'info');
-                return;
-            }
-            document.getElementById('flag-modal').classList.add('active');
-            document.getElementById('flag-reason').value = 'incorrect_answer';
-            document.getElementById('flag-comment').value = '';
-        }
-
-        function closeFlagOnboarding() {
-            localStorage.setItem('hasSeenFlagOnboarding', 'true');
-            document.getElementById('flag-onboarding-modal').classList.remove('active');
-            openFlagModal();
-        }
-
-        function closeFlagModal() {
-            document.getElementById('flag-modal').classList.remove('active');
-        }
-
-        async function handleFlagQuestion() {
-            const question = quizData.questions[currentQuestionIndex];
-            const reason = document.getElementById('flag-reason').value;
-            const comment = document.getElementById('flag-comment').value;
-            const submitBtn = document.querySelector('#flag-modal .btn-primary');
-
-            if (submitBtn) submitBtn.disabled = true;
-
-            try {
-                console.log(`Flagging question ${question.id}...`);
-                const response = await fetch(`${apiBase}/quizzes/flag`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ questionId: question.id, topicId: quizData.topicId, reason, comment })
-                });
-
-                if (response.ok) {
-                    showToast('Question flagged. Thank you!', 'success');
-                    flaggedQuestions.add(question.id);
-                    renderQuiz();
-                    closeFlagModal();
-                } else {
-                    const data = await response.json();
-                    showToast(data.error || 'Failed to flag', 'error');
-                }
-            } catch (err) {
-                console.error('Flagging error:', err);
-                showToast('Failed to flag', 'error');
-            } finally {
-                if (submitBtn) submitBtn.disabled = false;
-            }
-        }
-
+        // ... existing flag and format functions ...
         function formatQuestionText(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -509,16 +460,73 @@
             return escaped.replace(codeBlockRegex, (match, code) => `<div class="pseudocode-block">${code.trim()}</div>`);
         }
 
+        async function startPracticeQuiz() {
+            try {
+                const response = await fetch(`${apiBase}/practice-tests/start/${testId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    showError(data.error || 'Failed to load practice exam');
+                    return;
+                }
+
+                quizData = data;
+                document.getElementById('breadcrumb-topic').textContent = quizData.title;
+                document.getElementById('breadcrumb-bigidea').textContent = 'Practice Exam';
+                renderQuiz();
+            } catch (error) {
+                showError('Failed to start practice exam');
+            }
+        }
+
+        async function startReviewQuiz() {
+            try {
+                const response = await fetch(`${apiBase}/progress/${userData.uid}/weak-points`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    showError(data.error || 'Failed to load review questions');
+                    return;
+                }
+
+                if (!data.questions || data.questions.length === 0) {
+                    showError('No missed questions found to review!');
+                    return;
+                }
+
+                quizData = {
+                    topicId: 'review',
+                    topicName: 'Weak Point Review',
+                    questions: data.questions,
+                    attemptId: 'review-' + Date.now()
+                };
+
+                document.getElementById('breadcrumb-topic').textContent = quizData.topicName;
+                document.getElementById('breadcrumb-bigidea').textContent = 'Personalized Review';
+                renderQuiz();
+            } catch (error) {
+                showError('Failed to start review session');
+            }
+        }
+
         async function startQuiz() {
             try {
+                console.log('Starting quiz with:', { topicId, classId });
                 const response = await fetch(`${apiBase}/quizzes/start`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ topicId, classId })
                 });
+                
                 const data = await response.json();
+                
                 if (!response.ok) {
-                    showError(data.error || 'Failed to start quiz');
+                    console.error('Quiz start error data:', data);
+                    showError(data.error || `Failed to start quiz (Status: ${response.status})`);
                     return;
                 }
                 quizData = data;
@@ -526,7 +534,8 @@
                 if (quizData.bigIdeaName) document.getElementById('breadcrumb-bigidea').textContent = quizData.bigIdeaName;
                 renderQuiz();
             } catch (error) {
-                showError('Failed to start quiz');
+                console.error('Quiz start fetch exception:', error);
+                showError('Failed to start quiz. Please check your connection and try again.');
             }
         }
 
@@ -538,59 +547,82 @@
         }
 
         function renderQuiz() {
-            recordTime();
-            questionStartTime = Date.now();
-            const question = quizData.questions[currentQuestionIndex];
-            const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
-            const isFlagged = flaggedQuestions.has(question.id);
+            try {
+                console.log('Rendering quiz question index:', currentQuestionIndex);
+                recordTime();
+                questionStartTime = Date.now();
+                
+                if (!quizData || !quizData.questions || quizData.questions.length === 0) {
+                    throw new Error('No quiz data or questions available to render');
+                }
 
-            document.getElementById('quiz-content').innerHTML = `
-                <div class="quiz-header">
-                    <h2>${quizData.topicName}</h2>
-                    <div class="quiz-progress">
-                        <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
-                        <span class="quiz-progress-text">Question ${currentQuestionIndex + 1} of ${quizData.questions.length}</span>
+                const question = quizData.questions[currentQuestionIndex];
+                if (!question) {
+                    throw new Error(`Question at index ${currentQuestionIndex} is undefined`);
+                }
+
+                console.log('Current question ID:', question.id);
+                const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
+                const isFlagged = flaggedQuestions.has(question.id);
+
+                const quizContent = document.getElementById('quiz-content');
+                if (!quizContent) {
+                    throw new Error('Element #quiz-content not found in DOM');
+                }
+
+                quizContent.innerHTML = `
+                    <div class="quiz-header">
+                        <h2>${quizData.topicName}</h2>
+                        <div class="quiz-progress">
+                            <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
+                            <span class="quiz-progress-text">Question ${currentQuestionIndex + 1} of ${quizData.questions.length}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="question-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-                        <div class="question-number">Question ${currentQuestionIndex + 1}</div>
-                        <button class="btn-secondary btn-flag ${isFlagged ? 'flagged' : ''}" style="width:auto; margin:0; padding:0.4rem 0.8rem; font-size:0.75rem; display:flex; align-items:center; gap:0.4rem;" onclick="openFlagModal()">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" fill="${isFlagged ? 'currentColor' : 'none'}"></path>
-                                <line x1="4" y1="22" x2="4" y2="15"></line>
-                            </svg>
-                            ${isFlagged ? 'Flagged' : 'Flag Question'}
-                        </button>
+                    <div class="question-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                            <div class="question-number">Question ${currentQuestionIndex + 1}</div>
+                            <button class="btn-secondary btn-flag ${isFlagged ? 'flagged' : ''}" style="width:auto; margin:0; padding:0.4rem 0.8rem; font-size:0.75rem; display:flex; align-items:center; gap:0.4rem;" onclick="openFlagModal()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" fill="${isFlagged ? 'currentColor' : 'none'}"></path>
+                                    <line x1="4" y1="22" x2="4" y2="15"></line>
+                                </svg>
+                                ${isFlagged ? 'Flagged' : 'Flag Question'}
+                            </button>
+                        </div>
+                        <div class="question-text">${formatQuestionText(question.text || question.question)}</div>
+                        <div class="options-list">
+                            ${(question.options || []).map((opt, idx) => {
+                                const oId = opt.id || idx.toString();
+                                const selected = (answers[question.id] || []).includes(oId);
+                                const crossedOut = (crossedOutChoices[question.id] || []).includes(oId);
+                                const optText = opt.text || (typeof opt === 'string' ? opt : 'Missing option text');
+                                return `
+                                    <label class="option-item ${selected ? 'selected' : ''} ${crossedOut ? 'crossed-out' : ''}" 
+                                           onclick="selectOption('${question.id}', '${oId}', '${question.type}')">
+                                        <input type="${question.type === 'multiple_select' ? 'checkbox' : 'radio'}" name="q-${question.id}" ${selected ? 'checked' : ''}>
+                                        <span class="option-text">${formatQuestionText(optText)}</span>
+                                        <button type="button" class="cross-out-btn ${crossedOut ? 'active' : ''}" 
+                                                onclick="event.stopPropagation(); toggleCrossOut('${question.id}', '${oId}')"
+                                                title="${crossedOut ? 'Remove cross-out' : 'Cross out this option'}">
+                                            ${crossedOut ? '↺' : '—'}
+                                        </button>
+                                    </label>
+                                `;
+                            }).join('')}
+                        </div>
                     </div>
-                    <div class="question-text">${formatQuestionText(question.text || question.question)}</div>
-                    <div class="options-list">
-                        ${question.options.map((opt, idx) => {
-                            const oId = opt.id || idx.toString();
-                            const selected = (answers[question.id] || []).includes(oId);
-                            const crossedOut = (crossedOutChoices[question.id] || []).includes(oId);
-                            return `
-                                <label class="option-item ${selected ? 'selected' : ''} ${crossedOut ? 'crossed-out' : ''}" 
-                                       onclick="selectOption('${question.id}', '${oId}', '${question.type}')">
-                                    <input type="${question.type === 'multiple_select' ? 'checkbox' : 'radio'}" name="q-${question.id}" ${selected ? 'checked' : ''}>
-                                    <span class="option-text">${formatQuestionText(opt.text || opt)}</span>
-                                    <button type="button" class="cross-out-btn ${crossedOut ? 'active' : ''}" 
-                                            onclick="event.stopPropagation(); toggleCrossOut('${question.id}', '${oId}')"
-                                            title="${crossedOut ? 'Remove cross-out' : 'Cross out this option'}">
-                                        ${crossedOut ? '↺' : '—'}
-                                    </button>
-                                </label>
-                            `;
-                        }).join('')}
+                    <div class="quiz-actions">
+                        <button class="btn-secondary" onclick="previousQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''}>Previous</button>
+                        ${currentQuestionIndex === quizData.questions.length - 1 
+                            ? `<button class="btn-primary" onclick="submitQuiz()">Submit Quiz</button>`
+                            : `<button class="btn-primary" onclick="nextQuestion()">Next</button>`}
                     </div>
-                </div>
-                <div class="quiz-actions">
-                    <button class="btn-secondary" onclick="previousQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''}>Previous</button>
-                    ${currentQuestionIndex === quizData.questions.length - 1 
-                        ? `<button class="btn-primary" onclick="submitQuiz()">Submit Quiz</button>`
-                        : `<button class="btn-primary" onclick="nextQuestion()">Next</button>`}
-                </div>
-            `;
+                `;
+                console.log('Successfully rendered question');
+            } catch (err) {
+                console.error('CRITICAL RENDERING ERROR:', err);
+                showError('Error displaying quiz question: ' + err.message);
+            }
         }
 
         function selectOption(qId, oId, type) {
@@ -625,11 +657,19 @@
                 return;
             }
             try {
-                const response = await fetch(`${apiBase}/quizzes/submit`, {
+                // Determine endpoint based on mode
+                let endpoint = `${apiBase}/quizzes/submit`;
+                if (mode === 'review') {
+                    endpoint = `${apiBase}/quizzes/submit-review`;
+                } else if (mode === 'practice') {
+                    endpoint = `${apiBase}/practice-tests/submit`;
+                }
+                
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({
-                        attemptId: quizData.attemptId, topicId, classId,
+                        attemptId: quizData.attemptId, topicId, classId, testId,
                         answers: Object.entries(answers).map(([qId, sIds]) => ({ questionId: qId, selectedAnswerIds: sIds, timeSpentMs: questionTimes[qId] || 0 }))
                     })
                 });

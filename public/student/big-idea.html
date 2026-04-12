@@ -200,6 +200,31 @@
         .btn-secondary:hover {
             background: var(--gray-300);
         }
+        .benchmark-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid transparent;
+        }
+        .benchmark-badge.elite {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+        .benchmark-badge.above {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-blue);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+        .benchmark-badge.average {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--gray-600);
+            border-color: rgba(107, 114, 128, 0.2);
+        }
         .topic-resources {
             margin-top: 1rem;
             padding-top: 1rem;
@@ -469,6 +494,21 @@
             // This applies whether they passed or failed previously
             const retakeDisabled = isManual && hasAttempts && !topic.retakeUnlocked;
 
+            // Peer Benchmarking Logic
+            let benchmarkHtml = '';
+            if (topic.bestScore !== null && topic.globalAveragePercentage !== null) {
+                const studentPct = (topic.bestScore / 5) * 100;
+                const diff = studentPct - topic.globalAveragePercentage;
+                
+                if (diff >= 20) {
+                    benchmarkHtml = '<span class="benchmark-badge elite">Elite Performance</span>';
+                } else if (diff >= 5) {
+                    benchmarkHtml = '<span class="benchmark-badge above">Above Peer Average</span>';
+                } else if (diff > -5) {
+                    benchmarkHtml = '<span class="benchmark-badge average">On Par with Peers</span>';
+                }
+            }
+
             // Format remaining wait time
             let waitTimeText = '';
             if (hasWaitTime) {
@@ -488,7 +528,10 @@
                 <div class="topic-card ${statusClass} ${retakeDisabled ? 'locked' : ''}">
                     <div class="topic-number">${isPassed ? '&#10003;' : index + 1}</div>
                     <div class="topic-info" style="flex: 1;">
-                        <h3>${topic.name}</h3>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px;">
+                            <h3 style="margin: 0;">${topic.name}</h3>
+                            ${benchmarkHtml}
+                        </div>
                         ${topic.description ? `<p>${topic.description}</p>` : ''}
                         ${topic.attemptCount > 0 ? `
                         <div class="topic-meta">
